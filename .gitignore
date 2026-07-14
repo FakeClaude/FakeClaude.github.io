@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+dist/
+.env
+.env.production
+.idea
+scripts/serviceAccount.json
+.firebase/hosting.ZGlzdA.cache
+src/A_alllogic.jsx

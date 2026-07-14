@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "Light Mode": "Светлая тема",
+    "Dark Mode": "Тёмная тема",
+    "Create Event": "Создать событие",
+    "Language": "Язык",
+    "About": "О проекте",
+    "Best": "Лучшие",
+    "New": "Новые",
+    "Following": "Подписки",
+    "My Events": "Мои события",
+    "Follow": "Подписаться",
+    "Unfollow": "Отписаться",
+    "Followers": "Подписчики",
+    "Basis": "Основание",
+    "Edit": "Редактировать",
+    "Add Related News": "Добавить связанные новости",
+    "No following yet,You can follow without logging in": "Пока нет подписок. Вы можете подписываться без входа в аккаунт",
+    "No events yet,You can create events without logging in": "Пока нет событий, вы можете создавать события без входа в систему"
+  },
+  "create": {
+    "Event": "Событие",
+    "Base Probability": "Базовая вероятность",
+    "Related News": "Связанные новости",
+    "Occurred On": "Произошло",
+    "Source Link": "Ссылка на источник",
+    "Positive": "Положительное",
+    "or": "или",
+    "Negative": "Отрицательное",
+    "I agree to the": "Я согласен с",
+    "Disclaimer": "Отказом от ответственности",
+    "Confirm": "Подтвердить",
+    "Delete": "Удалить",
+"Are you sure you want to delete this proposition and all news?": "Вы уверены, что хотите удалить это утверждение и все новости?",
+"Are you sure you want to delete this news?": "Вы уверены, что хотите удалить эту новость?",
+  "Bayesian Mode": "Байесовский режим",
+    "Express Mode": "Быстрый режим",
+    "Probability of this news if Event happens": "Вероятность этой новости, если событие произойдет",
+    "Probability of this news if Event doesn't happen": "Вероятность этой новости, если событие не произойдет"
+  }
+}

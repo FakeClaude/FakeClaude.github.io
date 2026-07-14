@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "Light Mode": "ライトモード",
+    "Dark Mode": "ダークモード",
+    "Create Event": "命題作成",
+    "Language": "言語",
+    "About": "概要",
+    "Best": "注目",
+    "New": "最新",
+    "Following": "フォロー中",
+    "My Events": "マイイベント",
+    "Follow": "フォローする",
+    "Unfollow": "フォロー解除",
+    "Followers": "フォロワー",
+    "Basis": "根拠",
+    "Edit": "編集",
+    "Add Related News": "関連ニュースを追加",
+    "No following yet,You can follow without logging in": "フォロー中のユーザーはまだいません。ログインなしでフォローできます",
+    "No events yet,You can create events without logging in": "まだイベントはありません。ログインせずにイベントを作成できます"
+  },
+  "create": {
+    "Event": "イベント名",
+    "Base Probability": "基準確率",
+    "Related News": "関連ニュース",
+    "Occurred On": "発生日時",
+    "Source Link": "ソースリンク",
+    "Positive": "ポジティブ",
+    "or": "または",
+    "Negative": "ネガティブ",
+    "I agree to the": "私は",
+    "Disclaimer": "免責事項に同意します",
+    "Confirm": "確認",
+    "Delete": "削除",
+"Are you sure you want to delete this proposition and all news?": "この命題とすべてのニュースを削除してもよろしいですか？",
+"Are you sure you want to delete this news?": "このニュースを削除してもよろしいですか？",
+  "Bayesian Mode": "ベイズモード",
+    "Express Mode": "クイックモード",
+    "Probability of this news if Event happens": "イベント発生時にこのニュースが出る確率",
+    "Probability of this news if Event doesn't happen": "イベント不発生時にこのニュースが出る確率"
+  }
+}

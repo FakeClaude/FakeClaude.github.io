@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "Light Mode": "Mode clair",
+    "Dark Mode": "Mode sombre",
+    "Create Event": "Créer un événement",
+    "Language": "Langue",
+    "About": "À propos",
+    "Best": "Meilleurs",
+    "New": "Nouveaux",
+    "Following": "Abonnements",
+    "My Events": "Mes événements",
+    "Follow": "Suivre",
+    "Unfollow": "Ne plus suivre",
+    "Followers": "Abonnés",
+    "Basis": "Base",
+    "Edit": "Modifier",
+    "Add Related News": "Ajouter des actualités associées",
+    "No following yet,You can follow without logging in": "Aucun abonnement pour l'instant. Vous pouvez vous abonner sans vous connecter",
+    "No events yet,You can create events without logging in": "Pas encore d'événements, vous pouvez créer des événements sans vous connecter"
+  },
+  "create": {
+    "Event": "Événement",
+    "Base Probability": "Probabilité de base",
+    "Related News": "Actualités associées",
+    "Occurred On": "Survenu le",
+    "Source Link": "Lien de la source",
+    "Positive": "Positif",
+    "or": "ou",
+    "Negative": "Négatif",
+    "I agree to the": "J'accepte les",
+    "Disclaimer": "conditions de non-responsabilité",
+    "Confirm": "Confirmer",
+    "Delete": "Supprimer",
+"Are you sure you want to delete this proposition and all news?": "Êtes-vous sûr de vouloir supprimer cette proposition et toutes les actualités ?",
+"Are you sure you want to delete this news?": "Êtes-vous sûr de vouloir supprimer cette actualité ?",
+    "Bayesian Mode": "Mode bayésien",
+    "Express Mode": "Mode express",
+    "Probability of this news if Event happens": "Probabilité de cette nouvelle si l'événement se produit",
+    "Probability of this news if Event doesn't happen": "Probabilité de cette nouvelle si l'événement ne se produit pas"
+}
+}

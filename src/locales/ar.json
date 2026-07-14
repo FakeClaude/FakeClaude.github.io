@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "Light Mode": "الوضع الفاتح",
+    "Dark Mode": "الوضع الداكن",
+    "Create Event": "إنشاء حدث",
+    "Language": "اللغة",
+    "About": "حول",
+    "Best": "الأفضل",
+    "New": "الأحدث",
+    "Following": "المتابعة",
+    "My Events": "أحداثي",
+    "Follow": "متابعة",
+    "Unfollow": "إلغاء المتابعة",
+    "Followers": "المتابعون",
+    "Basis": "الأساس",
+    "Edit": "تعديل",
+    "Add Related News": "إضافة أخبار ذات صلة",
+    "No following yet,You can follow without logging in": "لا توجد متابعات بعد، يمكنك المتابعة دون تسجيل الدخول",
+    "No events yet,You can create events without logging in": "لا توجد أحداث بعد، يمكنك إنشاء أحداث دون تسجيل الدخول"
+  },
+  "create": {
+    "Event": "الحدث",
+    "Base Probability": "الاحتمالية الأساسية",
+    "Related News": "أخبار ذات صلة",
+    "Occurred On": "حدث في",
+    "Source Link": "رابط المصدر",
+    "Positive": "إيجابي",
+    "or": "أو",
+    "Negative": "سلبي",
+    "I agree to the": "أوافق على",
+    "Disclaimer": "إخلاء المسؤولية",
+    "Confirm": "تأكيد",
+    "Delete": "حذف",
+"Are you sure you want to delete this proposition and all news?": "هل أنت متأكد أنك تريد حذف هذا الاقتراح وجميع الأخبار؟",
+"Are you sure you want to delete this news?": "هل أنت متأكد أنك تريد حذف هذا الخبر؟",
+  "Bayesian Mode": "النمط البايزي",
+    "Express Mode": "النمط السريع",
+    "Probability of this news if Event happens": "احتمالية ظهور هذا الخبر في حال وقوع الحدث",
+    "Probability of this news if Event doesn't happen": "احتمالية ظهور هذا الخبر في حال عدم وقوع الحدث"
+  }
+}

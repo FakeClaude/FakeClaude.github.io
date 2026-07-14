@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "Light Mode": "लाइट मोड",
+    "Dark Mode": "डार्क मोड",
+    "Create Event": "इवेंट बनाएं",
+    "Language": "भाषा",
+    "About": "के बारे में",
+    "Best": "सर्वश्रेष्ठ",
+    "New": "नया",
+    "Following": "फ़ॉलो कर रहे हैं",
+    "My Events": "मेरे इवेंट",
+    "Follow": "फ़ॉलो करें",
+    "Unfollow": "अनफ़ॉलो करें",
+    "Followers": "फ़ॉलोअर्स",
+    "Basis": "आधार",
+    "Edit": "संपादित करें",
+    "Add Related News": "संबंधित समाचार जोड़ें",
+    "No following yet,You can follow without logging in": "अभी तक कोई फ़ॉलोइंग नहीं है, आप बिना लॉग इन किए फ़ॉलो कर सकते हैं",
+    "No events yet,You can create events without logging in": "अभी तक कोई इवेंट नहीं है, आप बिना लॉगिन किए इवेंट बना सकते हैं"
+  },
+  "create": {
+    "Event": "इवेंट",
+    "Base Probability": "मूल संभावना",
+    "Related News": "संबंधित समाचार",
+    "Occurred On": "इस दिन हुआ",
+    "Source Link": "स्रोत लिंक",
+    "Positive": "सकारात्मक",
+    "or": "या",
+    "Negative": "नकारात्मक",
+    "I agree to the": "मैं सहमत हूँ",
+    "Disclaimer": "अस्वीकरण से",
+    "Confirm": "पुष्टि करें",
+    "Delete": "हटाएं",
+"Are you sure you want to delete this proposition and all news?": "क्या आप पक्का इस प्रस्ताव और सभी समाचारों को हटाना चाहते हैं?",
+"Are you sure you want to delete this news?": "क्या आप पक्का इस समाचार को हटाना चाहते हैं?",
+   "Bayesian Mode": "बेयसियन मोड",
+    "Express Mode": "एक्सप्रेस मोड",
+    "Probability of this news if Event happens": "यदि घटना घटित होती है तो इस समाचार की संभावना",
+    "Probability of this news if Event doesn't happen": "यदि घटना घटित नहीं होती है तो इस समाचार की संभावना"
+  }
+}

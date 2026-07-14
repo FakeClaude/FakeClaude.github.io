@@ -1,0 +1,41 @@
+{
+  "nav": {
+    "Light Mode": "Modo claro",
+    "Dark Mode": "Modo escuro",
+    "Create Event": "Criar evento",
+    "Language": "Idioma",
+    "About": "Sobre",
+    "Best": "Melhores",
+    "New": "Novos",
+    "Following": "Seguindo",
+    "My Events": "Meus eventos",
+    "Follow": "Seguir",
+    "Unfollow": "Deixar de seguir",
+    "Followers": "Seguidores",
+    "Basis": "Base",
+    "Edit": "Editar",
+    "Add Related News": "Adicionar notícias relacionadas",
+    "No following yet,You can follow without logging in": "Nenhum seguimento ainda. Você pode seguir sem fazer login",
+    "No events yet,You can create events without logging in": "Ainda não há eventos, você pode criar eventos sem fazer login"
+  },
+  "create": {
+    "Event": "Evento",
+    "Base Probability": "Probabilidade base",
+    "Related News": "Notícias relacionadas",
+    "Occurred On": "Ocorrido em",
+    "Source Link": "Link da fonte",
+    "Positive": "Positivo",
+    "or": "ou",
+    "Negative": "Negativo",
+    "I agree to the": "Eu concordo com o",
+    "Disclaimer": "Aviso de isenção de responsabilidade",
+    "Confirm": "Confirmar",
+    "Delete": "Excluir",
+"Are you sure you want to delete this proposition and all news?": "Tem certeza de que deseja excluir esta proposição e todas as notícias?",
+"Are you sure you want to delete this news?": "Tem certeza de que deseja excluir esta notícia?",
+  "Bayesian Mode": "Modo Bayesiano",
+    "Express Mode": "Modo expresso",
+    "Probability of this news if Event happens": "Probabilidade desta notícia se o evento ocorrer",
+    "Probability of this news if Event doesn't happen": "Probabilidade desta notícia se o evento não ocorrer"
+  }
+}

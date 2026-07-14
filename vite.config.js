@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => {
     plugins: [preact()],
     base: env.VITE_BASE_URL,
     build: {
+      outDir: "docs",
       target: 'esnext',
       minify: 'terser', // 核心：使用 Terser 进行深度混淆
       terserOptions: {

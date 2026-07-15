@@ -4,9 +4,9 @@ import { useState, useRef } from "preact/hooks";
 import "./main.css";
 
 export default function Home() {
-  const [userName] = useState("Steven");
-  const [model] = useState("Sonnet 5");
-  const [effort] = useState("Low");
+  const [userName] = useState("Idiot");
+  const [model] = useState("Fable 5");
+  const [effort] = useState("Max");
   const [text, setText] = useState("");
   const textareaRef = useRef(null);
 
@@ -24,6 +24,14 @@ export default function Home() {
     return "Evening";
   }
 
+  function handleSend() {
+  if (!text.trim()) return;  // 没内容不执行
+  console.log("发送内容:", text);  // 这里以后换成真正的处理逻辑
+  setText("");
+  const el = textareaRef.current;
+  el.style.height = "56px";  // 还原成初始高度
+}
+
   return (
     <div class="home">
       <div class="greeting">
@@ -39,14 +47,22 @@ export default function Home() {
             value={text}
             onInput={handleInput}
         />
-        <div class="input-toolbar">
-          <div class="model-select">
-            <span class="model-name">{model}</span>
-            <span class="effort-label">{effort}</span>
-            <span class="chevron"> </span>
-          </div>
-        </div>
-      </div>
-    </div>
+        <div className="input-toolbar" >
+          <div className="model-select" >
+            <span className="model-name" >{model}</span >
+            <span className="effort-label" >{effort}</span >
+            <span className="chevron" > </span >
+          </div >
+
+          <div
+  className={`input-send ${text.trim() ? "" : "input-send-disabled"}`}
+  onClick={handleSend}
+>
+  <span className="input-send-icon"></span>
+</div>
+
+        </div >
+      </div >
+    </div >
   );
 }

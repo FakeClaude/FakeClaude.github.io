@@ -9,13 +9,16 @@ export default function Home() {
   const [effort] = useState("Max");
   const [text, setText] = useState("");
   const textareaRef = useRef(null);
+  const [started, setStarted] = useState(false);
+const [messages, setMessages] = useState([]);
 
   function handleInput(e) {
-    setText(e.target.value);
-    const el = textareaRef.current;
-    el.style.height = "auto";           // 先重置,避免只增不减
-    el.style.height = el.scrollHeight + "px";  // 再按实际内容高度赋值
-  }
+  setText(e.target.value);
+  const el = textareaRef.current;
+  const minH = started ? 24 : 52;
+  el.style.height = "auto";
+  el.style.height = Math.max(el.scrollHeight, minH) + "px";
+}
 
   function getGreeting() {
     const hour = new Date().getHours();
@@ -25,24 +28,36 @@ export default function Home() {
   }
 
   function handleSend() {
-  if (!text.trim()) return;  // 没内容不执行
-  console.log("发送内容:", text);  // 这里以后换成真正的处理逻辑
+  if (!text.trim()) return;
+  setMessages([...messages, text]);
+  setStarted(true);
   setText("");
   const el = textareaRef.current;
-  el.style.height = "56px";  // 还原成初始高度
+  el.style.height = "24px";
 }
 
   return (
-    <div class="home">
+     <div class={`home ${started ? "home-started" : ""}`}>
+    {!started && (
       <div class="greeting">
-        <span class="greeting-icon"> </span>
+        <span class="greeting-icon"></span>
         <span>{getGreeting()}, {userName}</span>
       </div>
+    )}
+
+    {started && (
+      <div class="message-list">
+        {messages.map((msg, i) => (
+          <div class="message-bubble" key={i}>{msg}</div>
+        ))}
+      </div>
+    )}
 
       <div class="input-card">
         <textarea
             ref={textareaRef}
-            class="input-textarea"
+            rows={1}
+            className={`input-textarea ${started ? "input-textarea-compact" : ""}`}
             placeholder="How can I help you today?"
             value={text}
             onInput={handleInput}

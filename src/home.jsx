@@ -1,17 +1,22 @@
 // home.jsx
 import { h } from "preact";
-import { useState } from "preact/hooks";
+import { useState, useRef } from "preact/hooks";
 import "./main.css";
 
 export default function Home() {
-  // 用户名,先写死,后面可以改成从设置里读取
   const [userName] = useState("Steven");
-
-  // 当前选中的模型和效果等级,先写死,下一步做成可切换
   const [model] = useState("Sonnet 5");
   const [effort] = useState("Low");
+  const [text, setText] = useState("");
+  const textareaRef = useRef(null);
 
-  // 根据当前时间生成问候语(早上/下午/晚上好)
+  function handleInput(e) {
+    setText(e.target.value);
+    const el = textareaRef.current;
+    el.style.height = "auto";           // 先重置,避免只增不减
+    el.style.height = el.scrollHeight + "px";  // 再按实际内容高度赋值
+  }
+
   function getGreeting() {
     const hour = new Date().getHours();
     if (hour < 12) return "Morning";
@@ -28,14 +33,17 @@ export default function Home() {
 
       <div class="input-card">
         <textarea
-          class="input-textarea"
-          placeholder="How can I help you today?"
+            ref={textareaRef}
+            class="input-textarea"
+            placeholder="How can I help you today?"
+            value={text}
+            onInput={handleInput}
         />
         <div class="input-toolbar">
           <div class="model-select">
             <span class="model-name">{model}</span>
             <span class="effort-label">{effort}</span>
-            <span class="chevron">▾</span>
+            <span class="chevron"> </span>
           </div>
         </div>
       </div>

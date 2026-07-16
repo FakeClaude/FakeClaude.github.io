@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "preact/hooks";
 import "./main.css";
 
 export default function Home() {
+  const [aiReplies, setAiReplies] = useState([]);
   const thinkingStartTime = useRef(null);
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingSvg, setThinkingSvg] = useState(null);
@@ -28,7 +29,7 @@ export default function Home() {
     if (hour < 18) return "Afternoon";
     return "Evening";
   }
-  function handleSend() {
+  async function handleSend() {
   if (!text.trim()) return;
   setMessages([...messages, text]);
   setStarted(true);
@@ -38,6 +39,20 @@ export default function Home() {
 
   setIsThinking(true);
   thinkingStartTime.current = Date.now();
+
+  // 请求数据库拿真实回答
+  const res = await fetch("/api/reply", { method: "POST" });
+  const data = await res.json();
+
+  // 按之前的思路:等到动画播完当前整数倍周期,再停止思考、显示回答
+  const dur = 700; // 对应你SVG里的 dur="0.7s",单位毫秒
+  const elapsed = Date.now() - thinkingStartTime.current;
+  const remain = dur - (elapsed % dur);
+
+  setTimeout(() => {
+    setIsThinking(false);
+    setAiReplies((prev) => [...prev, data.text]);
+  }, remain);
 }
   function handleKeyDown(e) {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
@@ -81,6 +96,9 @@ export default function Home() {
                    <span class="thinking-text" >Thinking </span >
                  </div >
              )}
+               {!isThinking && aiReplies.map((reply, i) => (
+      <div class="ai-reply" key={i}>{reply}</div>
+    ))}
 
            </div >
        )}

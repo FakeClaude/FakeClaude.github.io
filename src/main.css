@@ -109,7 +109,7 @@ html, body {
 .input-card {
     max-height: 60vh;
     overflow-y: auto;
-    width: 664px;
+    width: 668px;
     max-width: 90vw;
     background: var(--card-bg);
     border-radius: 20px;
@@ -119,6 +119,8 @@ html, body {
     flex-direction: column;
     border: .5px solid transparent;
     transition: border-color 0.2s ease;
+       scrollbar-width: thin;
+    scrollbar-color: var(--text-placeholder) transparent;
 }
 .input-card:hover {
     border-color: var(--text-white-20);
@@ -152,10 +154,6 @@ html, body {
 }
 .input-card::-webkit-scrollbar-thumb:hover {
     background: var(--text-placeholder);
-}
-.input-card {
-    scrollbar-width: thin;
-    scrollbar-color: var(--text-placeholder) transparent;
 }
 
 .input-toolbar {

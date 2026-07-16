@@ -78,7 +78,7 @@ export default function Home() {
                        class="thinking-icon"
                        dangerouslySetInnerHTML={{__html: thinkingSvg}}
                    />
-                   <span class="thinking-text" >Thinking</span >
+                   <span class="thinking-text" >Thinking </span >
                  </div >
              )}
 

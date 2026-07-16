@@ -8,7 +8,7 @@ export default function Home() {
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingSvg, setThinkingSvg] = useState(null);
   const [userName] = useState("Idiot");
-  const [model] = useState("Fable 5");
+  const [model] = useState("Idiot 5");
   const [effort] = useState("Max");
   const [text, setText] = useState("");
   const textareaRef = useRef(null);

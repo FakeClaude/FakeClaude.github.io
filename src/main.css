@@ -212,3 +212,46 @@ html, body {
     pointer-events: none;
 }
 
+.thinking-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+.thinking-icon svg {
+    width: 100%;
+    height: 100%;
+}
+.thinking-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    align-self: flex-start;
+    margin-top: 4px;
+}
+
+.thinking-text {
+    font-size: 15px;
+    background: linear-gradient(
+        90deg,
+        var(--text-main) 0%,
+        var(--text-placeholder) 50%,
+        var(--text-main) 100%
+    );
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: shimmer 2.6s linear infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    60% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}

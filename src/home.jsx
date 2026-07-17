@@ -72,6 +72,9 @@ export default function Home() {
   useEffect(() => {
   textareaRef.current?.focus();
 }, []);
+  useEffect(() => {
+  window.scrollTo(0, document.body.scrollHeight);
+}, [messages, isThinking]);
   // </editor-fold>
 
   return (
@@ -85,7 +88,9 @@ export default function Home() {
     )}
 
        {started && (
-           <div className="message-list" >
+           <div className="message-list"
+
+           >
              {messages.map((msg, i) =>
                  msg.role === "user" ? (
                      <div className="message-bubble" key={i} >{msg.text}</div >

@@ -71,7 +71,7 @@ html, body {
     flex-direction: column;
     align-items: flex-end;  /* 消息靠右对齐 */
     gap: 16px;
-    padding: 16px 0 140px 0;
+    padding: 16px 0 160px 0;
 }
 .message-bubble {
     background: var(--black-70);
@@ -303,4 +303,11 @@ html, body {
     font-size: 15px;
     line-height: 1.6;
     max-width: 90%;
+}
+.typewriter-chunk {
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+.typewriter-chunk.visible {
+    opacity: 1;
 }

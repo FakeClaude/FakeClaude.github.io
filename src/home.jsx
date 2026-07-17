@@ -2,10 +2,33 @@
 import { h } from "preact";
 import { useState, useRef, useEffect } from "preact/hooks";
 import "./main.css";
+import { useTypewriter } from "./utils/useTypewriter";
+
+function TypewriterText({ text, onChunkVisible }) {
+  const chunks = useTypewriter(text, 200);
+
+  useEffect(() => {
+    onChunkVisible?.();
+  }, [chunks]);
+
+  return (
+    <div class="ai-reply">
+      {chunks.map((chunk, i) => (
+        <span
+          key={i}
+          class={`typewriter-chunk ${chunk.visible ? "visible" : ""}`}
+        >
+          {chunk.text}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export default function Home() {
 
   // <editor-fold desc="const">
+  const userScrolledUp = useRef(false);
   const thinkingStartTime = useRef(null);
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingSvg, setThinkingSvg] = useState(null);
@@ -32,6 +55,7 @@ export default function Home() {
   }
   async function handleSend() {
     if (!text.trim()) return;
+    userScrolledUp.current = false;
     const userText = text;
     setMessages((prev) => [...prev, {role: "user", text: userText}]);
   setStarted(true);
@@ -57,12 +81,46 @@ export default function Home() {
   }, remain);
 }
   function handleKeyDown(e) {
-    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-      e.preventDefault();
-      handleSend();
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    handleSend();
+  }
+}
+  function scrollToKeepDistance() {
+  if (userScrolledUp.current) return;
+
+  const card = document.querySelector(".input-card");
+  const list = document.querySelector(".message-list");
+  if (!card || !list || !list.lastElementChild) return;
+
+  const cardTop = card.getBoundingClientRect().top;
+  const lastBottom = list.lastElementChild.getBoundingClientRect().bottom;
+  const gap = cardTop - lastBottom;
+
+  const vh = window.innerHeight;
+  const minGap = vh * 0.05;
+  const maxGap = vh * 0.06;
+
+  console.log("[scrollToKeepDistance] gap=", gap, "minGap=", minGap, "maxGap=", maxGap);
+
+  if (gap >= minGap && gap <= maxGap) return;
+
+  const target = window.scrollY - (gap - vh * 0.055);
+  console.log("[scrollToKeepDistance] scrollY=", window.scrollY, "-> target=", target);
+  window.scrollTo(0, target);
+}
+
+  useEffect(() => {
+  function handleWheel(e) {
+    console.log("[wheel]", "deltaY=", e.deltaY, "userScrolledUp(before)=", userScrolledUp.current);
+    if (e.deltaY < 0) {
+      userScrolledUp.current = true;
+      console.log("[wheel] -> userScrolledUp 设为 true");
     }
   }
-
+  window.addEventListener("wheel", handleWheel, { passive: true });
+  return () => window.removeEventListener("wheel", handleWheel);
+}, []);
   useEffect(() => {
     fetch("/loading_thinking.svg")
         .then((res) => res.text())
@@ -73,7 +131,7 @@ export default function Home() {
   textareaRef.current?.focus();
 }, []);
   useEffect(() => {
-  window.scrollTo(0, document.body.scrollHeight);
+  scrollToKeepDistance();
 }, [messages, isThinking]);
   // </editor-fold>
 
@@ -95,7 +153,7 @@ export default function Home() {
                   msg.role === "user" ? (
                       <div className="message-bubble" key={i} >{msg.text}</div >
                   ) : (
-                      <div className="ai-reply" key={i} >{msg.text}</div >
+                      <TypewriterText text={msg.text} key={i} onChunkVisible={scrollToKeepDistance} />
                   )
               )}
 

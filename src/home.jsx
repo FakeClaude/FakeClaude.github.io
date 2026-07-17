@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from "preact/hooks";
 import "./main.css";
 
 export default function Home() {
-  const [aiReplies, setAiReplies] = useState([]);
+
+
   const thinkingStartTime = useRef(null);
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingSvg, setThinkingSvg] = useState(null);
@@ -30,8 +31,9 @@ export default function Home() {
     return "Evening";
   }
   async function handleSend() {
-  if (!text.trim()) return;
-  setMessages([...messages, text]);
+    if (!text.trim()) return;
+    const userText = text;
+    setMessages((prev) => [...prev, {role: "user", text: userText}]);
   setStarted(true);
   setText("");
   const el = textareaRef.current;
@@ -51,7 +53,7 @@ export default function Home() {
 
   setTimeout(() => {
     setIsThinking(false);
-    setAiReplies((prev) => [...prev, data.text]);
+    setMessages((prev) => [...prev, { role: "ai", text: data.text }]);
   }, remain);
 }
   function handleKeyDown(e) {
@@ -82,28 +84,28 @@ export default function Home() {
     )}
 
        {started && (
-           <div class="message-list" >
-             {messages.map((msg, i) => (
-                 <div class="message-bubble" key={i} >{msg}</div >
-             ))}
+           <div className="message-list" >
+             {messages.map((msg, i) =>
+                 msg.role === "user" ? (
+                     <div className="message-bubble" key={i} >{msg.text}</div >
+                 ) : (
+                     <div className="ai-reply" key={i} >{msg.text}</div >
+                 )
+             )}
 
              {isThinking && thinkingSvg && (
-                 <div class="thinking-wrapper" >
+                 <div className="thinking-wrapper" >
                    <div
-                       class="thinking-icon"
+                       className="thinking-icon"
                        dangerouslySetInnerHTML={{__html: thinkingSvg}}
                    />
-                   <span class="thinking-text" >Thinking </span >
+                   <span className="thinking-text" >Thinking </span >
                  </div >
              )}
-               {!isThinking && aiReplies.map((reply, i) => (
-      <div class="ai-reply" key={i}>{reply}</div>
-    ))}
-
            </div >
        )}
 
-      <div class="input-card">
+       <div class="input-card" >
         <textarea
             ref={textareaRef}
             rows={1}
@@ -113,9 +115,9 @@ export default function Home() {
             onInput={handleInput}
             onKeyDown={handleKeyDown}
         />
-        <div className="input-toolbar" >
-          <div className="model-select" >
-            <span className="model-name" >{model}</span >
+         <div className="input-toolbar" >
+           <div className="model-select" >
+             <span className="model-name" >{model}</span >
             <span className="effort-label" >{effort}</span >
             <span className="chevron" > </span >
           </div >

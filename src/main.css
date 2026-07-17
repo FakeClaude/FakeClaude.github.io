@@ -264,7 +264,7 @@ html, body {
 
 .ai-reply {
     align-self: flex-start;
-    color: var(--text-main);
+    color: var(--text-white);
     font-size: 15px;
     line-height: 1.6;
     max-width: 90%;

@@ -78,40 +78,41 @@ export default function Home() {
   // </editor-fold>
 
   return (
-     <div class={`home ${started ? "home-started" : ""}`}>
+      <div className={`home ${started ? "home-started" : ""}`} >
 
-    {!started && (
-      <div class="greeting">
-        <span class="greeting-icon"></span>
-        <span>{getGreeting()}, {userName}</span>
-      </div>
-    )}
+        {!started && (
+            <div className="greeting" >
+              <span class="greeting-icon" ></span >
+              <span >{getGreeting()}, {userName}</span >
+            </div >
+        )}
 
-       {started && (
-           <div className="message-list"
+        {started && (
+            <div className="message-list"
 
-           >
-             {messages.map((msg, i) =>
-                 msg.role === "user" ? (
-                     <div className="message-bubble" key={i} >{msg.text}</div >
-                 ) : (
-                     <div className="ai-reply" key={i} >{msg.text}</div >
-                 )
-             )}
+            >
+              {messages.map((msg, i) =>
+                  msg.role === "user" ? (
+                      <div className="message-bubble" key={i} >{msg.text}</div >
+                  ) : (
+                      <div className="ai-reply" key={i} >{msg.text}</div >
+                  )
+              )}
 
-             {isThinking && thinkingSvg && (
-                 <div className="thinking-wrapper" >
-                   <div
-                       className="thinking-icon"
-                       dangerouslySetInnerHTML={{__html: thinkingSvg}}
-                   />
-                   <span className="thinking-text" >Thinking </span >
-                 </div >
-             )}
-           </div >
-       )}
+              {isThinking && thinkingSvg && (
+                  <div className="thinking-wrapper" >
+                    <div
+                        className="thinking-icon"
+                        dangerouslySetInnerHTML={{__html: thinkingSvg}}
+                    />
+                    <span className="thinking-text" >Thinking </span >
+                  </div >
+              )}
+            </div >
+        )}
 
-       <div class="input-card" >
+        <div className="input-footer" >
+          <div className="input-card" >
         <textarea
             ref={textareaRef}
             rows={1}
@@ -121,22 +122,25 @@ export default function Home() {
             onInput={handleInput}
             onKeyDown={handleKeyDown}
         />
-         <div className="input-toolbar" >
-           <div className="model-select" >
-             <span className="model-name" >{model}</span >
-            <span className="effort-label" >{effort}</span >
-            <span className="chevron" > </span >
-          </div >
+            <div className="input-toolbar" >
+              <div className="model-select" >
+                <span className="model-name" >{model}</span >
+                <span className="effort-label" >{effort}</span >
+                <span className="chevron" > </span >
+              </div >
 
-          <div
-  className={`input-send ${text.trim() ? "" : "input-send-disabled"}`}
-  onClick={handleSend}
->
-  <span className="input-send-icon"></span>
+              <div
+                  className={`input-send ${text.trim() ? "" : "input-send-disabled"}`}
+                  onClick={handleSend}
+              >
+                <span className="input-send-icon" ></span >
+              </div >
+
+            </div >
+          </div >
+          <p class="input-footer-disclaimer">FakeClaude can make mistakes. But makes far fewer mistakes than humans.</p>
 </div>
 
         </div >
-      </div >
-    </div >
-  );
-}
+        );
+        }

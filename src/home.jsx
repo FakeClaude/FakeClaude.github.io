@@ -5,7 +5,7 @@ import "./main.css";
 
 export default function Home() {
 
-
+  // <editor-fold desc="const">
   const thinkingStartTime = useRef(null);
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingSvg, setThinkingSvg] = useState(null);
@@ -72,6 +72,7 @@ export default function Home() {
   useEffect(() => {
   textareaRef.current?.focus();
 }, []);
+  // </editor-fold>
 
   return (
      <div class={`home ${started ? "home-started" : ""}`}>

@@ -98,14 +98,14 @@ export default function Home() {
   const gap = cardTop - lastBottom;
 
   const vh = window.innerHeight;
-  const minGap = vh * 0.05;
-  const maxGap = vh * 0.06;
+  const minGap = vh * 0.1;
+  const maxGap = vh * 0.2;
 
   console.log("[scrollToKeepDistance] gap=", gap, "minGap=", minGap, "maxGap=", maxGap);
 
   if (gap >= minGap && gap <= maxGap) return;
 
-  const target = window.scrollY - (gap - vh * 0.055);
+  const target = window.scrollY - (gap - vh * 0.15);
   console.log("[scrollToKeepDistance] scrollY=", window.scrollY, "-> target=", target);
   window.scrollTo(0, target);
 }
@@ -125,7 +125,7 @@ export default function Home() {
     fetch("/loading_thinking.svg")
         .then((res) => res.text())
         .then((svgText) => setThinkingSvg(svgText))
-        .catch((err) => console.error("加载动画失败:", err));
+        .catch((err) => console.error("error", err));
   }, []);
   useEffect(() => {
   textareaRef.current?.focus();

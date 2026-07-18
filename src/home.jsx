@@ -4,23 +4,38 @@ import { useState, useRef, useEffect } from "preact/hooks";
 import "./main.css";
 import { useTypewriter } from "./utils/useTypewriter";
 
-function TypewriterText({ text, onChunkVisible }) {
-  const chunks = useTypewriter(text, 200);
+function TypewriterText({ text, onChunkVisible, isLatest }) {
+  const { chunks, done } = useTypewriter(text, 200);
+  const [isSending, setIsSending] = useState(true);
+  const sendingStartTime = useRef(Date.now());
 
   useEffect(() => {
     onChunkVisible?.();
-  }, [chunks]);
+
+    if (done && isSending) {
+      const dur = 700;
+      const elapsed = Date.now() - sendingStartTime.current;
+      const remain = dur - (elapsed % dur);
+      const timer = setTimeout(() => setIsSending(false), remain);
+      return () => clearTimeout(timer);
+    }
+  }, [chunks, done]);
 
   return (
     <div class="ai-reply">
-      {chunks.map((chunk, i) => (
-        <span
-          key={i}
-          class={`typewriter-chunk ${chunk.visible ? "visible" : ""}`}
-        >
-          {chunk.text}
-        </span>
-      ))}
+      <div class="ai-reply-text">
+        {chunks.map((chunk, i) => (
+          <span key={i} class={`typewriter-chunk ${chunk.visible ? "visible" : ""}`}>
+            {chunk.text}
+          </span>
+        ))}
+      </div>
+
+      {isLatest && (
+        isSending
+          ? <img src="/loading_sending.svg" class="sending-icon" alt="" />
+          : <div class="sending-icon sending-icon-static" />
+      )}
     </div>
   );
 }
@@ -28,6 +43,7 @@ function TypewriterText({ text, onChunkVisible }) {
 export default function Home() {
 
   // <editor-fold desc="const">
+  const [sendingSvg, setSendingSvg] = useState(null);
   const userScrolledUp = useRef(false);
   const thinkingStartTime = useRef(null);
   const [isThinking, setIsThinking] = useState(false);
@@ -101,21 +117,16 @@ export default function Home() {
   const minGap = vh * 0.1;
   const maxGap = vh * 0.2;
 
-  console.log("[scrollToKeepDistance] gap=", gap, "minGap=", minGap, "maxGap=", maxGap);
-
   if (gap >= minGap && gap <= maxGap) return;
 
   const target = window.scrollY - (gap - vh * 0.15);
-  console.log("[scrollToKeepDistance] scrollY=", window.scrollY, "-> target=", target);
   window.scrollTo(0, target);
 }
 
   useEffect(() => {
   function handleWheel(e) {
-    console.log("[wheel]", "deltaY=", e.deltaY, "userScrolledUp(before)=", userScrolledUp.current);
     if (e.deltaY < 0) {
       userScrolledUp.current = true;
-      console.log("[wheel] -> userScrolledUp 设为 true");
     }
   }
   window.addEventListener("wheel", handleWheel, { passive: true });
@@ -127,6 +138,12 @@ export default function Home() {
         .then((svgText) => setThinkingSvg(svgText))
         .catch((err) => console.error("error", err));
   }, []);
+  useEffect(() => {
+  fetch("/loading_sending.svg")
+    .then((res) => res.text())
+    .then((svgText) => setSendingSvg(svgText))
+    .catch((err) => console.error("error", err));
+}, []);
   useEffect(() => {
   textareaRef.current?.focus();
 }, []);
@@ -153,7 +170,12 @@ export default function Home() {
                   msg.role === "user" ? (
                       <div className="message-bubble" key={i} >{msg.text}</div >
                   ) : (
-                      <TypewriterText text={msg.text} key={i} onChunkVisible={scrollToKeepDistance} />
+                      <TypewriterText
+    text={msg.text}
+    key={i}
+    onChunkVisible={scrollToKeepDistance}
+    isLatest={i === messages.length - 1}
+/>
                   )
               )}
 

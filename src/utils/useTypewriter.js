@@ -1,12 +1,15 @@
 // src/utils/useTypewriter.js
-import { useState, useEffect } from "preact/hooks";
+import { useState, useEffect, useRef } from "preact/hooks";
 
 export function useTypewriter(fullText, interval = 200) {
   const [chunks, setChunks] = useState([]);
+  const [done, setDone] = useState(false);
+  const totalRef = useRef(0);
 
   useEffect(() => {
     if (!fullText) {
       setChunks([]);
+      setDone(false);
       return;
     }
 
@@ -18,14 +21,14 @@ export function useTypewriter(fullText, interval = 200) {
       i += size;
     }
 
-    setChunks([]); // 从空数组开始,逐块 push,而不是一次性把全文放进 DOM
+    totalRef.current = rawChunks.length;
+    setChunks([]);
+    setDone(false);
 
     const timers = rawChunks.map((text, index) =>
       setTimeout(() => {
-        // 到点了,才把这一块加入 DOM(先是不可见状态)
         setChunks((prev) => [...prev, { text, visible: false }]);
 
-        // 等它被加入 DOM 的下一帧,再切换为可见,触发 opacity 过渡动画
         requestAnimationFrame(() => {
           setChunks((prev) => {
             const next = [...prev];
@@ -33,6 +36,10 @@ export function useTypewriter(fullText, interval = 200) {
             next[index] = { ...next[index], visible: true };
             return next;
           });
+          // 只有轮到最后一块、且它这一帧也标记为可见了,才算真正播完
+          if (index === totalRef.current - 1) {
+            setDone(true);
+          }
         });
       }, index * interval)
     );
@@ -40,5 +47,5 @@ export function useTypewriter(fullText, interval = 200) {
     return () => timers.forEach((t) => clearTimeout(t));
   }, [fullText, interval]);
 
-  return chunks;
+  return { chunks, done };
 }

@@ -197,7 +197,7 @@ export default function Home() {
             ref={textareaRef}
             rows={1}
             className={`input-textarea ${started ? "input-textarea-compact" : ""}`}
-            placeholder="How can I help you today?"
+            placeholder={started ? "Write a message…" : "How can I help you today?"}
             value={text}
             onInput={handleInput}
             onKeyDown={handleKeyDown}

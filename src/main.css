@@ -64,7 +64,7 @@ html, body {
 }
 .message-list {
     width: 720px;
-    max-width: 95vw;
+    max-width: 90vw;
     flex: 1;
     overflow-y: auto;
     display: flex;

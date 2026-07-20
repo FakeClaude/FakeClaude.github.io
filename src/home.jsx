@@ -251,7 +251,7 @@ export default function Home() {
 
             </div >
           </div >
-          <p class="input-footer-disclaimer">{t("home.FakeClaude can make mistakes. But makes far fewer mistakes than humans.")}</p>
+          <p class="input-footer-disclaimer">{t("home.FakeClaude can make mistakes, But makes far fewer mistakes than humans")}</p>
 </div>
 
         </div >

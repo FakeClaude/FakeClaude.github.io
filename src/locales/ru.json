@@ -6,7 +6,8 @@
     "Good Evening": "Добрый вечер",
     "Write a message…": "Напишите сообщение…",
     "How can I help you today?": "Чем я могу помочь вам сегодня?",
-    "FakeClaude can make mistakes. But makes far fewer mistakes than humans.": "FakeClaude может ошибаться, но гораздо реже, чем люди.",
+    "FakeClaude can make mistakes, But makes far fewer mistakes than humans":
+    "FakeClaude может ошибаться, но гораздо реже, чем люди",
     "Thinking": "Думаю"
   }
 }

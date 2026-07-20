@@ -1,0 +1,1 @@
+const e={Idiot:"バカ","Good Morning":"おはようございます","Good Afternoon":"こんにちは","Good Evening":"こんばんは","Write a message…":"メッセージを入力…","How can I help you today?":"今日はどのようにお手伝いしましょうか？","FakeClaude can make mistakes, But makes far fewer mistakes than humans":"FakeClaudeは間違えることがありますが、人間よりもはるかにミスは少ないです",Thinking:"考え中"},a={home:e};export{a as default,e as home};

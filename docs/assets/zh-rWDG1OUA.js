@@ -1,0 +1,1 @@
+const e={Idiot:"白痴","Good Morning":"早上好","Good Afternoon":"下午好","Good Evening":"晚上好","Write a message…":"输入消息…","How can I help you today?":"今天我能帮你什么？","FakeClaude can make mistakes, But makes far fewer mistakes than humans":"FakeClaude 可能会出错，但错误远比人类少",Thinking:"思考中"},a={home:e};export{a as default,e as home};

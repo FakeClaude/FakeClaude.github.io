@@ -1,1 +1,0 @@
-const e={Idiot:"바보","Good Morning":"좋은 아침입니다","Good Afternoon":"안녕하세요","Good Evening":"안녕하세요","Write a message…":"메시지를 입력하세요…","How can I help you today?":"오늘 무엇을 도와드릴까요?","FakeClaude can make mistakes. But makes far fewer mistakes than humans.":"FakeClaude도 실수를 할 수 있지만, 인간보다 훨씬 적게 실수합니다.",Thinking:"생각 중"},a={home:e};export{a as default,e as home};

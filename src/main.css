@@ -18,8 +18,8 @@
 }
 :root[data-theme="light"] {
     --home-bg: #faf9f5;
-    --black-70: rgba(255, 255, 255, 0.7);
-    --card-bg: #f0eee6;
+    --black-70: rgb(238, 238, 238);
+    --card-bg: #ffffff;
     --card-bg-hover: #e8e5db;
     --text-white: #000000;
     --text-white-20: rgba(0, 0, 0, 0.2);
@@ -245,7 +245,7 @@ html, body {
 .input-send-icon {
     width: 16px;
     height: 16px;
-    background-color: var(--text-white);
+    background-color: #fff;
     -webkit-mask: var(--send);
     mask: var(--send);
 }

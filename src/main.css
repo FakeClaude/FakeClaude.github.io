@@ -69,8 +69,8 @@ html, body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;  /* 消息靠右对齐 */
-    gap: 16px;
+    align-items: flex-end;
+    gap: 24px;
     padding: 16px 0 200px 0;
 }
 .message-bubble {

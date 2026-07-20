@@ -67,6 +67,7 @@ export default function Home() {
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState([]);
   const initialMessageCount = useRef(0);
+  const skipNextSave = useRef(false);
 
   function handleInput(e) {
   setText(e.target.value);
@@ -164,18 +165,21 @@ export default function Home() {
     idb.get("messages").then((saved) => {
       if (saved && saved.length > 0) {
         initialMessageCount.current = saved.length;
+        skipNextSave.current = true;
         setMessages(saved);
         setStarted(true);
       }
     });
   }, []);
-
-  // 每次消息变化时,自动保存到 IndexedDB
   useEffect(() => {
-    if (messages.length > 0) {
-      idb.set("messages", messages);
-    }
-  }, [messages]);
+  if (skipNextSave.current) {
+    skipNextSave.current = false;
+    return;
+  }
+  if (messages.length > 0) {
+    idb.set("messages", messages);
+  }
+}, [messages]);
   useEffect(() => {
     return initScrollMemory();
   }, []);

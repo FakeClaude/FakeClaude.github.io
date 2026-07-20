@@ -1,6 +1,7 @@
 // home.jsx
 import { h } from "preact";
 import { useState, useRef, useEffect } from "preact/hooks";
+import { useTranslation } from "react-i18next";
 import "./main.css";
 import { useTypewriter } from "./utils/useTypewriter";
 
@@ -41,6 +42,7 @@ function TypewriterText({ text, onChunkVisible, isLatest }) {
 }
 
 export default function Home() {
+  const { t } = useTranslation();
 
   // <editor-fold desc="const">
   const [sendingSvg, setSendingSvg] = useState(null);
@@ -48,7 +50,7 @@ export default function Home() {
   const thinkingStartTime = useRef(null);
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingSvg, setThinkingSvg] = useState(null);
-  const [userName] = useState("Idiot");
+  const [userName] = useState(t("home.Idiot"));
   const [model] = useState("Idiot 5");
   const [effort] = useState("Max");
   const [text, setText] = useState("");
@@ -65,9 +67,9 @@ export default function Home() {
 }
   function getGreeting() {
     const hour = new Date().getHours();
-    if (hour < 12) return "Morning";
-    if (hour < 18) return "Afternoon";
-    return "Evening";
+    if (hour < 12) return t("home.Good Morning");
+    if (hour < 18) return t("home.Good Afternoon");
+    return t("home.Good Evening");
   }
   async function handleSend() {
     if (!text.trim()) return;
@@ -185,7 +187,7 @@ export default function Home() {
                         className="thinking-icon"
                         dangerouslySetInnerHTML={{__html: thinkingSvg}}
                     />
-                    <span className="thinking-text" >Thinking </span >
+                    <span className="thinking-text" >{t("home.Thinking")} </span >
                   </div >
               )}
             </div >
@@ -197,7 +199,7 @@ export default function Home() {
             ref={textareaRef}
             rows={1}
             className={`input-textarea ${started ? "input-textarea-compact" : ""}`}
-            placeholder={started ? "Write a message…" : "How can I help you today?"}
+            placeholder={started ? t("home.Write a message…") : t("home.How can I help you today?")}
             value={text}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
@@ -218,7 +220,7 @@ export default function Home() {
 
             </div >
           </div >
-          <p class="input-footer-disclaimer">FakeClaude can make mistakes. But makes far fewer mistakes than humans.</p>
+          <p class="input-footer-disclaimer">{t("home.FakeClaude can make mistakes. But makes far fewer mistakes than humans.")}</p>
 </div>
 
         </div >

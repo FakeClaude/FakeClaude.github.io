@@ -1,42 +1,12 @@
 {
-  "nav": {
-    "Light Mode": "浅色模式",
-    "Dark Mode": "深色模式",
-    "Create Event": "创建命题",
-    "Language": "语言",
-    "About": "关于",
-    "Best": "最热",
-    "New": "最新",
-    "Following": "已关注",
-    "My Events": "我的命题",
-    "Follow": "关注",
-    "Unfollow": "取消关注",
-    "Followers": "已关注",
-    "Basis": "依据",
-    "Edit": "编辑",
-    "Add Related News": "添加相关新闻",
-    "No following yet,You can follow without logging in": "暂无关注，无需登录即可关注",
-    "No events yet,You can create events without logging in": "暂无创建命题，无需登录即可创建"
-  },
-  "create": {
-    "Event": "命题名称",
-    "Base Probability": "基础概率",
-    "Related News": "相关新闻",
-    "Occurred On": "发生时间",
-    "Source Link": "来源链接",
-    "Positive": "正向",
-    "or": "或",
-    "Negative": "负向",
-    "I agree to the": "我同意",
-    "Disclaimer": "免责声明",
-    "Confirm": "确认",
-    "Delete": "删除",
-    "Are you sure you want to delete this proposition and all news?": "确定要删除这个命题以及所有新闻吗？",
-    "Are you sure you want to delete this news?": "确定要删除这条新闻吗？",
-    "Bayesian Mode": "贝叶斯模式",
-    "Express Mode": "快速模式",
-    "Probability of this news if Event happens": "事件发生时此新闻出现的概率",
-    "Probability of this news if Event doesn't happen": "事件不发生时此新闻出现的概率"
-
+  "home": {
+    "Idiot": "白痴",
+    "Good Morning": "早上好",
+    "Good Afternoon": "下午好",
+    "Good Evening": "晚上好",
+    "Write a message…": "输入消息…",
+    "How can I help you today?": "今天我能帮你什么？",
+    "FakeClaude can make mistakes. But makes far fewer mistakes than humans.": "FakeClaude 可能会出错，但错误远比人类少。",
+    "Thinking": "思考中"
   }
 }

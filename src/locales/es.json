@@ -1,41 +1,12 @@
 {
-  "nav": {
-    "Light Mode": "Modo claro",
-    "Dark Mode": "Modo oscuro",
-    "Create Event": "Crear evento",
-    "Language": "Idioma",
-    "About": "Acerca de",
-    "Best": "Mejores",
-    "New": "Nuevos",
-    "Following": "Siguiendo",
-    "My Events": "Mis eventos",
-    "Follow": "Seguir",
-    "Unfollow": "Dejar de seguir",
-    "Followers": "Seguidores",
-    "Basis": "Base",
-    "Edit": "Editar",
-    "Add Related News": "Añadir noticias relacionadas",
-    "No following yet,You can follow without logging in": "Aún no sigues a nadie. Puedes seguir sin iniciar sesión",
-    "No events yet,You can create events without logging in": "Aún no hay eventos, puedes crear eventos sin iniciar sesión"
-  },
-  "create": {
-    "Event": "Evento",
-    "Base Probability": "Probabilidad base",
-    "Related News": "Noticias relacionadas",
-    "Occurred On": "Ocurrido el",
-    "Source Link": "Enlace de la fuente",
-    "Positive": "Positivo",
-    "or": "o",
-    "Negative": "Negativo",
-    "I agree to the": "Acepto los",
-    "Disclaimer": "Términos de exención de responsabilidad",
-    "Confirm": "Confirmar",
-    "Delete": "Eliminar",
-"Are you sure you want to delete this proposition and all news?": "¿Está seguro de que desea eliminar esta proposición y todas las noticias?",
-"Are you sure you want to delete this news?": "¿Está seguro de que desea eliminar esta noticia?",
-  "Bayesian Mode": "Modo bayesiano",
-    "Express Mode": "Modo exprés",
-    "Probability of this news if Event happens": "Probabilidad de esta noticia si el evento ocurre",
-    "Probability of this news if Event doesn't happen": "Probabilidad de esta noticia si el evento no ocurre"
+  "home": {
+    "Idiot": "Idiota",
+    "Good Morning": "Buenos días",
+    "Good Afternoon": "Buenas tardes",
+    "Good Evening": "Buenas noches",
+    "Write a message…": "Escribe un mensaje…",
+    "How can I help you today?": "¿Cómo puedo ayudarte hoy?",
+    "FakeClaude can make mistakes. But makes far fewer mistakes than humans.": "FakeClaude puede cometer errores. Pero muchos menos que los humanos.",
+    "Thinking": "Pensando"
   }
 }

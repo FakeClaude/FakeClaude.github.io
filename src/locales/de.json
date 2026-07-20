@@ -1,41 +1,12 @@
 {
-  "nav": {
-    "Light Mode": "Heller Modus",
-    "Dark Mode": "Dunkler Modus",
-    "Create Event": "Ereignis erstellen",
-    "Language": "Sprache",
-    "About": "Über",
-    "Best": "Beste",
-    "New": "Neu",
-    "Following": "Folge ich",
-    "My Events": "Meine Ereignisse",
-    "Follow": "Folgen",
-    "Unfollow": "Entfolgen",
-    "Followers": "Follower",
-    "Basis": "Basis",
-    "Edit": "Ändern",
-    "Add Related News": "Verwandte Nachrichten hinzufügen",
-    "No following yet,You can follow without logging in": "Noch keine Abonnements. Sie können auch ohne Anmeldung folgen",
-    "No events yet,You can create events without logging in": "Noch keine Ereignisse, Sie können Ereignisse ohne Anmeldung erstellen"
-  },
-  "create": {
-    "Event": "Ereignis",
-    "Base Probability": "Basiswahrscheinlichkeit",
-    "Related News": "Verwandte Nachrichten",
-    "Occurred On": "Eingetreten am",
-    "Source Link": "Quellenlink",
-    "Positive": "Positiv",
-    "or": "oder",
-    "Negative": "Negativ",
-    "I agree to the": "Ich stimme dem",
-    "Disclaimer": "Haftungsausschluss zu",
-    "Confirm": "Bestätigen",
-    "Delete": "Löschen",
-"Are you sure you want to delete this proposition and all news?": "Sind Sie sicher, dass Sie diese These und alle Nachrichten löschen möchten?",
-"Are you sure you want to delete this news?": "Sind Sie sicher, dass Sie diese Nachricht löschen möchten?",
-  "Bayesian Mode": "Bayes-Modus",
-    "Express Mode": "Express-Modus",
-    "Probability of this news if Event happens": "Wahrscheinlichkeit dieser Nachricht, wenn das Ereignis eintritt",
-    "Probability of this news if Event doesn't happen": "Wahrscheinlichkeit dieser Nachricht, wenn das Ereignis nicht eintritt"
+  "home": {
+    "Idiot": "Idiot",
+    "Good Morning": "Guten Morgen",
+    "Good Afternoon": "Guten Tag",
+    "Good Evening": "Guten Abend",
+    "Write a message…": "Nachricht schreiben…",
+    "How can I help you today?": "Wie kann ich dir heute helfen?",
+    "FakeClaude can make mistakes. But makes far fewer mistakes than humans.": "FakeClaude kann Fehler machen. Aber deutlich weniger als Menschen.",
+    "Thinking": "Denkt nach"
   }
 }

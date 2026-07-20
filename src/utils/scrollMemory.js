@@ -30,6 +30,8 @@ function restoreScrollPosition() {
  * @returns {Function} 清理函数,调用可移除监听(一般组件卸载时用)
  */
 export function initScrollMemory() {
+  restoreScrollPosition();
+
   let ticking = false;
   function onScroll() {
     if (ticking) return;
@@ -44,5 +46,3 @@ export function initScrollMemory() {
 
   return () => window.removeEventListener("scroll", onScroll);
 }
-
-export { restoreScrollPosition };

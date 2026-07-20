@@ -51,10 +51,9 @@ function TypewriterText({ text, onChunkVisible, isLatest, instant }) {
 }
 
 export default function Home() {
-  const { t } = useTranslation();
 
   // <editor-fold desc="const">
-  const [sendingSvg, setSendingSvg] = useState(null);
+  const { t } = useTranslation();
   const userScrolledUp = useRef(false);
   const thinkingStartTime = useRef(null);
   const [isThinking, setIsThinking] = useState(false);
@@ -151,12 +150,6 @@ export default function Home() {
         .then((svgText) => setThinkingSvg(svgText))
         .catch((err) => console.error("error", err));
   }, []);
-  useEffect(() => {
-  fetch("/loading_sending.svg")
-    .then((res) => res.text())
-    .then((svgText) => setSendingSvg(svgText))
-    .catch((err) => console.error("error", err));
-}, []);
   useEffect(() => {
     textareaRef.current?.focus();
   }, []);

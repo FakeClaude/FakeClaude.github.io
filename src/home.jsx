@@ -7,13 +7,15 @@ import { useTypewriter } from "./utils/useTypewriter";
 import { initScrollMemory } from "./utils/scrollMemory";
 import { idb } from "./utils/IndexedDB";
 
-function TypewriterText({ text, onChunkVisible, isLatest }) {
-  const { chunks, done } = useTypewriter(text, 200);
-  const [isSending, setIsSending] = useState(true);
+function TypewriterText({ text, onChunkVisible, isLatest, instant }) {
+  const { chunks, done } = useTypewriter(instant ? "" : text, 200);
+  const [isSending, setIsSending] = useState(!instant);
   const sendingStartTime = useRef(Date.now());
 
   useEffect(() => {
     onChunkVisible?.();
+
+    if (instant) return;
 
     if (done && isSending) {
       const dur = 700;
@@ -27,17 +29,22 @@ function TypewriterText({ text, onChunkVisible, isLatest }) {
   return (
     <div class="ai-reply">
       <div class="ai-reply-text">
-        {chunks.map((chunk, i) => (
-          <span key={i} class={`typewriter-chunk ${chunk.visible ? "visible" : ""}`}>
-            {chunk.text}
-          </span>
-        ))}
+        {instant
+          ? <span class="typewriter-chunk visible">{text}</span>
+          : chunks.map((chunk, i) => (
+              <span key={i} class={`typewriter-chunk ${chunk.visible ? "visible" : ""}`}>
+                {chunk.text}
+              </span>
+            ))
+        }
       </div>
 
       {isLatest && (
-        isSending
-          ? <img src="/loading_sending.svg" class="sending-icon" alt="" />
-          : <div class="sending-icon sending-icon-static" />
+        instant
+          ? <div class="sending-icon sending-icon-static" />
+          : (isSending
+              ? <img src="/loading_sending.svg" class="sending-icon" alt="" />
+              : <div class="sending-icon sending-icon-static" />)
       )}
     </div>
   );
@@ -59,6 +66,7 @@ export default function Home() {
   const textareaRef = useRef(null);
   const [started, setStarted] = useState(false);
   const [messages, setMessages] = useState([]);
+  const initialMessageCount = useRef(0);
 
   function handleInput(e) {
   setText(e.target.value);
@@ -149,12 +157,13 @@ export default function Home() {
     .catch((err) => console.error("error", err));
 }, []);
   useEffect(() => {
-  textareaRef.current?.focus();
-}, []);
+    textareaRef.current?.focus();
+  }, []);
   // 页面加载时,从 IndexedDB 读取历史消息
   useEffect(() => {
     idb.get("messages").then((saved) => {
       if (saved && saved.length > 0) {
+        initialMessageCount.current = saved.length;
         setMessages(saved);
         setStarted(true);
       }
@@ -198,6 +207,7 @@ export default function Home() {
     key={i}
     onChunkVisible={scrollToKeepDistance}
     isLatest={i === messages.length - 1}
+    instant={i < initialMessageCount.current}
 />
                   )
               )}

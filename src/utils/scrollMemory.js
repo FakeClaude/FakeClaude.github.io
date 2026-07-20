@@ -1,79 +1,48 @@
 // utils/scrollMemory.js
-import { useEffect, useRef } from "preact/hooks";
+// 记住页面滚动位置,存到 localStorage,刷新后自动恢复
 
 const STORAGE_KEY = "scrollMemory";
 
-function readAll() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-  } catch {
-    return {};
-  }
+function saveScrollPosition() {
+  localStorage.setItem(STORAGE_KEY, String(window.scrollY));
 }
 
-function writeAll(data) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {}
-}
+function restoreScrollPosition() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved === null) return;
 
-export function saveScroll(key, y) {
-  if (!key) return;
-  const all = readAll();
-  all[key] = y;
-  writeAll(all);
-}
+  const y = parseInt(saved, 10);
+  if (isNaN(y)) return;
 
-export function getScroll(key) {
-  if (!key) return 0;
-  const all = readAll();
-  return all[key] || 0;
+  // 用 requestAnimationFrame 确保在浏览器完成首次布局之后再滚动,
+  // 否则页面内容还没渲染出高度,scrollTo 会失效
+  requestAnimationFrame(() => {
+    window.scrollTo(0, y);
+  });
 }
 
 /**
- * 滚动位置记忆 Hook
- * @param {Object} containerRef  滚动容器的 ref（例如 .card-list）
- * @param {string} key           记忆位置的唯一键（如 "best" / "new" / "myevents"）
- * @param {boolean} ready        数据是否已加载完成（决定何时尝试恢复滚动）
+ * 初始化滚动位置记忆功能。
+ * 调用后会:
+ * 1. 立即尝试恢复上次保存的滚动位置
+ * 2. 监听滚动事件,持续保存最新位置
+ *
+ * @returns {Function} 清理函数,调用可移除监听(一般组件卸载时用)
  */
-export function useScrollMemory(containerRef, key, ready) {
-  const restoredRef = useRef(false);
+export function initScrollMemory() {
+  restoreScrollPosition();
 
-  // 监听滚动并保存
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      saveScrollPosition();
+      ticking = false;
+    });
+  }
 
-    let ticking = false;
-    const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        saveScroll(key, el.scrollTop);
-        ticking = false;
-      });
-    };
-    el.addEventListener('scroll', handleScroll, { passive: true });
-    return () => el.removeEventListener('scroll', handleScroll);
-  }, [key, ready]);
+  window.addEventListener("scroll", onScroll, { passive: true });
 
-  // 数据就绪后恢复滚动位置（仅恢复一次）
-  useEffect(() => {
-    if (!ready) {
-      restoredRef.current = false;
-      return;
-    }
-    if (restoredRef.current) return;
-
-    const el = containerRef.current;
-    const savedY = getScroll(key);
-    if (savedY > 0 && el) {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          el.scrollTop = savedY;
-        });
-      });
-    }
-    restoredRef.current = true;
-  }, [ready, key]);
+  return () => window.removeEventListener("scroll", onScroll);
 }

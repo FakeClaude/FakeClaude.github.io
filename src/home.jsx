@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 import "./main.css";
 import { useTypewriter } from "./utils/useTypewriter";
+import { initScrollMemory } from "./utils/scrollMemory";
+import { idb } from "./utils/IndexedDB";
 
 function TypewriterText({ text, onChunkVisible, isLatest }) {
   const { chunks, done } = useTypewriter(text, 200);
@@ -149,6 +151,25 @@ export default function Home() {
   useEffect(() => {
   textareaRef.current?.focus();
 }, []);
+  // 页面加载时,从 IndexedDB 读取历史消息
+  useEffect(() => {
+    idb.get("messages").then((saved) => {
+      if (saved && saved.length > 0) {
+        setMessages(saved);
+        setStarted(true);
+      }
+    });
+  }, []);
+
+  // 每次消息变化时,自动保存到 IndexedDB
+  useEffect(() => {
+    if (messages.length > 0) {
+      idb.set("messages", messages);
+    }
+  }, [messages]);
+  useEffect(() => {
+    return initScrollMemory();
+  }, []);
   useEffect(() => {
   scrollToKeepDistance();
 }, [messages, isThinking]);

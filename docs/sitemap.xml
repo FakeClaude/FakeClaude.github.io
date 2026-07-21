@@ -3,99 +3,99 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
   <url>
-    <loc>https://possmap.web.app/</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://possmap.web.app/zh"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://possmap.web.app/fr"/>
-    <xhtml:link rel="alternate" hreflang="de" href="https://possmap.web.app/de"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://possmap.web.app/es"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://possmap.web.app/ja"/>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://possmap.web.app/ko"/>
-    <xhtml:link rel="alternate" hreflang="pt" href="https://possmap.web.app/pt"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://possmap.web.app/ru"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://possmap.web.app/ar"/>
-    <xhtml:link rel="alternate" hreflang="hi" href="https://possmap.web.app/hi"/>
+    <loc>https://fakeclaude.pages.dev/</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://fakeclaude.pages.dev/zh"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://fakeclaude.pages.dev/fr"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://fakeclaude.pages.dev/de"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://fakeclaude.pages.dev/es"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://fakeclaude.pages.dev/ja"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://fakeclaude.pages.dev/ko"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://fakeclaude.pages.dev/pt"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://fakeclaude.pages.dev/ru"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://fakeclaude.pages.dev/ar"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://fakeclaude.pages.dev/hi"/>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/zh</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="zh" href="https://possmap.web.app/zh"/>
+    <loc>https://fakeclaude.pages.dev/zh</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://fakeclaude.pages.dev/zh"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/es</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="es" href="https://possmap.web.app/es"/>
+    <loc>https://fakeclaude.pages.dev/es</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://fakeclaude.pages.dev/es"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/fr</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://possmap.web.app/fr"/>
+    <loc>https://fakeclaude.pages.dev/fr</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://fakeclaude.pages.dev/fr"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/de</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="de" href="https://possmap.web.app/de"/>
+    <loc>https://fakeclaude.pages.dev/de</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="de" href="https://fakeclaude.pages.dev/de"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/ja</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="ja" href="https://possmap.web.app/ja"/>
+    <loc>https://fakeclaude.pages.dev/ja</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://fakeclaude.pages.dev/ja"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/ko</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="ko" href="https://possmap.web.app/ko"/>
+    <loc>https://fakeclaude.pages.dev/ko</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://fakeclaude.pages.dev/ko"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/pt</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="pt" href="https://possmap.web.app/pt"/>
+    <loc>https://fakeclaude.pages.dev/pt</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="pt" href="https://fakeclaude.pages.dev/pt"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/ru</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://possmap.web.app/ru"/>
+    <loc>https://fakeclaude.pages.dev/ru</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://fakeclaude.pages.dev/ru"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/ar</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="ar" href="https://possmap.web.app/ar"/>
+    <loc>https://fakeclaude.pages.dev/ar</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://fakeclaude.pages.dev/ar"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://possmap.web.app/hi</loc>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://possmap.web.app/"/>
-    <xhtml:link rel="alternate" hreflang="hi" href="https://possmap.web.app/hi"/>
+    <loc>https://fakeclaude.pages.dev/hi</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fakeclaude.pages.dev/"/>
+    <xhtml:link rel="alternate" hreflang="hi" href="https://fakeclaude.pages.dev/hi"/>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>

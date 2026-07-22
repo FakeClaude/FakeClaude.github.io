@@ -155,9 +155,13 @@ html, body {
     width: 756px;
     position: fixed;
     bottom: 28px;
-    border: .5px solid var(--text-white-20);
+    border: .5px solid transparent;
     left: 50%;
     transform: translateX(-50%);
+}
+.home-started .input-card:hover,
+.home-started .input-card:focus-within {
+    border-color: var(--text-white-20);
 }
 .home-started .input-footer {
     position: fixed;
@@ -165,7 +169,8 @@ html, body {
     left: 50%;
     transform: translateX(-50%);
 }
-.input-card:hover {
+.input-card:hover,
+.input-card:focus-within {
     border-color: var(--text-white-20);
 }
 .input-textarea {

@@ -6,6 +6,7 @@ import "./main.css";
 import { useTypewriter } from "./utils/useTypewriter";
 import { initScrollMemory } from "./utils/scrollMemory";
 import { idb } from "./utils/IndexedDB";
+import { detectLanguage } from "./utils/detectLanguage";
 
 function TypewriterText({ text, onChunkVisible, isLatest, instant }) {
   const { chunks, done } = useTypewriter(instant ? "" : text, 200);
@@ -77,15 +78,27 @@ export default function Home() {
 }
   function getGreeting() {
     const hour = new Date().getHours();
-    if (hour < 12) return t("home.Good Morning");
-    if (hour < 18) return t("home.Good Afternoon");
-    return t("home.Good Evening");
+    if (hour < 12) return t("home.Good morning");
+    if (hour < 18) return t("home.Good afternoon");
+    return t("home.Good evening");
   }
   async function handleSend() {
-    if (!text.trim()) return;
-    userScrolledUp.current = false;
-    const userText = text;
-    setMessages((prev) => [...prev, {role: "user", text: userText}]);
+  if (!text.trim()) return;
+  userScrolledUp.current = false;
+  const userText = text;
+
+    // 检测这条消息的语言
+    const result = await detectLanguage(userText);
+    const fallbackLang = localStorage.getItem("language") || "en";
+    const finalLang = result.lang === "unknown" ? fallbackLang : result.lang;
+
+    console.log("[detectLanguage]", userText, "→", result, "final:", finalLang);
+
+  setMessages((prev) => [
+    ...prev,
+    { role: "user", text: userText, lang: finalLang },
+  ]);
+
   setStarted(true);
   setText("");
   const el = textareaRef.current;
@@ -94,12 +107,15 @@ export default function Home() {
   setIsThinking(true);
   thinkingStartTime.current = Date.now();
 
-  // 请求数据库拿真实回答
-  const res = await fetch("/api/reply", { method: "POST" });
+  // 把检测到的语言传给后端,让它按这个语言回复
+  const res = await fetch("/api/reply", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: userText, lang: finalLang }),
+  });
   const data = await res.json();
 
-  // 按之前的思路:等到动画播完当前整数倍周期,再停止思考、显示回答
-  const dur = 700; // 对应你SVG里的 dur="0.7s",单位毫秒
+  const dur = 700;
   const elapsed = Date.now() - thinkingStartTime.current;
   const remain = dur - (elapsed % dur);
 

@@ -1,9 +1,9 @@
 {
   "home": {
     "Idiot": "أحمق",
-    "Good Morning": "صباح الخير",
-    "Good Afternoon": "طاب نهارك",
-    "Good Evening": "مساء الخير",
+    "Good morning": "صباح الخير",
+    "Good afternoon": "طاب نهارك",
+    "Good evening": "مساء الخير",
     "Write a message…": "اكتب رسالة…",
     "How can I help you today?": "كيف يمكنني مساعدتك اليوم؟",
     "FakeClaude can make mistakes, But makes far fewer mistakes than humans": "قد يرتكب FakeClaude أخطاء، لكنها أقل بكثير من أخطاء البشر.",

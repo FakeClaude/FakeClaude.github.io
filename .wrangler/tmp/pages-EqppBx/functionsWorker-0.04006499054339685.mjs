@@ -18,7 +18,7 @@ async function onRequestPost(context) {
 }
 __name(onRequestPost, "onRequestPost");
 
-// ../.wrangler/tmp/pages-HzTdG8/functionsRoutes-0.2503687349674787.mjs
+// ../.wrangler/tmp/pages-EqppBx/functionsRoutes-0.5948152678217282.mjs
 var routes = [
   {
     routePath: "/api/reply",
@@ -508,15 +508,21 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
     return await middlewareCtx.next(request, env);
   } catch (e) {
     const error = reduceError(e);
-    return Response.json(error, {
-      status: 500,
-      headers: { "MF-Experimental-Error-Stack": "true" }
-    });
+    const body = JSON.stringify(error);
+    const headers = {
+      "Content-Type": "application/json",
+      "MF-Experimental-Error-Stack": "true"
+    };
+    const encoded = encodeURIComponent(body);
+    if (encoded.length <= 8192) {
+      headers["MF-Experimental-Error-Stack-Payload"] = encoded;
+    }
+    return new Response(body, { status: 500, headers });
   }
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-Z0ZKpY/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-DrfI03/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -548,7 +554,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-Z0ZKpY/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-DrfI03/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;
@@ -648,4 +654,4 @@ export {
   __INTERNAL_WRANGLER_MIDDLEWARE__,
   middleware_loader_entry_default as default
 };
-//# sourceMappingURL=functionsWorker-0.13717995654537962.mjs.map
+//# sourceMappingURL=functionsWorker-0.04006499054339685.mjs.map

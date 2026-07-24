@@ -1,0 +1,897 @@
+[
+  {
+    "id": 1,
+    "type": "work",
+    "text": "The bees and the ants attend to their own work; how can you refuse the work of a human being?"
+  },
+  {
+    "id": 2,
+    "type": "work",
+    "text": "Nothing great is created suddenly."
+  },
+  {
+    "id": 3,
+    "type": "love",
+    "text": "A friend is a second self."
+  },
+  {
+    "id": 4,
+    "type": "love",
+    "text": "Love is composed of a single soul inhabiting two bodies."
+  },
+  {
+    "id": 5,
+    "type": "desire",
+    "text": "It is not because we judge a thing to be good that we desire it, but rather we judge it to be good because we desire it."
+  },
+  {
+    "id": 6,
+    "type": "desire",
+    "text": "Life swings like a pendulum backward and forward between pain and boredom."
+  },
+  {
+    "id": 7,
+    "type": "daily",
+    "text": "Even bread and water are pleasant to me."
+  },
+  {
+    "id": 8,
+    "type": "daily",
+    "text": "The wise man does not grieve for what he lacks, but rejoices in what he has."
+  },
+  {
+    "id": 9,
+    "type": "nature",
+    "text": "No man ever steps in the same river twice."
+  },
+  {
+    "id": 10,
+    "type": "nature",
+    "text": "Whatever is in harmony with the universe is in harmony with me."
+  },
+  {
+    "id": 11,
+    "type": "doubt",
+    "text": "There are more things that terrify us than there are that oppress us, and we suffer more often in imagination than in reality."
+  },
+  {
+    "id": 12,
+    "type": "doubt",
+    "text": "He who fears he will suffer, already suffers what he fears."
+  },
+  {
+    "id": 13,
+    "type": "procrastination",
+    "text": "While we wait for life, life passes."
+  },
+  {
+    "id": 14,
+    "type": "procrastination",
+    "text": "You could leave life right now. Let that determine what you do and say and think."
+  },
+  {
+    "id": 15,
+    "type": "health",
+    "text": "A sound mind in a sound body."
+  },
+  {
+    "id": 16,
+    "type": "health",
+    "text": "Take care of your body as if you were going to live forever, and take care of your soul as if you were going to die tomorrow."
+  },
+  {
+    "id": 17,
+    "type": "existential",
+    "text": "The unexamined life is not worth living."
+  },
+  {
+    "id": 18,
+    "type": "existential",
+    "text": "He who has a why to live can bear almost any how."
+  },
+  {
+    "id": 19,
+    "type": "fortune",
+    "text": "Some things are up to us, and some things are not up to us."
+  },
+  {
+    "id": 20,
+    "type": "fortune",
+    "text": "The wheel of fortune turns round incessantly, and today's topmost is tomorrow's lowest."
+  },
+  {
+    "id": 21,
+    "type": "decision",
+    "text": "A donkey placed exactly between two equally distant and enticing bales of hay would die of hunger, unable to decide which to eat first."
+  },
+  {
+    "id": 22,
+    "type": "decision",
+    "text": "When two things are perfectly balanced, the will is suspended between them, as if unable to act at all."
+  },
+  {
+    "id": 23,
+    "type": "insulted",
+    "text": "Men are disturbed not by the things which happen, but by the opinions about the things; it is not the man who abuses you that insults you, but your own judgment that these things are insulting."
+  },
+  {
+    "id": 24,
+    "type": "insulted",
+    "text": "The best revenge is to be unlike him who performed the injury."
+  },
+  {
+    "id": 25,
+    "type": "identity",
+    "text": "Become what you are, having learned what that is."
+  },
+  {
+    "id": 26,
+    "type": "identity",
+    "text": "The height and greatness of a man's mind can never be shown in prosperity; but if we would judge of him truly, we must view him when he is engaged in the government of himself."
+  },
+  {
+    "id": 27,
+    "type": "greeting",
+    "text": "The sun is new each day."
+  },
+  {
+    "id": 28,
+    "type": "greeting",
+    "text": "When you arise in the morning, think of what a precious privilege it is to be alive—to breathe, to think, to enjoy, to love."
+  },
+  {
+    "id": 29,
+    "type": "general",
+    "text": "I know that I know nothing."
+  },
+  {
+    "id": 30,
+    "type": "general",
+    "text": "We are what we repeatedly do. Excellence, then, is not an act, but a habit."
+  },
+  {
+    "id": 31,
+    "type": "society",
+    "text": "Man is by nature a political animal; he who is unable to live in society, or who has no need because he is sufficient for himself, must be either a beast or a god."
+  },
+  {
+    "id": 33,
+    "type": "society",
+    "text": "Man is born free, and everywhere he is in chains; before the establishment of civil society, mankind existed in a state of war of all against all."
+  },
+  {
+    "id": 34,
+    "type": "society",
+    "text": "It is a truth which experience has confirmed, that every man invested with power is apt to abuse it; the same power that has been given to protect the constitution is often used to destroy it; to prevent the abuse of power, it is necessary that power should be a check to power."
+  },
+  {
+    "id": 35,
+    "type": "society",
+    "text": "The great and chief end of men uniting into commonwealths, and putting themselves under government, is the preservation of their life, liberty, and property."
+  },
+  {
+    "id": 36,
+    "type": "society",
+    "text": "The history of all hitherto existing society is the history of class struggles."
+  },
+  {
+    "id": 37,
+    "type": "society",
+    "text": "The sudden dramatic collapse of power occurs but rarely; where power is losing its grip, violence is often used as a last resort."
+  },
+  {
+    "id": 38,
+    "type": "society",
+    "text": "Standing armies shall in time be totally abolished, for they constantly threaten other states with war by the very fact that they are always prepared for it."
+  },
+  {
+    "id": 39,
+    "type": "society",
+    "text": "Liberty, in its simplest sense, is the absence of obstacles to the fulfillment of a person's desires, or the area within which a subject can act unobstructed by others."
+  },
+  {
+    "id": 40,
+    "type": "society",
+    "text": "War is a massacre of people who don't know each other, for the profit of people who know each other but don't massacre each other."
+  },
+  {
+    "id": 41,
+    "type": "work",
+    "text": "A good will is not good because of what it effects or accomplishes, but simply by virtue of the volition; it is good in itself, and even if it should achieve nothing, it would still shine like a jewel by its own light."
+  },
+  {
+    "id": 42,
+    "type": "work",
+    "text": "We become just by doing just acts, temperate by doing temperate acts, brave by doing brave acts."
+  },
+  {
+    "id": 43,
+    "type": "work",
+    "text": "Knowledge is power, but only if put into practice."
+  },
+  {
+    "id": 44,
+    "type": "work",
+    "text": "The philosophers have only interpreted the world, in various ways; the point, however, is to change it."
+  },
+  {
+    "id": 45,
+    "type": "work",
+    "text": "The struggle itself toward the heights is enough to fill a man's heart."
+  },
+  {
+    "id": 46,
+    "type": "work",
+    "text": "Everything is hard before it is easy; all things are easy to industry, all things difficult to sloth."
+  },
+  {
+    "id": 47,
+    "type": "work",
+    "text": "An idea only becomes real through concrete action."
+  },
+  {
+    "id": 48,
+    "type": "work",
+    "text": "All good things are difficult of access, and it is only after long and patient effort that they are attained."
+  },
+  {
+    "id": 49,
+    "type": "love",
+    "text": "No one would choose to live without friends, even if he had all other goods."
+  },
+  {
+    "id": 50,
+    "type": "love",
+    "text": "Love is the pursuit of the whole, the desire and pursuit of the beautiful and the eternal."
+  },
+  {
+    "id": 51,
+    "type": "love",
+    "text": "Love is nothing but pleasure accompanied by the idea of an external cause."
+  },
+  {
+    "id": 52,
+    "type": "love",
+    "text": "Love is primarily giving, not receiving."
+  },
+  {
+    "id": 53,
+    "type": "love",
+    "text": "Love has moral worth only when we treat the other, at the same time, as an end in itself and never merely as a means."
+  },
+  {
+    "id": 54,
+    "type": "love",
+    "text": "In love, everything is illusion except the fact that two souls are drawn near each other."
+  },
+  {
+    "id": 55,
+    "type": "love",
+    "text": "If someone asks why I loved him, I feel that it can only be explained by replying: because it was him, because it was me."
+  },
+  {
+    "id": 56,
+    "type": "love",
+    "text": "All love, however ethereal it may appear, springs entirely from the instinct which is directed to the propagation of the species."
+  },
+  {
+    "id": 57,
+    "type": "desire",
+    "text": "That which is the object of desire we term good, and the object of hate, evil; there is no such thing as good and evil absolutely, for these are always relative to the person that desires or hates."
+  },
+  {
+    "id": 58,
+    "type": "desire",
+    "text": "Desire is always desire for what is absent, for what one does not have; desire is essentially the pursuit of an absence, a lack."
+  },
+  {
+    "id": 59,
+    "type": "desire",
+    "text": "The faculty of desire is the faculty such a being has of becoming, by means of its representations, the cause of the actual existence of the objects of these representations."
+  },
+  {
+    "id": 60,
+    "type": "desire",
+    "text": "Reason is, and ought only to be, the slave of the passions, and can never pretend to any other office than to serve and obey them."
+  },
+  {
+    "id": 61,
+    "type": "desire",
+    "text": "There is no end to human desire; there is no final good, and happiness is not a state of rest but a continuous progress from one object of desire to another."
+  },
+  {
+    "id": 62,
+    "type": "desire",
+    "text": "It is not desire itself that torments us, but the gap between desire and the power to satisfy it."
+  },
+  {
+    "id": 63,
+    "type": "desire",
+    "text": "What we want is not wealth itself, but the notice and approval that come with it."
+  },
+  {
+    "id": 64,
+    "type": "desire",
+    "text": "All of humanity's problems stem from man's inability to sit quietly in a room alone."
+  },
+  {
+    "id": 65,
+    "type": "daily",
+    "text": "We do not dare many things because they are difficult, but they are difficult because we do not dare."
+  },
+  {
+    "id": 66,
+    "type": "daily",
+    "text": "I went to the woods because I wished to live deliberately, to front only the essential facts of life."
+  },
+  {
+    "id": 67,
+    "type": "daily",
+    "text": "My life has been full of terrible misfortunes, most of which never happened."
+  },
+  {
+    "id": 68,
+    "type": "daily",
+    "text": "We must cultivate our garden."
+  },
+  {
+    "id": 69,
+    "type": "daily",
+    "text": "Men are disturbed not by things, but by the opinions they have of things."
+  },
+  {
+    "id": 70,
+    "type": "daily",
+    "text": "Your mind will take the shape of what you frequently hold in thought."
+  },
+  {
+    "id": 71,
+    "type": "daily",
+    "text": "It is not the man who has too little, but the man who craves more, that is poor."
+  },
+  {
+    "id": 72,
+    "type": "daily",
+    "text": "Happiness is not a state but an activity; it lies in the exercise of virtue in each present moment."
+  },
+  {
+    "id": 73,
+    "type": "nature",
+    "text": "Two things fill the mind with ever new and increasing admiration and awe, the more often and the more steadily we reflect on them: the starry heavens above me and the moral law within me."
+  },
+  {
+    "id": 74,
+    "type": "nature",
+    "text": "In nature there is nothing contingent, but all things have been conditioned to exist and operate in a particular manner by the necessity of the divine nature."
+  },
+  {
+    "id": 75,
+    "type": "nature",
+    "text": "Everything flows and nothing stays."
+  },
+  {
+    "id": 76,
+    "type": "nature",
+    "text": "Everything is good as it comes from the hands of the Author of things; everything degenerates in the hands of man."
+  },
+  {
+    "id": 77,
+    "type": "nature",
+    "text": "All things arise from seeds, and to nothing they at last return."
+  },
+  {
+    "id": 78,
+    "type": "nature",
+    "text": "The contemplation of the stars, walking with them, so to speak, washes away the filth of earthly life."
+  },
+  {
+    "id": 79,
+    "type": "nature",
+    "text": "Whatever is, is in God, and all things are modes or affections of the one substance, Nature."
+  },
+  {
+    "id": 80,
+    "type": "nature",
+    "text": "Nature never wears a mean appearance."
+  },
+  {
+    "id": 81,
+    "type": "doubt",
+    "text": "At least once in his life, every man should doubt everything he has believed, down to its very foundations."
+  },
+  {
+    "id": 82,
+    "type": "doubt",
+    "text": "Freedom is not incompatible with fear; a man can act out of fear and still be free."
+  },
+  {
+    "id": 83,
+    "type": "doubt",
+    "text": "There have been many more terrors in my life than dangers."
+  },
+  {
+    "id": 84,
+    "type": "doubt",
+    "text": "Custom is the great guide of human life; without it we should be ignorant of everything regarding the future, and our memory of the past would be of no use to us."
+  },
+  {
+    "id": 85,
+    "type": "doubt",
+    "text": "It is better to face the worst that can happen than to live in fear of everything."
+  },
+  {
+    "id": 86,
+    "type": "doubt",
+    "text": "Knowledge frees us from fear."
+  },
+  {
+    "id": 87,
+    "type": "doubt",
+    "text": "Hope and fear are inseparable, and there is no fear without hope, nor hope without fear, both arising from uncertainty about the future."
+  },
+  {
+    "id": 88,
+    "type": "doubt",
+    "text": "To philosophize is to learn how to die; once a man no longer fears death, he is freed from all servitude."
+  },
+  {
+    "id": 89,
+    "type": "procrastination",
+    "text": "It is not that we have so little time but that we lose so much of it."
+  },
+  {
+    "id": 90,
+    "type": "procrastination",
+    "text": "As it is not the length of life, but the use made of it, that gives it worth, it is possible to have lived long and yet lived but a little."
+  },
+  {
+    "id": 91,
+    "type": "procrastination",
+    "text": "Let us not act as if we had a thousand years to live; while you live, while it is in your power, strive to become good."
+  },
+  {
+    "id": 92,
+    "type": "procrastination",
+    "text": "He who has learned how to die has unlearned how to be a slave; whoever has learned to die has unlearned how to serve."
+  },
+  {
+    "id": 93,
+    "type": "procrastination",
+    "text": "We cannot step twice into the same river, nor can we grasp the same present twice."
+  },
+  {
+    "id": 94,
+    "type": "procrastination",
+    "text": "Never leave that till tomorrow which you can do today."
+  },
+  {
+    "id": 95,
+    "type": "procrastination",
+    "text": "We are never living, but hoping to live, and always looking forward to being happy; the present is never our end."
+  },
+  {
+    "id": 96,
+    "type": "procrastination",
+    "text": "Confine yourself to the present; only the present, this brief moment, is what a man can lose, for that is all he has."
+  },
+  {
+    "id": 97,
+    "type": "insulted",
+    "text": "It is better to suffer wrong than to do wrong."
+  },
+  {
+    "id": 98,
+    "type": "insulted",
+    "text": "If it be reported to you that a certain person speaks ill of you, do not make excuses about what is said, but answer, he did not know the rest of my faults, else he would not have mentioned only these."
+  },
+  {
+    "id": 99,
+    "type": "insulted",
+    "text": "The best revenge is not to be like your enemy."
+  },
+  {
+    "id": 100,
+    "type": "insulted",
+    "text": "A great mind never bothers itself to be angry over a single wound."
+  },
+  {
+    "id": 101,
+    "type": "insulted",
+    "text": "It is not the man who insults you or strikes you who abuses you, but your opinion that these things are insulting."
+  },
+  {
+    "id": 102,
+    "type": "insulted",
+    "text": "I would rather be laughed at by the whole world than act against my own conscience."
+  },
+  {
+    "id": 103,
+    "type": "insulted",
+    "text": "The wrongdoing of another is no reason for me to be angry; we are made for cooperation, like feet, like hands, like eyelids."
+  },
+  {
+    "id": 104,
+    "type": "insulted",
+    "text": "Anger is a brief madness."
+  },
+  {
+    "id": 105,
+    "type": "identity",
+    "text": "I think, therefore I am."
+  },
+  {
+    "id": 106,
+    "type": "identity",
+    "text": "Existence precedes essence; man first exists, and only afterward defines himself through his choices."
+  },
+  {
+    "id": 107,
+    "type": "identity",
+    "text": "To become what one is, is the work of a lifetime."
+  },
+  {
+    "id": 108,
+    "type": "identity",
+    "text": "Personal identity consists not in the identity of substance, but in the continuity of consciousness."
+  },
+  {
+    "id": 109,
+    "type": "identity",
+    "text": "Become who you are."
+  },
+  {
+    "id": 110,
+    "type": "identity",
+    "text": "Character is destiny."
+  },
+  {
+    "id": 111,
+    "type": "identity",
+    "text": "The greatest thing in the world is to know how to belong to oneself."
+  },
+  {
+    "id": 112,
+    "type": "identity",
+    "text": "Man is condemned to be free; because once thrown into the world, he is responsible for everything he does."
+  },
+  {
+    "id": 113,
+    "type": "greeting",
+    "text": "When you wake up in the morning, tell yourself: the people I deal with today will be meddling, ungrateful; but I will not be angry, for I was made to work with them."
+  },
+  {
+    "id": 114,
+    "type": "greeting",
+    "text": "My formula for greatness in a human being is amor fati: that one wants nothing to be other than it is, not merely to bear the necessary, but to love it."
+  },
+  {
+    "id": 115,
+    "type": "greeting",
+    "text": "The morning is the most memorable season of the day, the awakening hour."
+  },
+  {
+    "id": 116,
+    "type": "greeting",
+    "text": "In the morning, when you rise unwillingly, let this thought be present: I am rising to do the work of a human being."
+  },
+  {
+    "id": 117,
+    "type": "greeting",
+    "text": "What does not kill me makes me stronger."
+  },
+  {
+    "id": 118,
+    "type": "greeting",
+    "text": "Every morning is a fresh invitation to begin living again."
+  },
+  {
+    "id": 119,
+    "type": "greeting",
+    "text": "The greatest achievement of wisdom is to enable people to live happily."
+  },
+  {
+    "id": 120,
+    "type": "greeting",
+    "text": "Let each day be lived as if it were the last, neither anxiously grasping for it, nor carelessly casting it away."
+  },
+  {
+    "id": 121,
+    "type": "health",
+    "text": "Let the body be your standard."
+  },
+  {
+    "id": 122,
+    "type": "health",
+    "text": "Health of body and tranquility of mind are the ultimate end of the happy life."
+  },
+  {
+    "id": 123,
+    "type": "health",
+    "text": "The affections of the mind are closely connected with the health and vigor of the body."
+  },
+  {
+    "id": 124,
+    "type": "health",
+    "text": "The more capable the body is of being affected in many ways, the more capable the mind is of perceiving in many ways."
+  },
+  {
+    "id": 125,
+    "type": "health",
+    "text": "Both excess and deficiency destroy virtue; excessive or insufficient exercise destroys strength."
+  },
+  {
+    "id": 126,
+    "type": "health",
+    "text": "That there be a sound mind in a sound body is what I should pray for."
+  },
+  {
+    "id": 127,
+    "type": "health",
+    "text": "A feeble body weakens the mind."
+  },
+  {
+    "id": 128,
+    "type": "health",
+    "text": "Of all thoughts and writings, I believe only those written in blood, out of one's own bodily experience."
+  },
+  {
+    "id": 129,
+    "type": "existential",
+    "text": "There is only one truly serious philosophical problem, and that is suicide; judging whether life is or is not worth living amounts to answering the fundamental question of philosophy."
+  },
+  {
+    "id": 130,
+    "type": "existential",
+    "text": "Man is a being-toward-death."
+  },
+  {
+    "id": 131,
+    "type": "existential",
+    "text": "Life can only be understood backwards, but it must be lived forwards."
+  },
+  {
+    "id": 132,
+    "type": "existential",
+    "text": "Hell is other people."
+  },
+  {
+    "id": 133,
+    "type": "existential",
+    "text": "In the depth of winter, I finally learned that within me there lay an invincible summer."
+  },
+  {
+    "id": 134,
+    "type": "existential",
+    "text": "He who has long been the loudest of thunder-bringers, must long have been the stillest of clouds."
+  },
+  {
+    "id": 135,
+    "type": "existential",
+    "text": "Only by facing and accepting one's own death can one exist authentically."
+  },
+  {
+    "id": 136,
+    "type": "existential",
+    "text": "Man is but a reed, the weakest thing in nature, but he is a thinking reed."
+  },
+  {
+    "id": 137,
+    "type": "fortune",
+    "text": "Of things some are in our power, and others are not; our opinions, desires, and aversions are in our power, but the body, property, reputation, and offices are not in our power."
+  },
+  {
+    "id": 138,
+    "type": "fortune",
+    "text": "Fortune is like a raging river, but men can build dikes and dams to contain it before it floods."
+  },
+  {
+    "id": 139,
+    "type": "fortune",
+    "text": "Fortune cannot harm the man who has ceased to depend on her."
+  },
+  {
+    "id": 140,
+    "type": "fortune",
+    "text": "The wheel of fortune turns round incessantly, casting down the highest, raising the lowest."
+  },
+  {
+    "id": 141,
+    "type": "fortune",
+    "text": "Do not seek for things to happen as you wish, but wish the things that happen to be as they are, and you will have a tranquil flow of life."
+  },
+  {
+    "id": 142,
+    "type": "fortune",
+    "text": "Whatever fortune brings you, accept it, for it is what is most fitting for you."
+  },
+  {
+    "id": 143,
+    "type": "fortune",
+    "text": "Fortune has never dealt fairly; she favors some and tramples on others."
+  },
+  {
+    "id": 144,
+    "type": "fortune",
+    "text": "What men call fortune is nothing but a name we give to the causes of things whose order we do not know."
+  },
+  {
+    "id": 145,
+    "type": "decision",
+    "text": "Even when unable to know for certain which road is best, one should choose one direction firmly and follow it, as a traveler lost in a forest should never stand still."
+  },
+  {
+    "id": 146,
+    "type": "decision",
+    "text": "Act only according to that maxim whereby you can at the same time will that it should become a universal law."
+  },
+  {
+    "id": 147,
+    "type": "decision",
+    "text": "Prudence is a true and reasoned capacity to act with regard to the things that are good for a human being."
+  },
+  {
+    "id": 148,
+    "type": "decision",
+    "text": "In choosing for himself, man chooses for all mankind—this is the source of his anguish."
+  },
+  {
+    "id": 149,
+    "type": "decision",
+    "text": "You must wager; it is not optional."
+  },
+  {
+    "id": 150,
+    "type": "decision",
+    "text": "Indecision is the most painful of all states of mind."
+  },
+  {
+    "id": 151,
+    "type": "decision",
+    "text": "Well begun is half done."
+  },
+  {
+    "id": 152,
+    "type": "decision",
+    "text": "Immaturity is the inability to use one's own understanding without another's guidance; enlightenment is man's emergence from his self-incurred immaturity through the courage to use his own reason."
+  },
+  {
+    "id": 153,
+    "type": "general",
+    "text": "Man is a rational animal."
+  },
+  {
+    "id": 154,
+    "type": "general",
+    "text": "The limits of my language mean the limits of my world."
+  },
+  {
+    "id": 155,
+    "type": "general",
+    "text": "Common sense is the most fairly distributed thing in the world, for everyone thinks he is so well endowed with it."
+  },
+  {
+    "id": 156,
+    "type": "general",
+    "text": "A wise man proportions his belief to the evidence."
+  },
+  {
+    "id": 157,
+    "type": "general",
+    "text": "Enlightenment is man's emergence from his self-incurred immaturity."
+  },
+  {
+    "id": 158,
+    "type": "general",
+    "text": "All men by nature desire to know."
+  },
+  {
+    "id": 159,
+    "type": "general",
+    "text": "All the dignity of man consists in thought."
+  },
+  {
+    "id": 160,
+    "type": "general",
+    "text": "The mind is at first like a blank slate, and all knowledge, all its materials, come from experience."
+  },
+  {
+    "id": 161,
+    "type": "society",
+    "text": "The general inclination of all mankind is a perpetual and restless desire of power after power, that ceaseth only in death; the greatest of all passions is the fear of violent death."
+  },
+  {
+    "id": 162,
+    "type": "society",
+    "text": "Where there is no law, there is no freedom."
+  },
+  {
+    "id": 163,
+    "type": "society",
+    "text": "It is a truth confirmed by the constant experience of all ages, that any man who has power is inclined to abuse it."
+  },
+  {
+    "id": 164,
+    "type": "society",
+    "text": "If all mankind minus one were of one opinion, mankind would be no more justified in silencing that one person than he, if he had the power, would be justified in silencing mankind."
+  },
+  {
+    "id": 165,
+    "type": "society",
+    "text": "The first definitive article of perpetual peace is that the civil constitution of every state should be republican."
+  },
+  {
+    "id": 166,
+    "type": "society",
+    "text": "It is much safer to be feared than loved, when one of the two must be lacking."
+  },
+  {
+    "id": 167,
+    "type": "society",
+    "text": "The most terrifying thing about totalitarian domination is not that it destroys human bodies, but that it seeks to destroy man's capacity for independent thought and judgment."
+  },
+  {
+    "id": 168,
+    "type": "society",
+    "text": "A state is a human community that successfully claims the monopoly of the legitimate use of physical force within a given territory."
+  },
+  {
+    "id": 169,
+    "type": "society",
+    "text": "The greatest danger in a democracy is not tyranny, but the tyranny of the majority, the oppression of the minority in the name of freedom."
+  },
+  {
+    "id": 170,
+    "type": "society",
+    "text": "It is not from the benevolence of the butcher, the brewer, or the baker that we expect our dinner, but from their regard to their own interest."
+  },
+  {
+    "id": 171,
+    "type": "society",
+    "text": "Evil comes not from fanaticism or perversion, but from banality; the most terrifying thing about totalitarianism is that it seeks to destroy man's capacity for independent thought and judgment."
+  },
+  {
+    "id": 172,
+    "type": "society",
+    "text": "Force does not create right, and no man has a natural authority over his fellow men; obedience produced only by force generates no genuine right or obligation, unless it is given voluntarily."
+  },
+  {
+    "id": 173,
+    "type": "society",
+    "text": "Man is by nature a political animal; the greatest of all human passions is the fear of violent death, and the restless desire for power after power that ceases only in death."
+  },
+  {
+    "id": 174,
+    "type": "society",
+    "text": "The proletarians have nothing to lose in this revolution but their chains; they have a world to win. The road to hell is paved with good intentions."
+  },
+  {
+    "id": 175,
+    "type": "society",
+    "text": "Covenants, without the sword, are but words, and of no strength to secure a man at all."
+  },
+  {
+    "id": 176,
+    "type": "society",
+    "text": "Evil comes not from fanaticism or perversion, but from banality; it is the failure to think that makes it possible for people to commit the greatest evils."
+  },
+  {
+    "id": 177,
+    "type": "society",
+    "text": "The greatest happiness of the greatest number is the measure of right and wrong; each person is to be treated as an end in himself, and never merely as a means."
+  },
+  {
+    "id": 178,
+    "type": "society",
+    "text": "Whoever fights monsters should see to it that in the process he does not become a monster. War is peace, freedom is slavery, ignorance is strength."
+  },
+  {
+    "id": 179,
+    "type": "society",
+    "text": "The tree of liberty must be refreshed from time to time with the blood of patriots and tyrants. An eye for an eye only ends up making the whole world blind."
+  },
+  {
+    "id": 180,
+    "type": "society",
+    "text": "Justice is the first virtue of social institutions, as truth is of systems of thought; a theory however elegant and economical must be rejected or revised if it is untrue, and laws and institutions no matter how efficient and well-arranged must be reformed or abolished if they are unjust."
+  }
+]

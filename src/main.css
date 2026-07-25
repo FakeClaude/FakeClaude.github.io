@@ -155,7 +155,7 @@ html, body {
     width: 756px;
     position: fixed;
     bottom: 28px;
-    border: .5px solid transparent;
+    border: .5px solid var(--text-white-20);
     left: 50%;
     transform: translateX(-50%);
 }

@@ -5,3 +5,6 @@ pages_build_output_dir = "docs"
 binding = "DB"
 database_name = "fakeclaude"
 database_id = "38dbdb3a-80ff-400c-b02e-92d0091e5072"
+
+[ai]
+binding = "AI"

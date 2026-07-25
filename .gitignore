@@ -7,3 +7,4 @@ dist/
 scripts/serviceAccount.json
 .firebase/hosting.ZGlzdA.cache
 src/A_alllogic.jsx
+functions/api/generate-anchors.js

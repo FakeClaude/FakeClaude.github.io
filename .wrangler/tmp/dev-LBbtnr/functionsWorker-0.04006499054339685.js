@@ -16730,48 +16730,64 @@ __name(classifyType, "classifyType");
 __name2(classifyType, "classifyType");
 async function onRequestPost(context) {
   const { env, request } = context;
-  let lang, userText;
+  let lang, userText, seenIds;
   try {
     const body = await request.json();
     lang = body?.lang;
     userText = body?.text ?? "";
+    seenIds = body?.seenIds ?? {};
   } catch {
+    seenIds = {};
   }
   const table = TABLE_MAP[lang] ?? DEFAULT_TABLE;
+  const excludeIds = Array.isArray(seenIds?.[table]) ? seenIds[table].filter((id) => Number.isInteger(id)) : [];
   const type = userText ? await classifyType(env, userText) : null;
   let result = null;
+  let wasReset = false;
+  async function queryOne(tableName, typeFilter, excludeList) {
+    const conditions = [];
+    const binds = [];
+    if (typeFilter) {
+      conditions.push("type = ?");
+      binds.push(typeFilter);
+    }
+    if (excludeList && excludeList.length > 0) {
+      conditions.push(`id NOT IN (${excludeList.map(() => "?").join(",")})`);
+      binds.push(...excludeList);
+    }
+    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+    return env.DB.prepare(
+      `SELECT id, type, text FROM ${tableName} ${where} ORDER BY RANDOM() LIMIT 1`
+    ).bind(...binds).first();
+  }
+  __name(queryOne, "queryOne");
+  __name2(queryOne, "queryOne");
   if (type) {
-    result = await env.DB.prepare(
-      `SELECT id, type, text FROM ${table} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
-    ).bind(type).first();
+    result = await queryOne(table, type, excludeIds);
+    if (!result) {
+      result = await queryOne(table, type, []);
+      wasReset = true;
+    }
   }
   if (!result) {
-    result = await env.DB.prepare(
-      `SELECT id, type, text FROM ${table} ORDER BY RANDOM() LIMIT 1`
-    ).first();
+    result = await queryOne(table, null, excludeIds);
+  }
+  if (!result) {
+    result = await queryOne(table, null, []);
+    wasReset = true;
   }
   if (!result && table !== DEFAULT_TABLE) {
-    if (type) {
-      result = await env.DB.prepare(
-        `SELECT id, type, text FROM ${DEFAULT_TABLE} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
-      ).bind(type).first();
-    }
+    result = await queryOne(DEFAULT_TABLE, type, []);
     if (!result) {
-      result = await env.DB.prepare(
-        `SELECT id, type, text FROM ${DEFAULT_TABLE} ORDER BY RANDOM() LIMIT 1`
-      ).first();
+      result = await queryOne(DEFAULT_TABLE, null, []);
     }
-  }
-  if (!result) {
-    return new Response(JSON.stringify({ text: "no date" }), {
-      headers: { "Content-Type": "application/json" }
-    });
   }
   return new Response(JSON.stringify({
     text: result.text,
     type: result.type,
     id: result.id,
-    replies: table
+    replies: table,
+    wasReset
   }), {
     headers: { "Content-Type": "application/json" }
   });

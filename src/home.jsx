@@ -62,6 +62,7 @@ export default function Home() {
   const [userName] = useState(t("home.Idiot"));
   const [model] = useState("Idiot 5");
   const [effort] = useState("Max");
+  const [seenIdsMap, setSeenIdsMap] = useState({});
   const [text, setText] = useState("");
   const textareaRef = useRef(null);
   const [started, setStarted] = useState(false);
@@ -94,6 +95,7 @@ export default function Home() {
 
     console.log("[detectLanguage]", userText, "→", result, "final:", finalLang);
 
+
   setMessages((prev) => [
     ...prev,
     { role: "user", text: userText, lang: finalLang },
@@ -111,9 +113,19 @@ export default function Home() {
   const res = await fetch("/api/reply", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text: userText, lang: finalLang }),
+    body: JSON.stringify({ text: userText, lang: finalLang, seenIds: seenIdsMap }),
   });
   const data = await res.json();
+  setSeenIdsMap((prev) => {
+    const updated = { ...prev };
+    const list = data.wasReset ? [] : (updated[data.replies] || []);
+    if (data.id != null && !list.includes(data.id)) {
+      list.push(data.id);
+    }
+    updated[data.replies] = list;
+    idb.set("seenIds", updated);
+    return updated;
+  });
 
   const dur = 700;
   const elapsed = Date.now() - thinkingStartTime.current;
@@ -158,6 +170,11 @@ export default function Home() {
 }
 
   useEffect(() => {
+  idb.get("seenIds").then((saved) => {
+    if (saved) setSeenIdsMap(saved);
+  });
+}, []);
+  useEffect(() => {
   function handleWheel(e) {
     if (e.deltaY < 0) {
       userScrolledUp.current = true;
@@ -175,7 +192,6 @@ export default function Home() {
   useEffect(() => {
     textareaRef.current?.focus();
   }, []);
-  // 页面加载时,从 IndexedDB 读取历史消息
   useEffect(() => {
     idb.get("messages").then((saved) => {
       if (saved && saved.length > 0) {

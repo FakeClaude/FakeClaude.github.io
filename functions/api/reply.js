@@ -16598,61 +16598,83 @@ async function classifyType(env, userText) {
 export async function onRequestPost(context) {
   const { env, request } = context;
 
-  let lang, userText;
-  try {
-    const body = await request.json();
-    lang = body?.lang;
-    userText = body?.text ?? "";
-  } catch {
-    // 没有 body 或不是合法 JSON，走默认语言，且不做分类
-  }
+  let lang, userText, seenIds;
+try {
+  const body = await request.json();
+  lang = body?.lang;
+  userText = body?.text ?? "";
+  seenIds = body?.seenIds ?? {};
+} catch {
+  // 没有 body 或不是合法 JSON，走默认语言，且不做分类
+  seenIds = {};
+}
 
   const table = TABLE_MAP[lang] ?? DEFAULT_TABLE;
+
+  // 只保留合法的整数 id，防止异常数据混进 SQL
+  const excludeIds = Array.isArray(seenIds?.[table])
+      ? seenIds[table].filter((id) => Number.isInteger(id))
+      : [];
 
   // 用 embedding 判断语意类型，失败则 type 为 null（后面走不限定 type 的随机逻辑）
   const type = userText ? await classifyType(env, userText) : null;
 
   let result = null;
+  let wasReset = false;
 
-  if (type) {
-     result = await env.DB.prepare(
-    `SELECT id, type, text FROM ${table} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
-  ).bind(type).first();
+  // 小工具：按 type（可选）+ 排除id（可选）查一条，SELECT 统一带上 id/type 方便前端存
+  async function queryOne(tableName, typeFilter, excludeList) {
+    const conditions = [];
+    const binds = [];
+
+    if (typeFilter) {
+      conditions.push("type = ?");
+      binds.push(typeFilter);
+    }
+    if (excludeList && excludeList.length > 0) {
+      conditions.push(`id NOT IN (${excludeList.map(() => "?").join(",")})`);
+      binds.push(...excludeList);
+    }
+
+    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+    return env.DB.prepare(
+      `SELECT id, type, text FROM ${tableName} ${where} ORDER BY RANDOM() LIMIT 1`
+    )
+      .bind(...binds)
+      .first();
   }
 
-  // 该语言表里没有这个 type 的数据（或没识别出 type），退化成不限定 type 的随机一条
-  if (!result) {
-      result = await env.DB.prepare(
-    `SELECT id, type, text FROM ${table} ORDER BY RANDOM() LIMIT 1`
-  ).first();
-  }
-
-  // 该语言表本身还没建/是空的，兜底回退到默认的 en 表
-  if (!result && table !== DEFAULT_TABLE) {
     if (type) {
-      result = await env.DB.prepare(
-      `SELECT id, type, text FROM ${DEFAULT_TABLE} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
-    ).bind(type).first();
-    }
+    result = await queryOne(table, type, excludeIds);
+
     if (!result) {
-       result = await env.DB.prepare(
-      `SELECT id, type, text FROM ${DEFAULT_TABLE} ORDER BY RANDOM() LIMIT 1`
-    ).first();
+      result = await queryOne(table, type, []);
+      wasReset = true; // 这个type底下没看过的已经查完了，触发重置
     }
   }
 
   if (!result) {
-    return new Response(JSON.stringify({ text: "no date" }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    result = await queryOne(table, null, excludeIds);
+  }
+  if (!result) {
+    result = await queryOne(table, null, []);
+    wasReset = true; // 不限type也查不到没看过的，同样算重置
+  }
+
+  if (!result && table !== DEFAULT_TABLE) {
+    result = await queryOne(DEFAULT_TABLE, type, []);
+    if (!result) {
+      result = await queryOne(DEFAULT_TABLE, null, []);
+    }
   }
 
   return new Response(JSON.stringify({
-  text: result.text,
-  type: result.type,
-  id: result.id,
-  replies: table,
-}), {
+    text: result.text,
+    type: result.type,
+    id: result.id,
+    replies: table,
+    wasReset,
+  }), {
   headers: { "Content-Type": "application/json" },
 });
 }

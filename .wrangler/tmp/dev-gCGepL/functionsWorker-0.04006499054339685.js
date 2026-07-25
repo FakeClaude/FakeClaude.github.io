@@ -4,11 +4,32 @@ var __name = (target, value) => __defProp(target, "name", { value, configurable:
 // .wrangler/tmp/pages-EqppBx/functionsWorker-0.04006499054339685.mjs
 var __defProp2 = Object.defineProperty;
 var __name2 = /* @__PURE__ */ __name((target, value) => __defProp2(target, "name", { value, configurable: true }), "__name");
+var TABLE_MAP = {
+  en: "replies",
+  es: "replies_es",
+  pt: "replies_pt",
+  de: "replies_de",
+  zh: "replies_zh",
+  ja: "replies_ja"
+};
+var DEFAULT_TABLE = TABLE_MAP.en;
 async function onRequestPost(context) {
-  const { env } = context;
-  const result = await env.DB.prepare(
-    "SELECT text FROM replies ORDER BY RANDOM() LIMIT 1"
+  const { env, request } = context;
+  let lang;
+  try {
+    const body = await request.json();
+    lang = body?.lang;
+  } catch {
+  }
+  const table = TABLE_MAP[lang] ?? DEFAULT_TABLE;
+  let result = await env.DB.prepare(
+    `SELECT text FROM ${table} ORDER BY RANDOM() LIMIT 1`
   ).first();
+  if (!result && table !== DEFAULT_TABLE) {
+    result = await env.DB.prepare(
+      `SELECT text FROM ${DEFAULT_TABLE} ORDER BY RANDOM() LIMIT 1`
+    ).first();
+  }
   if (!result) {
     return new Response(JSON.stringify({ text: "\u6570\u636E\u5E93\u662F\u7A7A\u7684,\u5148\u53BB\u63D2\u51E0\u6761\u6570\u636E\u5427\u3002" }), {
       headers: { "Content-Type": "application/json" }

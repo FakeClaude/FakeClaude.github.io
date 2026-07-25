@@ -16738,32 +16738,37 @@ async function onRequestPost(context) {
   let result = null;
   if (type) {
     result = await env.DB.prepare(
-      `SELECT text FROM ${table} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
+      `SELECT id, type, text FROM ${table} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
     ).bind(type).first();
   }
   if (!result) {
     result = await env.DB.prepare(
-      `SELECT text FROM ${table} WHERE type = 'general' ORDER BY RANDOM() LIMIT 1`
+      `SELECT id, type, text FROM ${table} ORDER BY RANDOM() LIMIT 1`
     ).first();
   }
   if (!result && table !== DEFAULT_TABLE) {
     if (type) {
       result = await env.DB.prepare(
-        `SELECT text FROM ${DEFAULT_TABLE} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
+        `SELECT id, type, text FROM ${DEFAULT_TABLE} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
       ).bind(type).first();
     }
     if (!result) {
       result = await env.DB.prepare(
-        `SELECT text FROM ${DEFAULT_TABLE} ORDER BY RANDOM() LIMIT 1`
+        `SELECT id, type, text FROM ${DEFAULT_TABLE} ORDER BY RANDOM() LIMIT 1`
       ).first();
     }
   }
   if (!result) {
-    return new Response(JSON.stringify({ text: "\u6570\u636E\u5E93\u662F\u7A7A\u7684,\u5148\u53BB\u63D2\u51E0\u6761\u6570\u636E\u5427\u3002" }), {
+    return new Response(JSON.stringify({ text: "no date" }), {
       headers: { "Content-Type": "application/json" }
     });
   }
-  return new Response(JSON.stringify({ text: result.text }), {
+  return new Response(JSON.stringify({
+    text: result.text,
+    type: result.type,
+    id: result.id,
+    replies: table
+  }), {
     headers: { "Content-Type": "application/json" }
   });
 }
@@ -17280,7 +17285,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-d8ooQJ/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-tsiMVC/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -17312,7 +17317,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-d8ooQJ/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-tsiMVC/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

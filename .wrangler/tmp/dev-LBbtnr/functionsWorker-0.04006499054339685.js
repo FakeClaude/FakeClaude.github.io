@@ -16742,32 +16742,37 @@ async function onRequestPost(context) {
   let result = null;
   if (type) {
     result = await env.DB.prepare(
-      `SELECT text FROM ${table} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
+      `SELECT id, type, text FROM ${table} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
     ).bind(type).first();
   }
   if (!result) {
     result = await env.DB.prepare(
-      `SELECT text FROM ${table} WHERE type = 'general' ORDER BY RANDOM() LIMIT 1`
+      `SELECT id, type, text FROM ${table} ORDER BY RANDOM() LIMIT 1`
     ).first();
   }
   if (!result && table !== DEFAULT_TABLE) {
     if (type) {
       result = await env.DB.prepare(
-        `SELECT text FROM ${DEFAULT_TABLE} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
+        `SELECT id, type, text FROM ${DEFAULT_TABLE} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
       ).bind(type).first();
     }
     if (!result) {
       result = await env.DB.prepare(
-        `SELECT text FROM ${DEFAULT_TABLE} ORDER BY RANDOM() LIMIT 1`
+        `SELECT id, type, text FROM ${DEFAULT_TABLE} ORDER BY RANDOM() LIMIT 1`
       ).first();
     }
   }
   if (!result) {
-    return new Response(JSON.stringify({ text: "\u6570\u636E\u5E93\u662F\u7A7A\u7684,\u5148\u53BB\u63D2\u51E0\u6761\u6570\u636E\u5427\u3002" }), {
+    return new Response(JSON.stringify({ text: "no date" }), {
       headers: { "Content-Type": "application/json" }
     });
   }
-  return new Response(JSON.stringify({ text: result.text }), {
+  return new Response(JSON.stringify({
+    text: result.text,
+    type: result.type,
+    id: result.id,
+    replies: table
+  }), {
     headers: { "Content-Type": "application/json" }
   });
 }

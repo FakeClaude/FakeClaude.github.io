@@ -16615,43 +16615,44 @@ export async function onRequestPost(context) {
   let result = null;
 
   if (type) {
-    result = await env.DB.prepare(
-      `SELECT text FROM ${table} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
-    )
-      .bind(type)
-      .first();
+     result = await env.DB.prepare(
+    `SELECT id, type, text FROM ${table} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
+  ).bind(type).first();
   }
 
   // 该语言表里没有这个 type 的数据（或没识别出 type），退化成不限定 type 的随机一条
   if (!result) {
-    result = await env.DB.prepare(
-      `SELECT text FROM ${table} WHERE type = 'general' ORDER BY RANDOM() LIMIT 1`
-    ).first();
+      result = await env.DB.prepare(
+    `SELECT id, type, text FROM ${table} ORDER BY RANDOM() LIMIT 1`
+  ).first();
   }
 
   // 该语言表本身还没建/是空的，兜底回退到默认的 en 表
   if (!result && table !== DEFAULT_TABLE) {
     if (type) {
       result = await env.DB.prepare(
-        `SELECT text FROM ${DEFAULT_TABLE} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
-      )
-        .bind(type)
-        .first();
+      `SELECT id, type, text FROM ${DEFAULT_TABLE} WHERE type = ? ORDER BY RANDOM() LIMIT 1`
+    ).bind(type).first();
     }
     if (!result) {
-      result = await env.DB.prepare(
-        `SELECT text FROM ${DEFAULT_TABLE} ORDER BY RANDOM() LIMIT 1`
-      ).first();
+       result = await env.DB.prepare(
+      `SELECT id, type, text FROM ${DEFAULT_TABLE} ORDER BY RANDOM() LIMIT 1`
+    ).first();
     }
   }
 
   if (!result) {
-    return new Response(JSON.stringify({ text: "数据库是空的,先去插几条数据吧。" }), {
+    return new Response(JSON.stringify({ text: "no date" }), {
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  return new Response(JSON.stringify({ text: result.text }), {
-    headers: { "Content-Type": "application/json" },
-  });
+  return new Response(JSON.stringify({
+  text: result.text,
+  type: result.type,
+  id: result.id,
+  replies: table,
+}), {
+  headers: { "Content-Type": "application/json" },
+});
 }

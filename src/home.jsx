@@ -121,9 +121,15 @@ export default function Home() {
 
   setTimeout(() => {
     setIsThinking(false);
-    setMessages((prev) => [...prev, { role: "ai", text: data.text }]);
+    setMessages((prev) => [...prev, {
+      role: "ai",
+      text: data.text,
+      type: data.type,
+      id: data.id,
+      replies: data.replies,
+    }]);
   }, remain);
-}
+  }
   function handleKeyDown(e) {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
+python3 /Volumes/SSD/Other/other/Fakeclaude/scripts/replies/reorder_ids.py
+
 将当前目录下所有 .json 文件中的条目,按 type 分组(顺序 = 该 type 在文件中首次出现的顺序),
 组内保持原有相对顺序,然后从 1 开始重新连续编号 id。
 每个文件独立处理,互不影响。
+
 """
 
 import json

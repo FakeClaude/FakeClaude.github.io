@@ -1,5 +1,5 @@
 [
-   {
+  {
     "id": 1,
     "type": "work",
     "text": "Não vês as plantas, os pássaros, as formigas, as aranhas e as abelhas, cumprindo cada uma sua própria tarefa, pondo em ordem o mundo, tanto quanto podem? E tu não estás disposto a fazer o teu trabalho como ser humano?"
@@ -11,887 +11,792 @@
   },
   {
     "id": 3,
-    "type": "love",
-    "text": "Um amigo é um segundo eu."
-  },
-  {
-    "id": 4,
-    "type": "love",
-    "text": "O amor é composto por uma única alma habitando dois corpos."
-  },
-  {
-    "id": 5,
-    "type": "desire",
-    "text": "Não é porque julgamos algo bom que o desejamos, mas sim julgamos algo bom porque o desejamos."
-  },
-  {
-    "id": 6,
-    "type": "desire",
-    "text": "A vida oscila como um pêndulo entre a dor e o tédio."
-  },
-  {
-    "id": 7,
-    "type": "daily",
-    "text": "Até o pão e a água me são agradáveis."
-  },
-  {
-    "id": 8,
-    "type": "daily",
-    "text": "O sábio não lamenta o que lhe falta, mas se alegra com o que tem."
-  },
-  {
-    "id": 9,
-    "type": "nature",
-    "text": "Ninguém entra duas vezes no mesmo rio."
-  },
-  {
-    "id": 10,
-    "type": "nature",
-    "text": "Tudo o que está em harmonia com o universo está em harmonia comigo."
-  },
-  {
-    "id": 11,
-    "type": "doubt",
-    "text": "Há mais coisas que nos aterrorizam do que nos oprimem, e sofremos mais na imaginação do que na realidade."
-  },
-  {
-    "id": 12,
-    "type": "doubt",
-    "text": "Quem teme sofrer já sofre o que teme."
-  },
-  {
-    "id": 13,
-    "type": "procrastination",
-    "text": "Enquanto esperamos pela vida, a vida passa."
-  },
-  {
-    "id": 14,
-    "type": "procrastination",
-    "text": "Podias deixar a vida agora mesmo. Que isso determine o que fazes, dizes e pensas."
-  },
-  {
-    "id": 15,
-    "type": "health",
-    "text": "Mente sã em corpo são."
-  },
-  {
-    "id": 16,
-    "type": "health",
-    "text": "Cuida do teu corpo como se fosses viver para sempre, e cuida da tua alma como se fosses morrer amanhã."
-  },
-  {
-    "id": 17,
-    "type": "existential",
-    "text": "Uma vida não examinada não vale a pena ser vivida."
-  },
-  {
-    "id": 18,
-    "type": "existential",
-    "text": "Quem tem um porquê para viver suporta quase qualquer como."
-  },
-  {
-    "id": 19,
-    "type": "fortune",
-    "text": "Algumas coisas dependem de nós, outras não."
-  },
-  {
-    "id": 20,
-    "type": "fortune",
-    "text": "A roda da fortuna gira incessantemente, e o topo de hoje é o fundo de amanhã."
-  },
-  {
-    "id": 21,
-    "type": "decision",
-    "text": "Um burro colocado exatamente entre dois montes de feno igualmente distantes e apetitosos morreria de fome, incapaz de decidir qual comer primeiro."
-  },
-  {
-    "id": 22,
-    "type": "decision",
-    "text": "Quando duas coisas estão perfeitamente equilibradas, a vontade fica suspensa entre elas, como se fosse incapaz de agir."
-  },
-  {
-    "id": 23,
-    "type": "insulted",
-    "text": "Os homens não se perturbam com as coisas que acontecem, mas com as opiniões sobre elas; não é quem te ofende que te insulta, mas o teu próprio julgamento de que isso é insultante."
-  },
-  {
-    "id": 24,
-    "type": "insulted",
-    "text": "A melhor vingança é não ser como quem te feriu."
-  },
-  {
-    "id": 25,
-    "type": "identity",
-    "text": "Torna-te no que és, depois de teres aprendido o que isso é."
-  },
-  {
-    "id": 26,
-    "type": "identity",
-    "text": "A grandeza da mente de um homem nunca se mostra na prosperidade; para julgá-lo verdadeiramente, devemos vê-lo quando se governa a si mesmo."
-  },
-  {
-    "id": 27,
-    "type": "greeting",
-    "text": "O sol é novo a cada dia."
-  },
-  {
-    "id": 28,
-    "type": "greeting",
-    "text": "Quando acordares de manhã, pensa no precioso privilégio que é estar vivo — respirar, pensar, desfrutar, amar."
-  },
-  {
-    "id": 29,
-    "type": "general",
-    "text": "Só sei que nada sei."
-  },
-  {
-    "id": 30,
-    "type": "general",
-    "text": "Somos aquilo que fazemos repetidamente. A excelência, portanto, não é um ato, mas um hábito."
-  },
-  {
-    "id": 31,
-    "type": "society",
-    "text": "O homem é por natureza um animal político; quem não consegue viver em sociedade, ou não precisa por ser autossuficiente, deve ser uma besta ou um deus."
-  },
-  {
-    "id": 33,
-    "type": "society",
-    "text": "O homem nasce livre, e por toda parte está acorrentado; antes do estabelecimento da sociedade civil, a humanidade vivia num estado de guerra de todos contra todos."
-  },
-  {
-    "id": 34,
-    "type": "society",
-    "text": "É uma verdade confirmada pela experiência que todo homem investido de poder tende a abusar dele; o mesmo poder dado para proteger a constituição é muitas vezes usado para destruí-la; para evitar o abuso do poder, é preciso que o poder seja um freio ao poder."
-  },
-  {
-    "id": 35,
-    "type": "society",
-    "text": "O grande e principal fim de os homens se unirem em repúblicas e se submeterem a um governo é a preservação da sua vida, liberdade e propriedade."
-  },
-  {
-    "id": 36,
-    "type": "society",
-    "text": "A história de toda a sociedade até hoje existente é a história das lutas de classes."
-  },
-  {
-    "id": 37,
-    "type": "society",
-    "text": "O colapso súbito e dramático do poder ocorre raramente; onde o poder está a perder terreno, a violência é muitas vezes usada como último recurso."
-  },
-  {
-    "id": 38,
-    "type": "society",
-    "text": "Os exércitos permanentes deverão, com o tempo, ser totalmente abolidos, pois ameaçam constantemente outros estados com a guerra pelo simples facto de estarem sempre preparados para ela."
-  },
-  {
-    "id": 39,
-    "type": "society",
-    "text": "A liberdade, no seu sentido mais simples, é a ausência de obstáculos à realização dos desejos de uma pessoa, ou a área dentro da qual um sujeito pode agir sem obstrução de outros."
-  },
-  {
-    "id": 40,
-    "type": "society",
-    "text": "A guerra é um massacre de pessoas que não se conhecem, em benefício de pessoas que se conhecem mas não se massacram."
-  },
-  {
-    "id": 41,
     "type": "work",
     "text": "Especialistas sem espírito, sensualistas sem coração; essa nulidade imagina ter alcançado um nível de civilização jamais atingido antes."
   },
   {
-    "id": 42,
+    "id": 4,
     "type": "work",
     "text": "De todas as coisas ridículas, a mais ridícula me parece ser estar ocupado — ser um homem apressado com sua comida e seu trabalho."
   },
   {
-    "id": 43,
+    "id": 5,
     "type": "work",
     "text": "Um grande mal está sendo feito no mundo moderno pela crença na virtude do trabalho, e que o caminho para a felicidade e a prosperidade está numa diminuição organizada do trabalho."
   },
   {
-    "id": 44,
+    "id": 6,
     "type": "work",
     "text": "Os filósofos apenas interpretaram o mundo de diferentes maneiras; o que importa, porém, é transformá-lo. — Os jovens, na condução e gestão de suas ações, abarcam mais do que podem reter, agitam mais do que podem aquietar."
   },
   {
-    "id": 45,
+    "id": 7,
     "type": "work",
     "text": "O trabalho é de dois tipos: primeiro, alterar a posição da matéria na superfície da terra, ou perto dela, em relação a outra matéria; segundo, dizer a outros que o façam."
   },
   {
-    "id": 46,
+    "id": 8,
     "type": "work",
     "text": "Através do trabalho... o servo torna-se consciente daquilo que verdadeiramente é."
   },
   {
-    "id": 47,
+    "id": 9,
     "type": "work",
     "text": "Trabalho manual. O tempo entrando no corpo. Através do trabalho, o homem se transforma em matéria, como Cristo o faz através da Eucaristia."
   },
   {
-    "id": 48,
+    "id": 10,
     "type": "work",
     "text": "Todas as coisas excelentes são tão difíceis quanto raras."
   },
   {
-    "id": 49,
+    "id": 11,
+    "type": "love",
+    "text": "Um amigo é um segundo eu."
+  },
+  {
+    "id": 12,
+    "type": "love",
+    "text": "O amor é composto por uma única alma habitando dois corpos."
+  },
+  {
+    "id": 13,
     "type": "love",
     "text": "Ninguém escolheria viver sem amigos, mesmo que tivesse todos os outros bens."
   },
   {
-    "id": 50,
+    "id": 14,
     "type": "love",
     "text": "O amor é a busca do todo, o desejo e a busca do belo e do eterno."
   },
   {
-    "id": 51,
+    "id": 15,
     "type": "love",
     "text": "O amor não é senão prazer acompanhado da ideia de uma causa externa."
   },
   {
-    "id": 52,
+    "id": 16,
     "type": "love",
     "text": "Amar é essencialmente dar, não receber."
   },
   {
-    "id": 53,
+    "id": 17,
     "type": "love",
     "text": "O amor só tem valor moral quando tratamos o outro, ao mesmo tempo, como um fim em si mesmo e nunca apenas como um meio."
   },
   {
-    "id": 54,
+    "id": 18,
     "type": "love",
     "text": "No amor, tudo é ilusão, exceto o facto de duas almas se aproximarem uma da outra."
   },
   {
-    "id": 55,
+    "id": 19,
     "type": "love",
     "text": "Se alguém me perguntar por que o amei, sinto que só posso responder: porque era ele, porque era eu."
   },
   {
-    "id": 56,
+    "id": 20,
     "type": "love",
     "text": "Todo o amor, por mais etéreo que pareça, brota inteiramente do instinto dirigido à propagação da espécie."
   },
   {
-    "id": 57,
+    "id": 21,
     "type": "desire",
-    "text": "Aquilo que é objeto de desejo chamamos de bem, e o objeto de ódio, de mal; não existe bem e mal absolutos, pois são sempre relativos a quem deseja ou odeia."
+    "text": "A riqueza é como a água do mar: quanto mais bebemos, mais sede sentimos; e o mesmo vale para a fama."
   },
   {
-    "id": 58,
+    "id": 22,
     "type": "desire",
-    "text": "O desejo é sempre desejo do que está ausente, do que não se tem; o desejo é essencialmente a busca de uma ausência, de uma falta."
+    "text": "A vida é um nó de desejos; insatisfeitos, trazem sofrimento; satisfeitos, trazem tédio — assim a vida oscila como um pêndulo entre a dor e o tédio."
   },
   {
-    "id": 59,
+    "id": 23,
     "type": "desire",
-    "text": "A faculdade de desejar é a faculdade que um ser tem de, por meio das suas representações, ser a causa da existência real dos objetos dessas representações."
+    "text": "Seja qual for o objeto do desejo de um homem, é isso que ele chama de bem; e o objeto de sua aversão, de mal — pois essas palavras nunca são usadas com um significado constante, mas sempre em relação à pessoa que as emprega."
   },
   {
-    "id": 60,
+    "id": 24,
     "type": "desire",
-    "text": "A razão é, e deve ser apenas, escrava das paixões, e nunca pode pretender outra função além de as servir e obedecer."
+    "text": "Quem deseja, deseja necessariamente aquilo que não possui no presente, o ausente; a essência ontológica do desejo é, portanto, um direcionamento em direção à falta."
   },
   {
-    "id": 61,
+    "id": 25,
     "type": "desire",
-    "text": "Não há fim para o desejo humano; não existe um bem final, e a felicidade não é um estado de repouso, mas um progresso contínuo de um objeto de desejo para outro."
+    "text": "A inveja das pessoas revela o quão infelizes elas se sentem; e sua atenção constante ao que os outros fazem revela o quão entediadas estão."
   },
   {
-    "id": 62,
+    "id": 26,
     "type": "desire",
-    "text": "Não é o desejo em si que nos atormenta, mas a distância entre o desejo e o poder de o satisfazer."
+    "text": "Cada classe inveja e imita a classe imediatamente acima dela na escala social, enquanto raramente se compara às que estão abaixo, ou àquelas que estão consideravelmente à frente."
   },
   {
-    "id": 63,
+    "id": 27,
     "type": "desire",
-    "text": "O que queremos não é a riqueza em si, mas o reconhecimento e a aprovação que ela traz."
+    "text": "Nosso padrão de decência nos gastos, como em outros fins de emulação, é fixado pelos costumes daqueles que nos superam ligeiramente em reputação; assim, por gradações imperceptíveis, todos os cânones de decoro e decência acabam remontando aos hábitos e modos de pensar da mais rica classe ociosa."
   },
   {
-    "id": 64,
+    "id": 28,
     "type": "desire",
-    "text": "Todos os problemas da humanidade decorrem da incapacidade do homem de sentar-se sozinho e em silêncio numa sala."
+    "text": "Nunca é o desejo em si que nos atormenta, mas a distância entre o que desejamos e aquilo de que somos capazes."
   },
   {
-    "id": 65,
+    "id": 29,
+    "type": "desire",
+    "text": "O que ansiamos não é tanto a riqueza em si, mas a atenção e a aprovação que ela nos traz dos outros."
+  },
+  {
+    "id": 30,
+    "type": "desire",
+    "text": "Toda a desgraça dos homens vem de uma única coisa: não saber ficar tranquilamente sozinho em um quarto."
+  },
+  {
+    "id": 31,
     "type": "daily",
-    "text": "Não ousamos muitas coisas porque são difíceis, mas são difíceis porque não ousamos."
+    "text": "Reis e filósofos também cagam, e as damas também. Mesmo no trono mais alto do mundo, continuamos sentados sobre nossas próprias nádegas."
   },
   {
-    "id": 66,
+    "id": 32,
     "type": "daily",
-    "text": "Fui para os bosques porque queria viver deliberadamente, para enfrentar apenas os factos essenciais da vida."
+    "text": "Levantar, o bonde, quatro horas no escritório ou na fábrica, refeição, bonde, mais quatro horas de trabalho, refeição, sono, e segunda terça quarta quinta sexta e sábado no mesmo ritmo — esse caminho é seguido facilmente na maior parte do tempo."
   },
   {
-    "id": 67,
+    "id": 33,
     "type": "daily",
-    "text": "A minha vida foi cheia de terríveis desgraças, a maioria das quais nunca aconteceu."
+    "text": "Um homem que tem bens suficientes para viver, se soubesse ficar em casa com prazer, não sairia dela para ir ao mar ou para o cerco de uma praça; não se compraria um cargo no exército tão caro, senão porque se acharia insuportável não sair da cidade; e não se buscariam as conversas e os divertimentos do jogo, senão porque não se consegue ficar em casa com prazer."
   },
   {
-    "id": 68,
+    "id": 34,
     "type": "daily",
-    "text": "Devemos cultivar o nosso jardim."
+    "text": "Os pais que esperam gratidão dos filhos (há até os que a exigem) são como os usurários, felizes em arriscar o capital contanto que recebam os juros."
   },
   {
-    "id": 69,
+    "id": 35,
     "type": "daily",
-    "text": "Os homens não se perturbam com as coisas, mas com as opiniões que têm sobre elas."
+    "text": "Nós nos divertimos e desfrutamos como se divertem; lemos, vemos e julgamos a literatura e a arte como se vê e se julga... achamos 'chocante' o que se acha chocante. O 'a gente' (das Man), que não é nada determinado e que são todos, embora não como a soma, prescreve o modo de ser da cotidianidade."
   },
   {
-    "id": 70,
+    "id": 36,
     "type": "daily",
-    "text": "A tua mente tomará a forma daquilo em que pensas frequentemente."
+    "text": "Os aspectos das coisas mais importantes para nós estão ocultos por causa de sua simplicidade e familiaridade. (Não se consegue notar algo, porque está sempre diante dos olhos.)"
   },
   {
-    "id": 71,
+    "id": 37,
     "type": "daily",
-    "text": "Pobre não é quem tem pouco, mas quem deseja mais."
+    "text": "O costume, então, é o grande guia da vida humana. É esse único princípio que torna nossa experiência útil para nós e nos faz esperar, para o futuro, uma sequência de eventos semelhante à que apareceu no passado. Sem a influência do costume, ignoraríamos completamente qualquer fato além do que está imediatamente presente à memória e aos sentidos."
   },
   {
-    "id": 72,
+    "id": 38,
+    "type": "daily",
+    "text": "Mesmo a paisagem mais bela já não tem garantido o nosso amor depois de nela termos vivido três meses, e alguma costa distante começa a atrair nossa cobiça: a posse, em geral, diminui pela própria posse."
+  },
+  {
+    "id": 39,
+    "type": "daily",
+    "text": "Raramente erraremos se atribuirmos as ações extremas à vaidade, as ações comuns ao hábito, e as ações mesquinhas ao medo."
+  },
+  {
+    "id": 40,
+    "type": "daily",
+    "text": "Ao acordar de manhã, diga a si mesmo: as pessoas com quem lidarei hoje serão intrometidas, ingratas, arrogantes, desonestas, invejosas e mal-humoradas. São assim porque não sabem distinguir o bem do mal."
+  },
+  {
+    "id": 41,
     "type": "daily",
     "text": "A felicidade não é um estado, mas uma atividade; reside no exercício da virtude em cada momento presente."
   },
   {
-    "id": 73,
+    "id": 42,
     "type": "nature",
-    "text": "Duas coisas enchem a mente de admiração e espanto sempre novos e crescentes, quanto mais e mais constantemente refletimos sobre elas: o céu estrelado acima de mim e a lei moral dentro de mim."
+    "text": "O nitrogênio em nosso DNA, o cálcio em nossos dentes, o ferro em nosso sangue, o carbono em nossas tortas de maçã foram produzidos no interior de estrelas em colapso. Somos feitos de poeira de estrelas."
+  },
+  {
+    "id": 43,
+    "type": "nature",
+    "text": "A Voyager 1 foi lançada em 1977 e já viaja há cerca de 50 anos, percorrendo aproximadamente 25,9 bilhões de quilômetros — o objeto feito pelo homem que foi mais longe. Ainda assim, na velocidade atual, levaria cerca de 70 mil anos para alcançar Próxima Centauri, a estrela mais próxima, a 4 anos-luz de distância; sair da galáxia, nessa velocidade, levaria bilhões de anos. A verdade mais cruel do universo é que ele nos deixa olhar para as estrelas, mas nunca alcançá-las."
+  },
+  {
+    "id": 44,
+    "type": "nature",
+    "text": "Uma das mentiras mais antigas e persistentes que a humanidade já contou a si mesma é a de que a natureza contém propósito e ordem — o universo é indiferente à nossa existência, indiferente quase até a crueldade."
+  },
+  {
+    "id": 45,
+    "type": "nature",
+    "text": "Na natureza nada há de contingente, mas tudo está determinado, pela necessidade da natureza divina, a existir e a operar de um certo modo."
+  },
+  {
+    "id": 46,
+    "type": "nature",
+    "text": "O que é, então, a verdade? Um exército móvel de metáforas, metonímias, antropomorfismos — verdades que são ilusões das quais se esqueceu que o são."
+  },
+  {
+    "id": 47,
+    "type": "nature",
+    "text": "A natureza nunca mente; ela apenas se cala. Somos nós que transformamos esse silêncio no testemunho de que tudo existe por nossa causa."
+  },
+  {
+    "id": 48,
+    "type": "nature",
+    "text": "Não temos outra noção de causa e efeito senão a de certos objetos que sempre estiveram unidos entre si. É apenas o hábito que nos determina a esperar um a partir do aparecimento do outro."
+  },
+  {
+    "id": 49,
+    "type": "nature",
+    "text": "O progresso da ciência não é um acúmulo suave de verdades, mas uma sucessão de rupturas — cada revolução destrói o paradigma antigo; os defensores de paradigmas rivais praticam, de certo modo, em mundos diferentes."
+  },
+  {
+    "id": 50,
+    "type": "nature",
+    "text": "A razão humana tem o destino peculiar, numa de suas espécies de conhecimento, de ser importunada por questões que não pode rejeitar, pois lhe são impostas pela própria natureza da razão, mas às quais também não pode responder, pois excedem toda a sua capacidade."
+  },
+  {
+    "id": 51,
+    "type": "nature",
+    "text": "O mundo é minha representação — esta é uma verdade válida para todo ser vivente e cognoscente, ainda que só o homem possa elevá-la à consciência reflexiva e abstrata."
+  },
+  {
+    "id": 52,
+    "type": "existential",
+    "text": "Se o sofrimento das crianças foi necessário para completar a soma de sofrimentos que era preciso pagar para comprar a verdade, então declaro que essa verdade não vale esse preço... Não quero a harmonia. Por amor à humanidade, não a quero."
+  },
+  {
+    "id": 53,
+    "type": "existential",
+    "text": "As paixões que mais causam as diferenças de engenho entre os homens são principalmente o maior ou menor desejo de poder, de riquezas, de conhecimento e de honra."
+  },
+  {
+    "id": 54,
+    "type": "existential",
+    "text": "Os homens são tão simples e tão sujeitos às necessidades presentes, que aquele que quiser enganar sempre encontrará alguém disposto a deixar-se enganar."
+  },
+  {
+    "id": 55,
+    "type": "existential",
+    "text": "Não é contrário à razão preferir a destruição do mundo inteiro a um arranhão no meu dedo."
+  },
+  {
+    "id": 56,
+    "type": "existential",
+    "text": "Ponho, pois, em primeiro lugar, como uma inclinação geral de toda a humanidade, um desejo perpétuo e incansável de poder após poder, que só cessa com a morte."
+  },
+  {
+    "id": 57,
+    "type": "existential",
+    "text": "Os homens, em geral, julgam mais pelos olhos do que pelas mãos; pois ver está ao alcance de todos, mas compreender apenas de poucos. Todos veem o que pareces ser, poucos percebem o que realmente és... está na natureza do povo deixar-se enganar com mais facilidade do que ser desenganado."
+  },
+  {
+    "id": 58,
+    "type": "existential",
+    "text": "A razão é perfeitamente inerte, e nunca pode nem impedir nem produzir qualquer ação ou afeto."
+  },
+  {
+    "id": 59,
+    "type": "existential",
+    "text": "Os homens creem-se livres, simplesmente porque têm consciência das suas ações e ignoram as causas pelas quais são determinadas."
+  },
+  {
+    "id": 60,
+    "type": "existential",
+    "text": "Um homem que queira fazer profissão de bondade em tudo há de arruinar-se necessariamente entre tantos que não são bons."
+  },
+  {
+    "id": 61,
+    "type": "existential",
+    "text": "Onde não há poder comum, não há lei; onde não há lei, não há injustiça. A força e a fraude são, na guerra, as duas virtudes cardeais."
+  },
+  {
+    "id": 62,
+    "type": "fortune",
+    "text": "Julgo, de fato, que é verdade que a fortuna é árbitra de metade das nossas ações, mas que nos deixa dirigir a outra metade, ou quase."
+  },
+  {
+    "id": 63,
+    "type": "fortune",
+    "text": "A roda da fortuna gira sem cessar, e o que hoje está no topo, amanhã está no fundo."
+  },
+  {
+    "id": 64,
+    "type": "fortune",
+    "text": "Umas coisas estão em nosso poder e outras não; as opiniões, os desejos e as aversões estão em nosso poder, mas o corpo, os bens, a reputação e os cargos não."
+  },
+  {
+    "id": 65,
+    "type": "fortune",
+    "text": "A fortuna é como um rio transbordante, mas os homens podem construir diques e represas para contê-lo antes que inunde."
+  },
+  {
+    "id": 66,
+    "type": "fortune",
+    "text": "O que vem por acaso é instável; quanto mais alto sobe, mais perto está de cair."
+  },
+  {
+    "id": 67,
+    "type": "fortune",
+    "text": "Assim ela faz girar com mão altiva a sua roda do acaso, e continua avançando."
+  },
+  {
+    "id": 68,
+    "type": "fortune",
+    "text": "Não busques que as coisas aconteçam como desejas, mas deseja que aconteçam tal como acontecem, e terás uma vida serena."
+  },
+  {
+    "id": 69,
+    "type": "fortune",
+    "text": "O que a fortuna deu a um homem, ela mesma pode retirar, e o que dá, dá sem qualquer pacto."
+  },
+  {
+    "id": 70,
+    "type": "fortune",
+    "text": "Nenhum homem pode sentir-se seguro até que a fortuna o tenha abandonado."
+  },
+  {
+    "id": 71,
+    "type": "fortune",
+    "text": "Toda fortuna é boa fortuna; pois ou recompensa, ou disciplina, ou corrige, ou castiga, e assim é útil ou justa."
+  },
+  {
+    "id": 72,
+    "type": "decision",
+    "text": "Um burro colocado exatamente entre dois montes de feno igualmente distantes e igualmente atraentes morreria de fome, incapaz de decidir qual comer primeiro."
+  },
+  {
+    "id": 73,
+    "type": "decision",
+    "text": "Estás embarcado. Pesemos o ganho e a perda ao apostar que Deus existe: se ganhares, ganhas tudo; se perderes, não perdes nada."
   },
   {
     "id": 74,
-    "type": "nature",
-    "text": "Na natureza nada é contingente, mas todas as coisas foram condicionadas a existir e a operar de um modo particular pela necessidade da natureza divina."
+    "type": "decision",
+    "text": "Mesmo sem poder saber com certeza qual caminho é o melhor, deve-se escolher firmemente uma direção e segui-la, como um viajante perdido na floresta que nunca deve permanecer parado."
   },
   {
     "id": 75,
-    "type": "nature",
-    "text": "Tudo flui e nada permanece."
+    "type": "decision",
+    "text": "A verdadeira escolha que uma pessoa deve fazer na vida não está entre as inúmeras possibilidades que o mundo oferece, mas sim em ter ou não a coragem de se tornar quem já é; a maior parte da hesitação é, na verdade, uma recusa em enfrentar essa resposta, tão simples quanto cruel."
   },
   {
     "id": 76,
-    "type": "nature",
-    "text": "Tudo é bom quando sai das mãos do Autor das coisas; tudo degenera nas mãos do homem."
+    "type": "decision",
+    "text": "A prudência é uma capacidade verdadeira e racional de agir em relação ao que é bom para o ser humano."
   },
   {
     "id": 77,
-    "type": "nature",
-    "text": "Todas as coisas nascem de sementes, e a nada finalmente retornam."
+    "type": "decision",
+    "text": "Casa-te, e te arrependerás; não te cases, também te arrependerás; seja qual for a tua escolha, te arrependerás de ambas, pois o arrependimento é a estrutura básica da existência humana."
   },
   {
     "id": 78,
-    "type": "nature",
-    "text": "A contemplação das estrelas, caminhando com elas, por assim dizer, lava a sujidade da vida terrena."
+    "type": "decision",
+    "text": "Vejo tudo com clareza; há duas situações possíveis—pode-se fazer isto ou aquilo. A minha opinião sincera e o meu conselho de amigo é este: faze-o ou não o faças—te arrependerás de ambos."
   },
   {
     "id": 79,
-    "type": "nature",
-    "text": "Tudo o que existe está em Deus, e todas as coisas são modos ou afeções de uma única substância, a Natureza."
+    "type": "decision",
+    "text": "Uma mente verdadeiramente profunda deveria ousar suspender o julgamento por muito tempo, tolerando ser dilacerada entre duas possibilidades opostas, em vez de precipitar-se numa decisão apressada apenas para comprar a aparência de paz."
   },
   {
     "id": 80,
-    "type": "nature",
-    "text": "A natureza nunca tem uma aparência mesquinha."
+    "type": "decision",
+    "text": "Um espírito verdadeiramente independente está fadado a atravessar um ponto de viragem perigoso—o momento em que é preciso destruir com as próprias mãos os valores nos quais sempre se apoiou, sem pedir mais a resposta a nenhuma autoridade externa; essa solidão da autolegislação é muito mais pesada do que a liberdade parece ser, e poucos realmente ousam suportá-la."
   },
   {
     "id": 81,
-    "type": "doubt",
-    "text": "Pelo menos uma vez na vida, todo homem deveria duvidar de tudo em que acreditou, até aos seus fundamentos."
+    "type": "decision",
+    "text": "A menoridade é a incapacidade de se servir do próprio entendimento sem a orientação de outrem; o esclarecimento é a saída do homem da sua menoridade, da qual ele mesmo é culpado, pela coragem de se servir do seu próprio entendimento."
   },
   {
     "id": 82,
-    "type": "doubt",
-    "text": "A liberdade não é incompatível com o medo; um homem pode agir por medo e ainda assim ser livre."
+    "type": "insulted",
+    "text": "Lembra-te de que não é aquele que te insulta ou te bate quem te ofende, mas a tua opinião de que essas coisas são ofensivas — retira esse juízo, e a ira desaparece com ele."
   },
   {
     "id": 83,
-    "type": "doubt",
-    "text": "Houve muito mais terrores na minha vida do que perigos."
+    "type": "insulted",
+    "text": "Quem se perturba com o insulto de outrem concede-lhe, com isso, o direito de o julgar — e isso, por si só, já é uma forma de autodepreciação."
   },
   {
     "id": 84,
-    "type": "doubt",
-    "text": "O costume é o grande guia da vida humana; sem ele nada saberíamos sobre o futuro, e a nossa memória do passado seria inútil."
+    "type": "insulted",
+    "text": "A ira é uma loucura breve — o que ela deseja nunca é o autodomínio, mas arruinar os outros junto consigo mesma."
   },
   {
     "id": 85,
-    "type": "doubt",
-    "text": "É melhor enfrentar o pior que pode acontecer do que viver com medo de tudo."
+    "type": "insulted",
+    "text": "Se alguém te disser que outra pessoa falou mal de ti, não te justifiques pelo que se diz, mas responde: ele decerto ignorava os meus outros defeitos, senão não teria mencionado apenas estes."
   },
   {
     "id": 86,
-    "type": "doubt",
-    "text": "O conhecimento liberta-nos do medo."
+    "type": "insulted",
+    "text": "A grosseria é uma fraqueza disfarçada de força — não prova a superioridade de quem a demonstra, apenas expõe o seu vazio interior."
   },
   {
     "id": 87,
-    "type": "doubt",
-    "text": "Esperança e medo são inseparáveis, e não há medo sem esperança, nem esperança sem medo, ambos nascendo da incerteza sobre o futuro."
+    "type": "insulted",
+    "text": "Se alguém puder mostrar-me que não penso ou não ajo corretamente, mudarei de bom grado; pois busco a verdade, pela qual ninguém jamais foi prejudicado. Prejudicado é aquele que persiste no seu erro e na sua ignorância."
   },
   {
     "id": 88,
-    "type": "doubt",
-    "text": "Filosofar é aprender a morrer; quando um homem deixa de temer a morte, liberta-se de toda a servidão."
+    "type": "insulted",
+    "text": "O melhor remédio para a ira é o adiamento — pede à ira, antes de mais nada, não que perdoe, mas que julgue com acerto."
   },
   {
     "id": 89,
-    "type": "procrastination",
-    "text": "Não é que tenhamos pouco tempo, mas que perdemos muito dele."
+    "type": "insulted",
+    "text": "A causa da ira é a crença de que fomos prejudicados; essa crença não deve ser aceite levianamente. Ainda que a ofensa pareça evidente e clara, não devemos exaltar-nos de imediato, pois algumas falsidades têm a aparência da verdade, e é o tempo que a revela."
   },
   {
     "id": 90,
-    "type": "procrastination",
-    "text": "Já que não é a duração da vida, mas o uso que dela se faz, que lhe dá valor, é possível ter vivido muito e, no entanto, ter vivido pouco."
+    "type": "insulted",
+    "text": "Dar demasiado valor à opinião dos outros é um erro generalizado — a honra é, objetivamente, a opinião que os outros têm do nosso valor, e, subjetivamente, o nosso receio dessa opinião."
   },
   {
     "id": 91,
-    "type": "procrastination",
-    "text": "Não ajamos como se tivéssemos mil anos para viver; enquanto vivem, enquanto está em teu poder, esforça-te por te tornares bom."
+    "type": "insulted",
+    "text": "Em toda a fala há um grão de desdém. A linguagem, ao que parece, foi inventada apenas para o mediano, o comum, o comunicável — ao falar, quem fala já se vulgariza a si mesmo."
   },
   {
     "id": 92,
-    "type": "procrastination",
-    "text": "Quem aprendeu a morrer desaprendeu a ser escravo; quem aprendeu a morrer desaprendeu a servir."
+    "type": "identity",
+    "text": "Mas imediatamente observei que, embora quisesse assim pensar que tudo era falso, era absolutamente necessário que eu, que assim pensava, fosse alguma coisa; e ao observar que esta verdade, penso, logo existo, era tão certa e tão segura..."
   },
   {
     "id": 93,
-    "type": "procrastination",
-    "text": "Não podemos entrar duas vezes no mesmo rio, nem podemos agarrar o mesmo presente duas vezes."
+    "type": "identity",
+    "text": "A grandeza e o poder da alma de um homem não se mostram por subir a grandes alturas ou ir muito longe, mas pelo seu domínio sobre si mesmo, tratando a sua própria vida como um campo que merece ser cultivado com esmero."
   },
   {
     "id": 94,
-    "type": "procrastination",
-    "text": "Nunca deixes para amanhã o que podes fazer hoje."
+    "type": "identity",
+    "text": "Por minha parte, quando entro mais intimamente naquilo a que chamo eu mesmo, tropeço sempre nalguma percepção particular ou outra, de calor ou frio, luz ou sombra, amor ou ódio, dor ou prazer. Nunca consigo surpreender-me a mim mesmo em momento algum sem uma percepção, e nunca consigo observar nada além da percepção."
   },
   {
     "id": 95,
-    "type": "procrastination",
-    "text": "Nunca estamos a viver, mas a esperar viver, sempre ansiando por ser felizes; o presente nunca é o nosso destino."
+    "type": "identity",
+    "text": "Na medida em que esta consciência pode estender-se para trás a qualquer ação ou pensamento passado, até aí chega a identidade dessa pessoa; é o mesmo eu agora que era então, e é por esse mesmo eu, com este presente que agora reflete sobre isso, que aquela ação foi feita."
   },
   {
     "id": 96,
-    "type": "procrastination",
-    "text": "Limita-te ao presente; só o presente, este breve momento, é o que um homem pode perder, pois é tudo o que tem."
+    "type": "identity",
+    "text": "Atrevo-me a afirmar, do resto da humanidade, que não são senão um feixe ou coleção de diferentes percepções, que se sucedem umas às outras com uma rapidez inconcebível, e que estão em perpétuo fluxo e movimento."
   },
   {
     "id": 97,
-    "type": "insulted",
-    "text": "É melhor sofrer a injustiça do que praticá-la."
+    "type": "identity",
+    "text": "Na medida em que esta consciência pode estender-se para trás a qualquer ação ou pensamento passado, até aí chega a identidade dessa pessoa; é pela mesma consciência que ela se torna, para si mesma, a mesma pessoa."
   },
   {
     "id": 98,
-    "type": "insulted",
-    "text": "Se te disserem que alguém fala mal de ti, não te desculpes pelo que foi dito, mas responde: ele não conhecia o resto dos meus defeitos, senão não teria mencionado apenas estes."
+    "type": "identity",
+    "text": "Das coisas, umas estão em nosso poder e outras não. Em nosso poder estão a opinião, o impulso, o desejo, a aversão; numa palavra, tudo o que é obra nossa. Não estão em nosso poder o corpo, os bens, a reputação, os cargos."
   },
   {
     "id": 99,
-    "type": "insulted",
-    "text": "A melhor vingança é não ser como o teu inimigo."
+    "type": "identity",
+    "text": "Posso duvidar de que tenho um corpo, e até duvidar se o mundo externo inteiro existe; mas enquanto duvido, esse 'eu' que duvida e pensa tem de existir necessariamente — isto, nenhuma dúvida pode abalar."
   },
   {
     "id": 100,
-    "type": "insulted",
-    "text": "Uma grande mente nunca se dá ao trabalho de se irritar por uma única ferida."
+    "type": "identity",
+    "text": "Suponhamos que houvesse uma máquina cuja estrutura produzisse pensamento, sentimento e percepção; poderíamos imaginá-la ampliada, mantendo as mesmas proporções, de modo que pudéssemos entrar nela como se entra num moinho. Ao entrar, veríamos apenas partes que se empurram umas às outras, e nunca nada que explique uma percepção."
   },
   {
     "id": 101,
-    "type": "insulted",
-    "text": "Não é quem te insulta ou te bate que te ofende, mas a tua opinião de que essas coisas são insultuosas."
+    "type": "identity",
+    "text": "O verdadeiro problema difícil da consciência é o problema da experiência. Quando pensamos e percebemos, há um turbilhão de processamento de informação, mas há também um aspeto subjetivo."
   },
   {
     "id": 102,
-    "type": "insulted",
-    "text": "Prefiro ser ridicularizado pelo mundo inteiro a agir contra a minha própria consciência."
+    "type": "greeting",
+    "text": "Minha alma é tão pesada que nenhum pensamento pode mais sustentá-la, nenhum bater de asas pode mais elevá-la às alturas—e ainda assim, amanhã, o sol voltará a nascer."
   },
   {
     "id": 103,
-    "type": "insulted",
-    "text": "O erro de outro não é razão para eu me irritar; fomos feitos para cooperar, como os pés, como as mãos, como as pálpebras."
+    "type": "greeting",
+    "text": "Levantar-se, lavar-se, e depois esperar que algum medo ou desânimo imprevisível apareça—eu daria o universo inteiro, mais toda a obra de Shakespeare, por um instante de mente serena."
   },
   {
     "id": 104,
-    "type": "insulted",
-    "text": "A ira é uma breve loucura."
+    "type": "greeting",
+    "text": "Quando Alexandre perguntou a Diógenes o que ele desejava, Diógenes respondeu: \"Sim—afasta-te um pouco, estás a tapar-me o sol.\""
   },
   {
     "id": 105,
-    "type": "identity",
-    "text": "Penso, logo existo."
+    "type": "greeting",
+    "text": "E se um dia, ou uma noite, um demônio se esgueirasse até a tua solidão mais profunda e te dissesse: 'Esta vida, tal como agora a vives e a viveste, terás de vivê-la mais uma vez e inúmeras vezes mais; e nada de novo haverá nela... Quererias isto mais uma vez e inúmeras vezes mais?'"
   },
   {
     "id": 106,
-    "type": "identity",
-    "text": "A existência precede a essência; o homem primeiro existe, e só depois se define através das suas escolhas."
+    "type": "greeting",
+    "text": "Quem aprendeu a morrer desaprendeu a ser escravo; filosofar é aprender a morrer, e só então o homem se levanta cada manhã verdadeiramente livre."
   },
   {
     "id": 107,
-    "type": "identity",
-    "text": "Tornar-se no que se é é obra de toda uma vida."
+    "type": "greeting",
+    "text": "Umas coisas dependem de nós e outras não; o corpo, os bens e a reputação não dependem de nós, mas sim as nossas opiniões e a nossa vontade—dirige, pois, no começo de cada dia, a mente para aquilo que verdadeiramente é teu."
   },
   {
     "id": 108,
-    "type": "identity",
-    "text": "A identidade pessoal não consiste na identidade da substância, mas na continuidade da consciência."
+    "type": "greeting",
+    "text": "Assim começou o ocaso de Zaratustra: Que seria da tua felicidade, grande astro, se não tivesses aqueles a quem iluminas? E desceu da montanha, fazendo de cada nascer do sol um ato de entrega escolhido, não algo simplesmente esperado."
   },
   {
     "id": 109,
-    "type": "identity",
-    "text": "Torna-te quem és."
+    "type": "greeting",
+    "text": "Acontece numa manhã qualquer, num mundo não tingido pelo passado nem pelo futuro, que um homem se pergunta 'por quê'—e nesse instante carregado de cansaço e espanto, tudo começa."
   },
   {
     "id": 110,
-    "type": "identity",
-    "text": "O caráter é destino."
+    "type": "greeting",
+    "text": "Esqueceste-te de que o homem prefere a paz, e até mesmo a morte, à liberdade de escolher entre o bem e o mal? O homem não suporta a liberdade e prefere trocá-la por pão e milagre."
   },
   {
     "id": 111,
-    "type": "identity",
-    "text": "A maior coisa no mundo é saber pertencer a si mesmo."
+    "type": "general",
+    "text": "Só sei que nada sei."
   },
   {
     "id": 112,
-    "type": "identity",
-    "text": "O homem está condenado a ser livre; porque, uma vez lançado no mundo, é responsável por tudo o que faz."
+    "type": "general",
+    "text": "Somos aquilo que fazemos repetidamente. A excelência, portanto, não é um ato, mas um hábito."
   },
   {
     "id": 113,
-    "type": "greeting",
-    "text": "Quando acordares de manhã, diz a ti mesmo: as pessoas com quem lidarei hoje serão intrometidas, ingratas; mas não me irritarei, pois fui feito para trabalhar com elas."
+    "type": "general",
+    "text": "Tudo o que pode ser dito, pode ser dito com clareza; e sobre aquilo de que não se pode falar, deve-se calar."
   },
   {
     "id": 114,
-    "type": "greeting",
-    "text": "A minha fórmula para a grandeza num ser humano é amor fati: que nada se queira diferente do que é, não apenas suportar o necessário, mas amá-lo."
+    "type": "general",
+    "text": "O conhecimento de nenhum homem pode ir além de sua própria experiência."
   },
   {
     "id": 115,
-    "type": "greeting",
-    "text": "A manhã é a estação mais memorável do dia, a hora do despertar."
+    "type": "general",
+    "text": "O bom senso é, de todas as coisas, a mais equitativamente distribuída entre os homens; pois cada um julga estar tão bem provido dele que, mesmo os mais difíceis de contentar em tudo o mais, não costumam desejar mais do que já possuem."
   },
   {
     "id": 116,
-    "type": "greeting",
-    "text": "De manhã, quando te levantares contra a vontade, pensa: levanto-me para fazer o trabalho de um ser humano."
+    "type": "general",
+    "text": "Um homem sábio proporciona sua crença à evidência."
   },
   {
     "id": 117,
-    "type": "greeting",
-    "text": "Aquilo que não me mata torna-me mais forte."
+    "type": "general",
+    "text": "Pensamentos sem conteúdo são vazios, intuições sem conceitos são cegas."
   },
   {
     "id": 118,
-    "type": "greeting",
-    "text": "Cada manhã é um novo convite para começar a viver de novo."
-  },
-  {
-    "id": 119,
-    "type": "greeting",
-    "text": "A maior conquista da sabedoria é permitir que as pessoas vivam felizes."
-  },
-  {
-    "id": 120,
-    "type": "greeting",
-    "text": "Vive cada dia como se fosse o último, sem o agarrares ansiosamente, nem o descartares com descuido."
-  },
-  {
-    "id": 121,
-    "type": "health",
-    "text": "Que o corpo seja o teu padrão."
-  },
-  {
-    "id": 122,
-    "type": "health",
-    "text": "Saúde do corpo e tranquilidade da mente são o fim último da vida feliz."
-  },
-  {
-    "id": 123,
-    "type": "health",
-    "text": "As afeições da mente estão intimamente ligadas à saúde e ao vigor do corpo."
-  },
-  {
-    "id": 124,
-    "type": "health",
-    "text": "Quanto mais capaz o corpo é de ser afetado de muitas maneiras, mais capaz a mente é de perceber de muitas maneiras."
-  },
-  {
-    "id": 125,
-    "type": "health",
-    "text": "Tanto o excesso quanto a deficiência destroem a virtude; o exercício excessivo ou insuficiente destrói a força."
-  },
-  {
-    "id": 126,
-    "type": "health",
-    "text": "Que haja uma mente sã num corpo são é o que devo pedir em oração."
-  },
-  {
-    "id": 127,
-    "type": "health",
-    "text": "Um corpo débil enfraquece a mente."
-  },
-  {
-    "id": 128,
-    "type": "health",
-    "text": "De todos os pensamentos e escritos, só creio naqueles escritos com sangue, a partir da própria experiência corporal."
-  },
-  {
-    "id": 129,
-    "type": "existential",
-    "text": "Só há um problema filosófico verdadeiramente sério, e é o suicídio; julgar se a vida vale ou não a pena ser vivida equivale a responder à questão fundamental da filosofia."
-  },
-  {
-    "id": 130,
-    "type": "existential",
-    "text": "O homem é um ser-para-a-morte."
-  },
-  {
-    "id": 131,
-    "type": "existential",
-    "text": "A vida só pode ser compreendida olhando para trás, mas deve ser vivida olhando para a frente."
-  },
-  {
-    "id": 132,
-    "type": "existential",
-    "text": "O inferno são os outros."
-  },
-  {
-    "id": 133,
-    "type": "existential",
-    "text": "No auge do inverno, aprendi finalmente que havia em mim um verão invencível."
-  },
-  {
-    "id": 134,
-    "type": "existential",
-    "text": "Quem por muito tempo foi o mais estrondoso dos trovões deve ter sido, por muito tempo, a mais silenciosa das nuvens."
-  },
-  {
-    "id": 135,
-    "type": "existential",
-    "text": "Só ao enfrentar e aceitar a própria morte é que se pode existir autenticamente."
-  },
-  {
-    "id": 136,
-    "type": "existential",
-    "text": "O homem não passa de um caniço, a coisa mais fraca da natureza, mas é um caniço pensante."
-  },
-  {
-    "id": 137,
-    "type": "fortune",
-    "text": "Algumas coisas estão em nosso poder, outras não; as nossas opiniões, desejos e aversões estão em nosso poder, mas o corpo, os bens, a reputação e os cargos não estão em nosso poder."
-  },
-  {
-    "id": 138,
-    "type": "fortune",
-    "text": "A fortuna é como um rio furioso, mas os homens podem construir diques e barragens para a conter antes que inunde."
-  },
-  {
-    "id": 139,
-    "type": "fortune",
-    "text": "A fortuna não pode ferir quem deixou de depender dela."
-  },
-  {
-    "id": 140,
-    "type": "fortune",
-    "text": "A roda da fortuna gira incessantemente, derrubando o mais alto, erguendo o mais baixo."
-  },
-  {
-    "id": 141,
-    "type": "fortune",
-    "text": "Não busques que as coisas aconteçam como desejas, mas deseja que as coisas que acontecem sejam como são, e terás um fluxo tranquilo de vida."
-  },
-  {
-    "id": 142,
-    "type": "fortune",
-    "text": "O que quer que a fortuna te traga, aceita-o, pois é o mais apropriado para ti."
-  },
-  {
-    "id": 143,
-    "type": "fortune",
-    "text": "A fortuna nunca foi justa; favorece uns e pisa outros."
-  },
-  {
-    "id": 144,
-    "type": "fortune",
-    "text": "Aquilo a que os homens chamam fortuna não é senão o nome que damos às causas das coisas cuja ordem desconhecemos."
-  },
-  {
-    "id": 145,
-    "type": "decision",
-    "text": "Mesmo quando não se pode saber com certeza qual o melhor caminho, deve-se escolher firmemente uma direção e segui-la, tal como um viajante perdido numa floresta nunca deve ficar parado."
-  },
-  {
-    "id": 146,
-    "type": "decision",
-    "text": "Age apenas segundo a máxima pela qual possas ao mesmo tempo querer que ela se torne lei universal."
-  },
-  {
-    "id": 147,
-    "type": "decision",
-    "text": "A prudência é uma capacidade verdadeira e racional de agir em relação às coisas que são boas para o ser humano."
-  },
-  {
-    "id": 148,
-    "type": "decision",
-    "text": "Ao escolher por si mesmo, o homem escolhe por toda a humanidade — essa é a fonte da sua angústia."
-  },
-  {
-    "id": 149,
-    "type": "decision",
-    "text": "Tens de apostar; não é opcional."
-  },
-  {
-    "id": 150,
-    "type": "decision",
-    "text": "A indecisão é o mais doloroso de todos os estados de espírito."
-  },
-  {
-    "id": 151,
-    "type": "decision",
-    "text": "Bem começado é meio caminho andado."
-  },
-  {
-    "id": 152,
-    "type": "decision",
-    "text": "A imaturidade é a incapacidade de usar o próprio entendimento sem a orientação de outrem; o esclarecimento é a saída do homem da sua imaturidade autoimposta através da coragem de usar a sua própria razão."
-  },
-  {
-    "id": 153,
-    "type": "general",
-    "text": "O homem é um animal racional."
-  },
-  {
-    "id": 154,
-    "type": "general",
-    "text": "Os limites da minha linguagem significam os limites do meu mundo."
-  },
-  {
-    "id": 155,
-    "type": "general",
-    "text": "O senso comum é a coisa mais bem distribuída no mundo, pois cada um pensa estar tão bem dotado dele."
-  },
-  {
-    "id": 156,
-    "type": "general",
-    "text": "Um homem sábio proporciona a sua crença às evidências."
-  },
-  {
-    "id": 157,
-    "type": "general",
-    "text": "O esclarecimento é a saída do homem da sua imaturidade autoimposta."
-  },
-  {
-    "id": 158,
     "type": "general",
     "text": "Todos os homens, por natureza, desejam saber."
   },
   {
-    "id": 159,
+    "id": 119,
     "type": "general",
-    "text": "Toda a dignidade do homem consiste no pensamento."
+    "text": "Os limites da minha linguagem significam os limites do meu mundo."
   },
   {
-    "id": 160,
+    "id": 120,
     "type": "general",
-    "text": "A mente é, no início, como uma folha em branco, e todo o conhecimento, todos os seus materiais, vêm da experiência."
+    "text": "Se um leão pudesse falar, não poderíamos compreendê-lo."
   },
   {
-    "id": 161,
+    "id": 121,
+    "type": "general",
+    "text": "A emoção, que é sofrimento, deixa de ser sofrimento assim que dela formamos uma ideia clara e precisa."
+  },
+  {
+    "id": 122,
+    "type": "general",
+    "text": "A emoção, que é sofrimento, deixa de ser sofrimento assim que dela formamos uma ideia clara e precisa."
+  },
+  {
+    "id": 123,
+    "type": "general",
+    "text": "O conhecimento humano e o poder humano coincidem; pois onde a causa não é conhecida, o efeito não pode ser produzido. A natureza só se comanda obedecendo-lhe."
+  },
+  {
+    "id": 124,
+    "type": "general",
+    "text": "Até hoje não se encontrou ninguém com firmeza de espírito e de propósito suficiente para se obrigar resolutamente a varrer todas as teorias e noções comuns, e a aplicar o entendimento, assim tornado justo e equilibrado, a um novo exame dos particulares. Assim acontece que o conhecimento humano, tal como o possuímos, não passa de uma mistura confusa e mal digerida, feita de muita credulidade e muito acaso, e também das noções infantis que absorvemos no início."
+  },
+  {
+    "id": 125,
+    "type": "general",
+    "text": "A fé consiste em acreditar não no que parece verdadeiro, mas no que parece falso ao nosso entendimento."
+  },
+  {
+    "id": 126,
+    "type": "general",
+    "text": "Suponhamos então que a mente seja, como dizemos, um papel em branco, sem nenhum caractere, sem nenhuma ideia. Como ela vem a ser preenchida?"
+  },
+  {
+    "id": 127,
+    "type": "general",
+    "text": "Se observarmos atentamente os recém-nascidos, teremos poucas razões para pensar que trazem consigo muitas ideias ao nascer."
+  },
+  {
+    "id": 128,
+    "type": "general",
+    "text": "Em filosofia, um estudante deveria duvidar das coisas que julga entender com demasiada facilidade, tanto quanto daquelas que não entende de forma alguma."
+  },
+  {
+    "id": 129,
+    "type": "general",
+    "text": "O Iluminismo é a saída do homem de sua menoridade, da qual ele mesmo é culpado. Menoridade é a incapacidade de se servir do próprio entendimento sem a direção de outro. Essa menoridade é autoculpada quando sua causa não reside na falta de entendimento, mas na falta de decisão e coragem de se servir dele sem a direção de outro."
+  },
+  {
+    "id": 130,
+    "type": "general",
+    "text": "A preguiça e a covardia são as razões pelas quais uma parte tão grande dos homens permanece em menoridade por toda a vida."
+  },
+  {
+    "id": 131,
+    "type": "general",
+    "text": "Todo o problema do mundo é que os tolos e os fanáticos estão sempre tão certos de si mesmos, e as pessoas mais sábias, tão cheias de dúvidas."
+  },
+  {
+    "id": 132,
     "type": "society",
-    "text": "A inclinação geral de toda a humanidade é um desejo perpétuo e incessante de poder após poder, que só cessa na morte; a maior de todas as paixões é o medo da morte violenta."
+    "text": "O homem é por natureza um animal político; quem pode prescindir da pólis é uma besta ou um deus.—O homem não nasce apto para a sociedade civil, mas a educação o torna apto para ela."
   },
   {
-    "id": 162,
+    "id": 133,
     "type": "society",
-    "text": "Onde não há lei, não há liberdade."
+    "text": "O homem nasceu livre, e por toda parte encontra-se acorrentado.—Antes de se estabelecer a sociedade civil, a humanidade vivia num estado de guerra de todos contra todos."
   },
   {
-    "id": 163,
+    "id": 134,
     "type": "society",
-    "text": "É uma verdade confirmada pela experiência constante de todas as épocas que qualquer homem com poder tende a abusar dele."
+    "text": "É uma verdade confirmada pela experiência que todo homem que detém poder tende a abusar dele; para evitar esse abuso, é necessário que o poder limite o poder.—A soberania é indivisível; ao dividi-la em seus objetos, os teóricos políticos transformaram o soberano num monstro montado de membros dispares, rasgando a unidade da vontade comum."
   },
   {
-    "id": 164,
+    "id": 135,
     "type": "society",
-    "text": "Se toda a humanidade, menos um, fosse de uma opinião, a humanidade não estaria mais justificada em silenciar essa pessoa do que ela, se tivesse o poder, estaria justificada em silenciar a humanidade."
+    "text": "Um grande estado democrático só se conservou por um inimigo às portas, pelo prestígio de um cidadão eminente, ou pelo temor mútuo entre facções rivais—nunca pela deliberação pública em assembleia."
   },
   {
-    "id": 165,
+    "id": 136,
     "type": "society",
-    "text": "O primeiro artigo definitivo da paz perpétua é que a constituição civil de todo estado deve ser republicana."
+    "text": "A história de todas as sociedades até hoje existentes é a história da luta de classes.—O povo nunca abre mão de suas liberdades senão sob alguma ilusão."
   },
   {
-    "id": 166,
+    "id": 137,
     "type": "society",
-    "text": "É muito mais seguro ser temido do que amado, quando um dos dois tem de faltar."
+    "text": "O fim das leis não foi abolir ou restringir a liberdade, mas preservá-la e ampliá-la; para que os homens não se prejudicassem uns aos outros, mas se ajudassem mutuamente e se unissem contra um inimigo comum."
   },
   {
-    "id": 167,
+    "id": 138,
     "type": "society",
-    "text": "O mais aterrorizante no domínio totalitário não é que destrua corpos humanos, mas que procure destruir a capacidade do homem de pensar e julgar de forma independente."
+    "text": "Só há duas coisas que podem tornar um acontecimento admirável: ou é estranho e raramente visto, ou não podemos imaginar que tenha sido produzido por causas naturais. Mas assim que reconhecemos uma possível causa natural, deixamos de nos admirar, por raro que seja o acontecimento, e não mais o consideramos um milagre."
   },
   {
-    "id": 168,
+    "id": 139,
     "type": "society",
-    "text": "Um Estado é uma comunidade humana que reivindica com sucesso o monopólio do uso legítimo da força física dentro de um determinado território."
+    "text": "Sendo o pensamento livre, todo homem conserva a liberdade de julgar por si mesmo se um suposto milagre merece crédito, ponderando que proveito tiram disso aqueles que o afirmam ou o sustentam, e assim julgar se se trata de um verdadeiro prodígio ou de um embuste."
   },
   {
-    "id": 169,
+    "id": 140,
+    "type": "society",
+    "text": "A guerra é um massacre de gente que não se conhece, em benefício de gente que se conhece mas não se massacra entre si.—Manter a paz diante de um grave mal que só a força pode deter é em si mesmo uma espécie de pecado."
+  },
+  {
+    "id": 141,
+    "type": "society",
+    "text": "Ponho, pois, em primeiro lugar, como uma inclinação geral de toda a humanidade, um desejo perpétuo e incansável de poder após poder, que só cessa com a morte."
+  },
+  {
+    "id": 142,
+    "type": "society",
+    "text": "A segurança do povo exige ainda que quem detenha o poder soberano administre a justiça igualmente a todos os homens; e que a ninguém seja permitido infligir castigo maior que o do soberano, sob pena de dissolver o estado."
+  },
+  {
+    "id": 143,
+    "type": "society",
+    "text": "O fim da lei não é abolir ou restringir a liberdade, mas preservá-la e ampliá-la.—A liberdade dos lobos tem, muitas vezes, significado a morte das ovelhas."
+  },
+  {
+    "id": 144,
+    "type": "society",
+    "text": "O público deve ser posto em seu lugar... um rebanho confuso, que deve ser governado por uma classe especializada cujo interesse transcende o local.—O problema não é que as pessoas comuns sejam incapazes por natureza de compreender os assuntos públicos, mas sim que os métodos e condições atuais de debate, discussão e persuasão são pobres demais; melhorando-os, o público pode participar plenamente, e até mesmo dirigir, o julgamento sobre os seus próprios assuntos."
+  },
+  {
+    "id": 145,
+    "type": "society",
+    "text": "O primeiro artigo definitivo para a paz perpétua é que a constituição civil de todo estado seja republicana.—Esse mecanismo liberal de pesos e contrapesos, que pretende substituir a decisão política concreta por uma negociação e um procedimento jurídico intermináveis, acredita ter abolido a tirania, mas na realidade dissolve a unidade política, degradando o estado, pelo desgaste interno, a um medíocre campo de negociação de interesses."
+  },
+  {
+    "id": 146,
+    "type": "society",
+    "text": "É muito mais seguro ser temido do que amado, quando há de faltar um dos dois.—Mas uma paz sustentada apenas pelo medo não é senão hostilidade ainda não explodida; uma segurança que nunca conquistou a razão nem o consentimento dos súditos acabará destruída pelo próprio ressentimento que o medo acumulou."
+  },
+  {
+    "id": 147,
+    "type": "society",
+    "text": "A ditadura é o exercício do poder estatal com a supressão das restrições legais normalmente vigentes, para fazer face a um estado de exceção.—O estado de exceção foi sempre o pretexto pelo qual se corroem as garantias da liberdade individual."
+  },
+  {
+    "id": 148,
+    "type": "society",
+    "text": "Um estado é uma comunidade humana que reivindica com êxito o monopólio do uso legítimo da força física dentro de um determinado território.—A guerra é um instrumento necessário do estado, e a paz não é, muitas vezes, mais que a preparação para a próxima guerra."
+  },
+  {
+    "id": 149,
     "type": "society",
     "text": "O maior perigo numa democracia não é a tirania, mas a tirania da maioria, a opressão da minoria em nome da liberdade."
   },
   {
-    "id": 170,
+    "id": 150,
     "type": "society",
-    "text": "Não é da benevolência do açougueiro, do cervejeiro ou do padeiro que esperamos o nosso jantar, mas do seu interesse próprio."
+    "text": "A guerra não é senão a continuação da política por outros meios, pelo que a justiça de uma guerra não pode ser julgada à parte do fim político a que serve."
   },
   {
-    "id": 171,
+    "id": 151,
     "type": "society",
-    "text": "O mal não vem do fanatismo ou da perversão, mas da banalidade; o mais aterrorizante no totalitarismo é que procura destruir a capacidade do homem de pensar e julgar de forma independente."
+    "text": "O mal não provém do fanatismo ou da perversão, mas da banalidade—o mais aterrador no domínio totalitário é que ele busca destruir a capacidade do homem de pensar e julgar de modo independente."
   },
   {
-    "id": 172,
+    "id": 152,
     "type": "society",
-    "text": "A força não cria direito, e nenhum homem tem autoridade natural sobre os seus semelhantes; a obediência produzida apenas pela força não gera direito ou obrigação genuínos, a menos que seja dada voluntariamente."
+    "text": "A força não cria direito, e nenhuma obediência produzida pela mera força gera um direito ou dever verdadeiros, a menos que seja prestada voluntariamente.—Pactos sem a espada não passam de palavras, sem força alguma para proteger quem quer que seja."
   },
   {
-    "id": 173,
+    "id": 153,
     "type": "society",
-    "text": "O homem é por natureza um animal político; a maior de todas as paixões humanas é o medo da morte violenta, e o desejo incessante de poder após poder que só cessa na morte."
+    "text": "Foram dotados pelo seu Criador de certos direitos inalienáveis.—Direitos naturais são pura tolice: direitos naturais e imprescritíveis, tolice retórica—tolice sobre andas."
   },
   {
-    "id": 174,
+    "id": 154,
     "type": "society",
-    "text": "Os proletários nada têm a perder nesta revolução além das suas correntes; têm um mundo a ganhar. O caminho do inferno está pavimentado de boas intenções."
+    "text": "Os proletários nada têm a perder nesta revolução além de suas cadeias; têm um mundo a ganhar.—O caminho para o inferno está pavimentado de boas intenções."
   },
   {
-    "id": 175,
+    "id": 155,
     "type": "society",
-    "text": "Pactos sem a espada não passam de palavras, sem força alguma para garantir segurança a um homem."
+    "text": "Pactos sem a espada não passam de palavras, sem força alguma para proteger quem quer que seja."
   },
   {
-    "id": 176,
+    "id": 156,
     "type": "society",
-    "text": "O mal não vem do fanatismo ou da perversão, mas da banalidade; é a incapacidade de pensar que torna possível às pessoas cometer os maiores males."
+    "text": "Um príncipe deve saber imitar tanto a raposa quanto o leão, pois o leão não pode defender-se das armadilhas, nem a raposa dos lobos.—Os homens julgam, em geral, mais pelas aparências do que pelos atos de um príncipe, e no final só importa se ele conservou o seu estado e venceu."
   },
   {
-    "id": 177,
+    "id": 157,
     "type": "society",
-    "text": "A maior felicidade do maior número é a medida do certo e do errado; cada pessoa deve ser tratada como um fim em si mesma, e nunca apenas como um meio."
+    "text": "O principal sinal que ajuda o realismo político a encontrar o seu caminho na paisagem da política internacional é o conceito de interesse definido em termos de poder—o verdadeiro motor do comportamento estatal nunca são os ideais ou a justiça, mas o cálculo nu do interesse e a comparação de forças."
   },
   {
-    "id": 178,
+    "id": 158,
     "type": "society",
-    "text": "Quem luta contra monstros deve cuidar para não se tornar também um monstro no processo. A guerra é paz, a liberdade é escravidão, a ignorância é força."
+    "text": "Uma ordem internacional fundada na diplomacia aberta, na autodeterminação e na segurança coletiva, substituindo o velho jogo do equilíbrio de poder por uma liga das nações, poderia, se construída com regras suficientemente transparentes e democráticas, eliminar as próprias raízes da guerra."
   },
   {
-    "id": 179,
+    "id": 159,
     "type": "society",
-    "text": "A árvore da liberdade deve ser refrescada de tempos em tempos com o sangue de patriotas e tiranos. Olho por olho só acaba por deixar o mundo inteiro cego."
+    "text": "Mesmo que as sociedades partam de premissas diferentes, desde que sigam um conjunto de regras básicas razoáveis, sociedades liberais e sociedades não liberais mas decentes podem coexistir e cooperar com base no respeito mútuo."
   },
   {
-    "id": 180,
+    "id": 160,
     "type": "society",
-    "text": "A justiça é a primeira virtude das instituições sociais, tal como a verdade é dos sistemas de pensamento; uma teoria, por mais elegante e económica que seja, deve ser rejeitada ou revista se for falsa, e leis e instituições, por mais eficientes e bem organizadas que sejam, devem ser reformadas ou abolidas se forem injustas."
+    "text": "A justiça é a primeira virtude das instituições sociais, assim como a verdade o é dos sistemas de pensamento; uma teoria, por mais elegante que seja, deve ser rejeitada se não for verdadeira, e as leis, por mais eficientes que sejam, devem ser reformadas se forem injustas.—A justiça, no fundo, não é senão um refinamento do sentimento de vingança."
   }
 ]

@@ -11,887 +11,787 @@
   },
   {
     "id": 3,
-    "type": "love",
-    "text": "Ein Freund ist ein zweites Selbst."
-  },
-  {
-    "id": 4,
-    "type": "love",
-    "text": "Die Liebe besteht aus einer einzigen Seele, die in zwei Körpern wohnt."
-  },
-  {
-    "id": 5,
-    "type": "desire",
-    "text": "Nicht weil wir eine Sache für gut halten, begehren wir sie, sondern wir halten sie für gut, weil wir sie begehren."
-  },
-  {
-    "id": 6,
-    "type": "desire",
-    "text": "Das Leben schwingt wie ein Pendel hin und her zwischen Schmerz und Langeweile."
-  },
-  {
-    "id": 7,
-    "type": "daily",
-    "text": "Selbst Brot und Wasser sind mir angenehm."
-  },
-  {
-    "id": 8,
-    "type": "daily",
-    "text": "Der Weise trauert nicht um das, was ihm fehlt, sondern freut sich über das, was er hat."
-  },
-  {
-    "id": 9,
-    "type": "nature",
-    "text": "Kein Mensch tritt zweimal in denselben Fluss."
-  },
-  {
-    "id": 10,
-    "type": "nature",
-    "text": "Was mit dem Universum im Einklang ist, ist auch mit mir im Einklang."
-  },
-  {
-    "id": 11,
-    "type": "doubt",
-    "text": "Es gibt mehr Dinge, die uns erschrecken, als solche, die uns bedrücken, und wir leiden öfter in der Vorstellung als in der Wirklichkeit."
-  },
-  {
-    "id": 12,
-    "type": "doubt",
-    "text": "Wer fürchtet, dass er leiden wird, leidet bereits an dem, was er fürchtet."
-  },
-  {
-    "id": 13,
-    "type": "procrastination",
-    "text": "Während wir auf das Leben warten, vergeht das Leben."
-  },
-  {
-    "id": 14,
-    "type": "procrastination",
-    "text": "Du könntest das Leben jetzt sofort verlassen. Lass das bestimmen, was du tust, sagst und denkst."
-  },
-  {
-    "id": 15,
-    "type": "health",
-    "text": "Ein gesunder Geist in einem gesunden Körper."
-  },
-  {
-    "id": 16,
-    "type": "health",
-    "text": "Kümmere dich um deinen Körper, als würdest du ewig leben, und um deine Seele, als würdest du morgen sterben."
-  },
-  {
-    "id": 17,
-    "type": "existential",
-    "text": "Das ungeprüfte Leben ist nicht lebenswert."
-  },
-  {
-    "id": 18,
-    "type": "existential",
-    "text": "Wer ein Warum zum Leben hat, erträgt fast jedes Wie."
-  },
-  {
-    "id": 19,
-    "type": "fortune",
-    "text": "Manches liegt in unserer Macht, anderes nicht."
-  },
-  {
-    "id": 20,
-    "type": "fortune",
-    "text": "Das Rad des Schicksals dreht sich unaufhörlich, und das Höchste von heute ist das Niedrigste von morgen."
-  },
-  {
-    "id": 21,
-    "type": "decision",
-    "text": "Ein Esel, der genau zwischen zwei gleich weit entfernten und gleich verlockenden Heubündeln steht, würde vor Hunger sterben, unfähig zu entscheiden, welches er zuerst fressen soll."
-  },
-  {
-    "id": 22,
-    "type": "decision",
-    "text": "Wenn zwei Dinge sich vollkommen die Waage halten, bleibt der Wille zwischen ihnen schwebend, als könne er überhaupt nicht handeln."
-  },
-  {
-    "id": 23,
-    "type": "insulted",
-    "text": "Nicht die Dinge, die geschehen, beunruhigen die Menschen, sondern die Meinungen über die Dinge; nicht wer dich beschimpft, beleidigt dich, sondern dein eigenes Urteil, dass diese Dinge beleidigend seien."
-  },
-  {
-    "id": 24,
-    "type": "insulted",
-    "text": "Die beste Rache ist, nicht so zu sein wie derjenige, der das Unrecht begangen hat."
-  },
-  {
-    "id": 25,
-    "type": "identity",
-    "text": "Werde, was du bist, nachdem du gelernt hast, was das ist."
-  },
-  {
-    "id": 26,
-    "type": "identity",
-    "text": "Die Höhe und Größe des menschlichen Geistes kann sich niemals im Wohlstand zeigen; wollen wir ihn wahrhaft beurteilen, müssen wir ihn betrachten, wenn er mit der Beherrschung seiner selbst beschäftigt ist."
-  },
-  {
-    "id": 27,
-    "type": "greeting",
-    "text": "Die Sonne ist jeden Tag neu."
-  },
-  {
-    "id": 28,
-    "type": "greeting",
-    "text": "Wenn du morgens aufstehst, denke daran, welch kostbares Privileg es ist, am Leben zu sein – zu atmen, zu denken, zu genießen, zu lieben."
-  },
-  {
-    "id": 29,
-    "type": "general",
-    "text": "Ich weiß, dass ich nichts weiß."
-  },
-  {
-    "id": 30,
-    "type": "general",
-    "text": "Wir sind, was wir immer wieder tun. Vortrefflichkeit ist also keine Handlung, sondern eine Gewohnheit."
-  },
-  {
-    "id": 31,
-    "type": "society",
-    "text": "Der Mensch ist von Natur aus ein politisches Wesen; wer unfähig ist, in Gesellschaft zu leben, oder wer nichts braucht, weil er sich selbst genügt, muss entweder ein Tier oder ein Gott sein."
-  },
-  {
-    "id": 33,
-    "type": "society",
-    "text": "Der Mensch ist frei geboren, und überall liegt er in Ketten; vor der Errichtung der bürgerlichen Gesellschaft herrschte unter den Menschen ein Krieg aller gegen alle."
-  },
-  {
-    "id": 34,
-    "type": "society",
-    "text": "Es ist eine durch die Erfahrung bestätigte Wahrheit, dass jeder Mensch, der mit Macht ausgestattet ist, dazu neigt, sie zu missbrauchen; dieselbe Macht, die zum Schutz der Verfassung gegeben wurde, wird oft benutzt, sie zu zerstören; um den Missbrauch der Macht zu verhindern, muss die Macht die Macht in Schranken halten."
-  },
-  {
-    "id": 35,
-    "type": "society",
-    "text": "Der große und hauptsächliche Zweck, weshalb Menschen sich zu Gemeinwesen zusammenschließen und sich einer Regierung unterstellen, ist die Erhaltung ihres Lebens, ihrer Freiheit und ihres Eigentums."
-  },
-  {
-    "id": 36,
-    "type": "society",
-    "text": "Die Geschichte aller bisherigen Gesellschaft ist die Geschichte von Klassenkämpfen."
-  },
-  {
-    "id": 37,
-    "type": "society",
-    "text": "Der plötzliche, dramatische Zusammenbruch der Macht geschieht nur selten; wo die Macht ihren Halt verliert, wird Gewalt oft als letztes Mittel eingesetzt."
-  },
-  {
-    "id": 38,
-    "type": "society",
-    "text": "Stehende Heere sollen mit der Zeit ganz abgeschafft werden, denn sie bedrohen andere Staaten durch die bloße Tatsache, dass sie stets zum Krieg bereit sind."
-  },
-  {
-    "id": 39,
-    "type": "society",
-    "text": "Freiheit ist, in ihrem einfachsten Sinn, die Abwesenheit von Hindernissen bei der Erfüllung der Wünsche einer Person, oder der Bereich, in dem ein Subjekt ungehindert von anderen handeln kann."
-  },
-  {
-    "id": 40,
-    "type": "society",
-    "text": "Krieg ist ein Massaker von Menschen, die einander nicht kennen, zum Nutzen von Menschen, die einander kennen, sich aber nicht gegenseitig abschlachten."
-  },
-  {
-    "id": 41,
     "type": "work",
     "text": "Fachmenschen ohne Geist, Genußmenschen ohne Herz: dies Nichts bildet sich ein, eine nie vorher erreichte Stufe des Menschentums erstiegen zu haben."
   },
   {
-    "id": 42,
+    "id": 4,
     "type": "work",
     "text": "Von allen lächerlichen Dingen scheint mir das lächerlichste zu sein, geschäftig zu sein — ein Mann zu sein, der eilig ist mit seinem Essen und seiner Arbeit."
   },
   {
-    "id": 43,
+    "id": 5,
     "type": "work",
     "text": "Der modernen Welt wird durch den Glauben an die Tugendhaftigkeit der Arbeit großer Schaden zugefügt; der Weg zu Glück und Wohlstand liegt in einer organisierten Verminderung der Arbeit."
   },
   {
-    "id": 44,
+    "id": 6,
     "type": "work",
     "text": "Die Philosophen haben die Welt nur verschieden interpretiert; es kommt darauf an, sie zu verändern. — Junge Männer greifen im Umgang mit Angelegenheiten mehr an, als sie halten können, und rühren mehr auf, als sie beruhigen können."
   },
   {
-    "id": 45,
+    "id": 7,
     "type": "work",
     "text": "Arbeit ist zweierlei: erstens, die Lage von Materie an oder nahe der Erdoberfläche relativ zu anderer Materie zu verändern; zweitens, anderen zu befehlen, dies zu tun."
   },
   {
-    "id": 46,
+    "id": 8,
     "type": "work",
     "text": "Durch die Arbeit aber kommt das Bewußtsein des Knechtes zu sich selbst."
   },
   {
-    "id": 47,
+    "id": 9,
     "type": "work",
     "text": "Körperliche Arbeit: die Zeit dringt in den Körper ein. Durch die Arbeit verwandelt der Mensch sich selbst in Materie, so wie Christus es durch die Eucharistie tut."
   },
   {
-    "id": 48,
+    "id": 10,
     "type": "work",
     "text": "Alles Vortreffliche ist ebenso schwierig wie selten."
   },
   {
-    "id": 49,
+    "id": 11,
+    "type": "love",
+    "text": "Ein Freund ist ein zweites Selbst."
+  },
+  {
+    "id": 12,
+    "type": "love",
+    "text": "Die Liebe besteht aus einer einzigen Seele, die in zwei Körpern wohnt."
+  },
+  {
+    "id": 13,
     "type": "love",
     "text": "Niemand würde sich entscheiden, ohne Freunde zu leben, selbst wenn er alle anderen Güter besäße."
   },
   {
-    "id": 50,
+    "id": 14,
     "type": "love",
     "text": "Liebe ist das Streben nach dem Ganzen, das Verlangen und Streben nach dem Schönen und Ewigen."
   },
   {
-    "id": 51,
+    "id": 15,
     "type": "love",
     "text": "Liebe ist nichts als Lust, verbunden mit der Vorstellung einer äußeren Ursache."
   },
   {
-    "id": 52,
+    "id": 16,
     "type": "love",
     "text": "Liebe ist in erster Linie Geben, nicht Empfangen."
   },
   {
-    "id": 53,
+    "id": 17,
     "type": "love",
     "text": "Liebe hat nur dann moralischen Wert, wenn wir den anderen zugleich als Zweck an sich selbst behandeln und niemals bloß als Mittel."
   },
   {
-    "id": 54,
+    "id": 18,
     "type": "love",
     "text": "In der Liebe ist alles Illusion, außer der Tatsache, dass zwei Seelen sich einander nähern."
   },
   {
-    "id": 55,
+    "id": 19,
     "type": "love",
     "text": "Wenn man mich fragt, warum ich ihn liebte, fühle ich, dass es sich nur so erklären lässt: weil er es war, weil ich es war."
   },
   {
-    "id": 56,
+    "id": 20,
     "type": "love",
     "text": "Alle Liebe, so ätherisch sie auch erscheinen mag, entspringt gänzlich dem Instinkt, der auf die Fortpflanzung der Art gerichtet ist."
   },
   {
-    "id": 57,
+    "id": 21,
     "type": "desire",
-    "text": "Das, was Gegenstand des Begehrens ist, nennen wir gut, und den Gegenstand des Hasses böse; es gibt kein Gut und Böse an sich, denn diese sind stets relativ zu dem, der begehrt oder hasst."
+    "text": "Reichtum gleicht dem Meerwasser: je mehr man davon trinkt, desto durstiger wird man; ebenso ist es mit dem Ruhm."
+  },
+  {
+    "id": 22,
+    "type": "desire",
+    "text": "Das Leben ist ein Knäuel von Wünschen; unerfüllt bringen sie Leiden, erfüllt bringen sie Langeweile – so schwingt das Leben wie ein Pendel hin und her zwischen Schmerz und Langeweile."
+  },
+  {
+    "id": 23,
+    "type": "desire",
+    "text": "Was auch immer der Gegenstand des Begehrens eines Menschen ist, das nennt er gut; und den Gegenstand seines Abscheus nennt er böse – denn diese Worte werden niemals mit einer festen Bedeutung gebraucht, sondern stets nur bezogen auf die Person, die sie gebraucht."
+  },
+  {
+    "id": 24,
+    "type": "desire",
+    "text": "Wer immer begehrt, begehrt notwendig das, was er gegenwärtig nicht besitzt, das Abwesende; das ontologische Wesen des Begehrens ist somit ein Gerichtetsein auf den Mangel."
+  },
+  {
+    "id": 25,
+    "type": "desire",
+    "text": "Der Neid der Menschen zeigt, wie unglücklich sie sich fühlen; und ihre beständige Beobachtung dessen, was andere tun, zeigt, wie sehr sie sich langweilen."
+  },
+  {
+    "id": 26,
+    "type": "desire",
+    "text": "Jede Klasse beneidet und ahmt die ihr in der sozialen Stufenleiter nächsthöhere Klasse nach, während sie sich kaum mit denen vergleicht, die unter ihr stehen, oder mit jenen, die ihr weit voraus sind."
+  },
+  {
+    "id": 27,
+    "type": "desire",
+    "text": "Unser Maßstab für angemessene Ausgaben wird, wie bei allen anderen Zielen des Wetteifers, durch die Gepflogenheiten derer bestimmt, die uns im Ansehen ein wenig übertreffen; so lassen sich, in unmerklichen Abstufungen, alle Normen von Anstand und Schicklichkeit letztlich auf die Gewohnheiten und Denkweisen der reichsten Müßiggängerklasse zurückführen."
+  },
+  {
+    "id": 28,
+    "type": "desire",
+    "text": "Nicht das Begehren selbst quält uns jemals, sondern die Kluft zwischen dem, was wir begehren, und dem, wozu wir fähig sind."
+  },
+  {
+    "id": 29,
+    "type": "desire",
+    "text": "Wonach wir uns sehnen, ist nicht so sehr der Reichtum selbst, sondern die Aufmerksamkeit und Anerkennung, die er von anderen einbringt."
+  },
+  {
+    "id": 30,
+    "type": "desire",
+    "text": "Alles Unglück der Menschen rührt von einer einzigen Sache her: dass sie nicht ruhig allein in einem Zimmer sitzen können."
+  },
+  {
+    "id": 31,
+    "type": "daily",
+    "text": "Könige und Philosophen scheißen, und Damen ebenso. Selbst auf dem höchsten Thron der Welt sitzen wir doch nur auf unserem eigenen Hintern."
+  },
+  {
+    "id": 32,
+    "type": "daily",
+    "text": "Aufstehen, Straßenbahn, vier Stunden im Büro oder in der Fabrik, Essen, Straßenbahn, vier weitere Stunden Arbeit, Essen, Schlaf, und Montag Dienstag Mittwoch Donnerstag Freitag und Samstag im selben Rhythmus — diesen Weg geht man die meiste Zeit ganz von selbst."
+  },
+  {
+    "id": 33,
+    "type": "daily",
+    "text": "Ein Mann, der genug besitzt, um zu leben, würde, wüsste er nur, wie man vergnügt zu Hause bleibt, nicht aufs Meer hinausfahren oder eine Festung belagern; man kauft sich nur deshalb so teuer einen Posten beim Militär, weil man es unerträglich fände, nie aus der Stadt herauszukommen; und man sucht Gespräche und die Zerstreuung des Spiels nur, weil man nicht vergnügt zu Hause bleiben kann."
+  },
+  {
+    "id": 34,
+    "type": "daily",
+    "text": "Eltern, die von ihren Kindern Dankbarkeit erwarten (manche verlangen sie sogar), gleichen Wucherern, die gern das Kapital aufs Spiel setzen, solange sie nur die Zinsen bekommen."
+  },
+  {
+    "id": 35,
+    "type": "daily",
+    "text": "Wir vergnügen und erfreuen uns, wie man sich vergnügt; wir lesen, sehen und urteilen über Literatur und Kunst, wie man sieht und urteilt … wir finden das ‚schockierend‘, was man schockierend findet. Das Man, das nichts Bestimmtes ist und das alle sind, ohne dass es die Summe wäre, schreibt die Seinsart der Alltäglichkeit vor."
+  },
+  {
+    "id": 36,
+    "type": "daily",
+    "text": "Die Aspekte der Dinge, die für uns am wichtigsten sind, sind uns durch ihre Einfachheit und Vertrautheit verborgen. (Man kann etwas nicht bemerken – weil es einem immer vor Augen ist.)"
+  },
+  {
+    "id": 37,
+    "type": "daily",
+    "text": "Die Gewohnheit also ist der große Führer des menschlichen Lebens. Sie allein ist es, die unsere Erfahrung für uns nützlich macht und uns erwarten lässt, dass sich in Zukunft ein ähnlicher Lauf der Ereignisse zeigen wird wie in der Vergangenheit. Ohne den Einfluss der Gewohnheit wüssten wir über keine Tatsache Bescheid, die über das hinausgeht, was Gedächtnis und Sinne uns gerade unmittelbar zeigen."
+  },
+  {
+    "id": 38,
+    "type": "daily",
+    "text": "Selbst die schönste Landschaft ist unserer Liebe nicht mehr gewiss, wenn wir drei Monate in ihr gelebt haben, und eine entfernte Küste beginnt unsere Habgier zu reizen: Besitz vermindert sich in der Regel durch den Besitz selbst."
+  },
+  {
+    "id": 39,
+    "type": "daily",
+    "text": "Man wird selten irren, wenn man extreme Handlungen der Eitelkeit zuschreibt, gewöhnliche der Gewohnheit und niedrige der Furcht."
+  },
+  {
+    "id": 40,
+    "type": "daily",
+    "text": "Sage dir gleich am Morgen: Die Menschen, mit denen ich heute zu tun haben werde, werden sich einmischen, undankbar, überheblich, unaufrichtig, neidisch und mürrisch sein. Sie sind so, weil sie Gut und Böse nicht zu unterscheiden vermögen."
+  },
+  {
+    "id": 41,
+    "type": "nature",
+    "text": "Der Stickstoff in unserer DNA, das Kalzium in unseren Zähnen, das Eisen in unserem Blut, der Kohlenstoff in unserem Apfelkuchen — all das wurde im Inneren kollabierender Sterne erzeugt. Wir sind aus Sternenstaub gemacht."
+  },
+  {
+    "id": 42,
+    "type": "nature",
+    "text": "Voyager 1 wurde 1977 gestartet und ist seit rund 50 Jahren unterwegs, hat etwa 25,9 Milliarden Kilometer zurückgelegt — das am weitesten entfernte von Menschen geschaffene Objekt. Und doch würde es bei seiner jetzigen Geschwindigkeit rund 70.000 Jahre brauchen, um Proxima Centauri, den nächstgelegenen Stern, in 4 Lichtjahren Entfernung zu erreichen; um die Galaxis zu verlassen, wären Milliarden von Jahren nötig. Die grausamste Wahrheit des Universums ist, dass es uns zu den Sternen aufblicken lässt, sie aber niemals erreichbar macht."
+  },
+  {
+    "id": 43,
+    "type": "nature",
+    "text": "Eine der ältesten und beständigsten Lügen, die sich die Menschheit je selbst erzählt hat, ist die, dass die Natur Zweck und Ordnung enthalte — das Universum ist unserer Existenz gegenüber gleichgültig, gleichgültig bis an die Grenze der Grausamkeit."
+  },
+  {
+    "id": 44,
+    "type": "nature",
+    "text": "In der Natur gibt es nichts Zufälliges, sondern alles ist durch die Notwendigkeit der göttlichen Natur bestimmt, in bestimmter Weise zu existieren und zu wirken."
+  },
+  {
+    "id": 45,
+    "type": "nature",
+    "text": "Was ist also Wahrheit? Ein bewegliches Heer von Metaphern, Metonymien, Anthropomorphismen — Wahrheiten sind Illusionen, von denen man vergessen hat, dass sie welche sind."
+  },
+  {
+    "id": 46,
+    "type": "nature",
+    "text": "Die Natur lügt nie; sie schweigt nur. Wir aber machen aus diesem Schweigen ein Zeugnis dafür, dass alles unseretwegen existiere."
+  },
+  {
+    "id": 47,
+    "type": "nature",
+    "text": "Wir haben keinen anderen Begriff von Ursache und Wirkung als den bestimmter Gegenstände, die stets miteinander verbunden gewesen sind. Allein die Gewohnheit lässt uns von dem einen auf das Erscheinen des anderen schließen."
+  },
+  {
+    "id": 48,
+    "type": "nature",
+    "text": "Der Fortschritt der Wissenschaft ist keine glatte Anhäufung von Wahrheiten, sondern eine Reihe von Brüchen — jede Revolution zertrümmert das alte Paradigma; die Vertreter konkurrierender Paradigmen leben gleichsam in verschiedenen Welten."
+  },
+  {
+    "id": 49,
+    "type": "nature",
+    "text": "Die menschliche Vernunft hat das besondere Schicksal in einer Gattung ihrer Erkenntnisse: dass sie durch Fragen belästigt wird, die sie nicht abweisen kann, denn sie sind ihr durch die Natur der Vernunft selbst aufgegeben, die sie aber auch nicht beantworten kann, denn sie übersteigen alles Vermögen der menschlichen Vernunft."
+  },
+  {
+    "id": 50,
+    "type": "nature",
+    "text": "Die Welt ist meine Vorstellung — dies ist eine Wahrheit, welche in Beziehung auf jedes lebende und erkennende Wesen Gültigkeit hat, wiewohl der Mensch allein sie in das reflektierte, abstrakte Bewusstsein bringen kann."
+  },
+  {
+    "id": 51,
+    "type": "existential",
+    "text": "Wenn das Leid der Kinder nötig war, um die Summe an Leiden vollzumachen, die man zahlen musste, um die Wahrheit zu erkaufen, dann erkläre ich, dass diese Wahrheit diesen Preis nicht wert ist... Ich will die Harmonie nicht. Aus Liebe zur Menschheit will ich sie nicht."
+  },
+  {
+    "id": 52,
+    "type": "existential",
+    "text": "Die Leidenschaften, die am meisten die Unterschiede des Verstandes unter den Menschen hervorbringen, sind hauptsächlich das größere oder geringere Verlangen nach Macht, Reichtum, Wissen und Ehre."
+  },
+  {
+    "id": 53,
+    "type": "existential",
+    "text": "Die Menschen sind so einfältig und den gegenwärtigen Notwendigkeiten so unterworfen, dass derjenige, der täuschen will, stets jemanden findet, der sich täuschen lässt."
+  },
+  {
+    "id": 54,
+    "type": "existential",
+    "text": "Es widerspricht der Vernunft nicht, den Untergang der ganzen Welt einem Kratzer an meinem Finger vorzuziehen."
+  },
+  {
+    "id": 55,
+    "type": "existential",
+    "text": "So setze ich an erster Stelle als eine allgemeine Neigung der ganzen Menschheit ein beständiges und rastloses Verlangen nach Macht über Macht, das erst mit dem Tode endet."
+  },
+  {
+    "id": 56,
+    "type": "existential",
+    "text": "Die Menschen urteilen im Allgemeinen mehr nach den Augen als nach den Händen; denn zu sehen vermag jeder, zu begreifen nur wenige. Jeder sieht, was du zu sein scheinst, wenige erkennen, was du wirklich bist... es liegt in der Natur des Volkes, dass es leichter zu täuschen als aus der Täuschung zu befreien ist."
+  },
+  {
+    "id": 57,
+    "type": "existential",
+    "text": "Die Vernunft ist vollkommen träge und vermag niemals, irgendeine Handlung oder Regung weder zu verhindern noch hervorzubringen."
   },
   {
     "id": 58,
-    "type": "desire",
-    "text": "Begehren ist stets Begehren nach dem, was fehlt, nach dem, was man nicht hat; Begehren ist im Wesentlichen das Streben nach einer Abwesenheit, einem Mangel."
+    "type": "existential",
+    "text": "Die Menschen glauben sich frei, weil sie sich ihrer Handlungen bewusst sind und die Ursachen nicht kennen, von denen sie bestimmt werden."
   },
   {
     "id": 59,
-    "type": "desire",
-    "text": "Das Begehrungsvermögen ist das Vermögen eines Wesens, durch seine Vorstellungen zur Ursache der Wirklichkeit der Gegenstände dieser Vorstellungen zu werden."
+    "type": "existential",
+    "text": "Ein Mensch, der sich in allen Dingen dem Guten verschreiben will, muss notwendig unter so vielen, die nicht gut sind, zugrunde gehen."
   },
   {
     "id": 60,
-    "type": "desire",
-    "text": "Die Vernunft ist und soll nur der Sklave der Leidenschaften sein und darf nie den Anspruch erheben, ein anderes Amt zu haben, als ihnen zu dienen und zu gehorchen."
+    "type": "existential",
+    "text": "Wo keine gemeinsame Macht ist, da ist kein Gesetz; wo kein Gesetz ist, da ist keine Ungerechtigkeit. Gewalt und Betrug sind im Kriege die beiden Kardinaltugenden."
   },
   {
     "id": 61,
-    "type": "desire",
-    "text": "Es gibt kein Ende des menschlichen Begehrens; es gibt kein letztes Gut, und Glück ist kein Zustand der Ruhe, sondern ein fortwährendes Fortschreiten von einem Gegenstand des Begehrens zum nächsten."
+    "type": "fortune",
+    "text": "Ich urteile in der Tat, dass es wahr ist, dass das Schicksal über die Hälfte unserer Handlungen entscheidet, uns aber die andere Hälfte, oder beinahe die Hälfte, selbst überlässt."
   },
   {
     "id": 62,
-    "type": "desire",
-    "text": "Nicht das Begehren selbst quält uns, sondern die Kluft zwischen dem Begehren und der Fähigkeit, es zu befriedigen."
+    "type": "fortune",
+    "text": "Das Rad des Schicksals dreht sich unaufhörlich, und was heute oben ist, ist morgen unten."
   },
   {
     "id": 63,
-    "type": "desire",
-    "text": "Was wir wollen, ist nicht der Reichtum selbst, sondern die Beachtung und Anerkennung, die damit einhergehen."
+    "type": "fortune",
+    "text": "Manches steht in unserer Macht, anderes nicht; Meinungen, Wünsche und Abneigungen stehen in unserer Macht, aber Körper, Besitz, Ansehen und Ämter nicht."
   },
   {
     "id": 64,
-    "type": "desire",
-    "text": "Alle Probleme der Menschheit entstammen der Unfähigkeit des Menschen, still allein in einem Zimmer zu sitzen."
+    "type": "fortune",
+    "text": "Das Schicksal gleicht einem reißenden Strom, doch der Mensch kann Deiche und Dämme errichten, um ihn einzudämmen, bevor er über die Ufer tritt."
   },
   {
     "id": 65,
-    "type": "daily",
-    "text": "Wir wagen viele Dinge nicht, weil sie schwer sind, aber sie sind schwer, weil wir sie nicht wagen."
+    "type": "fortune",
+    "text": "Was der Zufall gebracht hat, ist unbeständig; je höher es steigt, desto näher ist es dem Fall."
   },
   {
     "id": 66,
-    "type": "daily",
-    "text": "Ich ging in die Wälder, weil ich bewusst leben wollte, um nur den wesentlichen Tatsachen des Lebens gegenüberzutreten."
+    "type": "fortune",
+    "text": "So dreht sie mit hochmütiger Hand ihr Rad des Zufalls und drängt weiter voran."
   },
   {
     "id": 67,
-    "type": "daily",
-    "text": "Mein Leben war voller schrecklicher Unglücke, von denen die meisten nie geschehen sind."
+    "type": "fortune",
+    "text": "Suche nicht, dass die Dinge geschehen, wie du es wünschst, sondern wünsche, dass die Dinge geschehen, wie sie geschehen, und dein Leben wird ruhig dahinfließen."
   },
   {
     "id": 68,
-    "type": "daily",
-    "text": "Wir müssen unseren Garten bestellen."
+    "type": "fortune",
+    "text": "Was das Schicksal einem Menschen gegeben hat, kann es ihm auch wieder nehmen, und was es gibt, gibt es ohne jede Zusage."
   },
   {
     "id": 69,
-    "type": "daily",
-    "text": "Die Menschen werden nicht durch die Dinge beunruhigt, sondern durch die Meinungen, die sie über die Dinge haben."
+    "type": "fortune",
+    "text": "Kein Mensch kann sich je sicher fühlen, bevor ihn nicht das Schicksal verlassen hat."
   },
   {
     "id": 70,
-    "type": "daily",
-    "text": "Dein Geist wird die Gestalt dessen annehmen, woran du häufig denkst."
+    "type": "fortune",
+    "text": "Alles Schicksal ist gutes Schicksal; denn es belohnt, übt ein, bessert oder bestraft, und ist somit entweder nützlich oder gerecht."
   },
   {
     "id": 71,
-    "type": "daily",
-    "text": "Nicht der Mensch, der zu wenig hat, sondern der, der nach mehr verlangt, ist arm."
+    "type": "decision",
+    "text": "Ein Esel, der zwischen zwei gleich weit entfernten und gleich verlockenden Heubündeln steht, würde vor Hunger sterben, unfähig zu entscheiden, welches er zuerst fressen soll."
   },
   {
     "id": 72,
-    "type": "daily",
-    "text": "Glück ist kein Zustand, sondern eine Tätigkeit; es liegt in der Ausübung der Tugend in jedem gegenwärtigen Augenblick."
+    "type": "decision",
+    "text": "Du bist eingeschifft. Wägen wir Gewinn und Verlust ab, wenn wir darauf wetten, dass Gott existiert: Wenn du gewinnst, gewinnst du alles; wenn du verlierst, verlierst du nichts."
   },
   {
     "id": 73,
-    "type": "nature",
-    "text": "Zwei Dinge erfüllen das Gemüt mit immer neuer und zunehmender Bewunderung und Ehrfurcht, je öfter und anhaltender sich das Nachdenken damit beschäftigt: der bestirnte Himmel über mir und das moralische Gesetz in mir."
+    "type": "decision",
+    "text": "Auch wenn man nicht mit Gewissheit wissen kann, welcher Weg der beste ist, sollte man sich entschlossen für eine Richtung entscheiden und ihr folgen, wie ein im Wald verirrter Wanderer, der niemals stehen bleiben darf."
   },
   {
     "id": 74,
-    "type": "nature",
-    "text": "In der Natur gibt es nichts Zufälliges, sondern alle Dinge sind durch die Notwendigkeit der göttlichen Natur bestimmt, auf eine bestimmte Weise zu existieren und zu wirken."
+    "type": "decision",
+    "text": "Die eigentliche Entscheidung, die ein Mensch in seinem Leben zu treffen hat, liegt nicht in der Auswahl unter den zahllosen Möglichkeiten, die die Welt bietet, sondern darin, ob er den Mut hat, der zu werden, der er bereits ist; das meiste Zögern ist in Wahrheit nur die Weigerung, sich dieser einfachsten und grausamsten Antwort zu stellen."
   },
   {
     "id": 75,
-    "type": "nature",
-    "text": "Alles fließt und nichts bleibt."
+    "type": "decision",
+    "text": "Klugheit ist die wahre und vernünftige Fähigkeit, in Bezug auf das zu handeln, was für den Menschen gut ist."
   },
   {
     "id": 76,
-    "type": "nature",
-    "text": "Alles ist gut, wie es aus den Händen des Schöpfers der Dinge kommt; alles entartet in den Händen des Menschen."
+    "type": "decision",
+    "text": "Heirate, und du wirst es bereuen; heirate nicht, du wirst es ebenfalls bereuen; was immer du wählst, du wirst beides bereuen, denn die Reue ist die Grundstruktur des menschlichen Daseins."
   },
   {
     "id": 77,
-    "type": "nature",
-    "text": "Alle Dinge entstehen aus Samen, und zu nichts kehren sie am Ende zurück."
+    "type": "decision",
+    "text": "Ich sehe alles ganz genau; es gibt zwei mögliche Situationen—man kann entweder dies oder das tun. Meine ehrliche Meinung und mein freundschaftlicher Rat lauten: Tu es oder tu es nicht—du wirst beides bereuen."
   },
   {
     "id": 78,
-    "type": "nature",
-    "text": "Die Betrachtung der Sterne, sozusagen das Wandeln mit ihnen, wäscht den Schmutz des irdischen Lebens ab."
+    "type": "decision",
+    "text": "Ein wirklich tiefgründiger Geist sollte es wagen, das Urteil lange auszusetzen, es zu ertragen, zwischen zwei entgegengesetzten Möglichkeiten hin- und hergerissen zu sein, anstatt sich in eine übereilte Entscheidung zu stürzen, nur um den Anschein von Ruhe zu erkaufen."
   },
   {
     "id": 79,
-    "type": "nature",
-    "text": "Was immer ist, ist in Gott, und alle Dinge sind Modi oder Affektionen der einen Substanz, der Natur."
+    "type": "decision",
+    "text": "Ein wahrhaft unabhängiger Geist muss zwangsläufig einen gefährlichen Wendepunkt durchlaufen—jenen Moment, in dem man mit eigenen Händen die Werte zerschlagen muss, auf die man sich stets verlassen hat, ohne noch irgendeine äußere Autorität nach der Antwort zu fragen; diese Einsamkeit der Selbstgesetzgebung ist weit schwerer, als Freiheit erscheinen mag, und nur wenige wagen es wirklich, sie zu ertragen."
   },
   {
     "id": 80,
-    "type": "nature",
-    "text": "Die Natur zeigt sich niemals von ihrer geringsten Seite."
+    "type": "decision",
+    "text": "Unmündigkeit ist das Unvermögen, sich seines Verstandes ohne Leitung eines anderen zu bedienen; Aufklärung ist der Ausgang des Menschen aus seiner selbst verschuldeten Unmündigkeit durch den Mut, sich seines eigenen Verstandes zu bedienen."
   },
   {
     "id": 81,
-    "type": "doubt",
-    "text": "Mindestens einmal im Leben sollte jeder Mensch alles, was er geglaubt hat, bis in seine Grundfesten anzweifeln."
+    "type": "insulted",
+    "text": "Bedenke, dass nicht der, der dich schmäht oder schlägt, dich beleidigt, sondern deine Meinung, dass diese Dinge beleidigend seien — nimm dieses Urteil weg, und der Zorn verschwindet mit ihm."
   },
   {
     "id": 82,
-    "type": "doubt",
-    "text": "Freiheit ist mit Furcht nicht unvereinbar; ein Mensch kann aus Furcht handeln und dennoch frei sein."
+    "type": "insulted",
+    "text": "Wer sich über die Beschimpfung eines anderen aufregt, gesteht ihm damit das Recht zu, über ihn zu urteilen — und das allein ist bereits eine Selbsterniedrigung."
   },
   {
     "id": 83,
-    "type": "doubt",
-    "text": "Es gab in meinem Leben viel mehr Schrecken als Gefahren."
+    "type": "insulted",
+    "text": "Zorn ist ein kurzer Wahnsinn — er verlangt niemals nach Selbstbeherrschung, sondern danach, andere zusammen mit sich selbst zugrunde zu richten."
   },
   {
     "id": 84,
-    "type": "doubt",
-    "text": "Gewohnheit ist der große Führer des menschlichen Lebens; ohne sie wüssten wir nichts über die Zukunft, und unsere Erinnerung an die Vergangenheit wäre uns von keinem Nutzen."
+    "type": "insulted",
+    "text": "Wenn dir jemand sagt, ein anderer habe schlecht über dich gesprochen, so entschuldige dich nicht, sondern antworte: er kannte wohl meine übrigen Fehler nicht, sonst hätte er nicht nur diese erwähnt."
   },
   {
     "id": 85,
-    "type": "doubt",
-    "text": "Es ist besser, dem Schlimmsten, was geschehen kann, ins Auge zu sehen, als in Furcht vor allem zu leben."
+    "type": "insulted",
+    "text": "Grobheit ist eine als Stärke verkleidete Schwäche — sie beweist nicht die Überlegenheit dessen, der sie zeigt, sondern offenbart nur seine innere Leere."
   },
   {
     "id": 86,
-    "type": "doubt",
-    "text": "Wissen befreit uns von der Furcht."
+    "type": "insulted",
+    "text": "Kann mir jemand zeigen, dass ich nicht richtig denke oder handle, so werde ich es gerne ändern; denn ich suche die Wahrheit, durch die noch niemand geschädigt wurde. Geschädigt aber wird der, welcher in seinem Irrtum und seiner Unwissenheit verharrt."
   },
   {
     "id": 87,
-    "type": "doubt",
-    "text": "Hoffnung und Furcht sind untrennbar, es gibt keine Furcht ohne Hoffnung und keine Hoffnung ohne Furcht, beide entspringen der Ungewissheit über die Zukunft."
+    "type": "insulted",
+    "text": "Das beste Mittel gegen den Zorn ist der Aufschub — bitte den Zorn zunächst nur darum, nicht dass er verzeiht, sondern dass er richtig urteilt."
   },
   {
     "id": 88,
-    "type": "doubt",
-    "text": "Philosophieren heißt sterben lernen; sobald ein Mensch den Tod nicht mehr fürchtet, ist er von aller Knechtschaft befreit."
+    "type": "insulted",
+    "text": "Die Ursache des Zorns ist der Glaube, verletzt worden zu sein; diesem Glauben sollte man nicht leichtfertig trauen. Selbst wenn die Kränkung offen und deutlich erscheint, sollte man nicht sogleich aufbrausen, denn manches Falsche trägt den Schein der Wahrheit, und erst die Zeit deckt die Wahrheit auf."
   },
   {
     "id": 89,
-    "type": "procrastination",
-    "text": "Es ist nicht so, dass wir so wenig Zeit haben, sondern dass wir so viel davon verlieren."
+    "type": "insulted",
+    "text": "Viel zu viel Wert auf die Meinung anderer zu legen ist ein allgemein herrschender Irrwahn — die Ehre ist, objektiv, die Meinung anderer von unserem Wert, und subjektiv, unsere Furcht vor dieser Meinung."
   },
   {
     "id": 90,
-    "type": "procrastination",
-    "text": "Da es nicht die Länge des Lebens ist, sondern der Gebrauch, den man von ihm macht, der ihm Wert verleiht, kann man lange gelebt haben und doch nur wenig gelebt haben."
+    "type": "insulted",
+    "text": "In allem Reden liegt ein Korn Verachtung. Die Sprache, so scheint es, ist nur für das Mittlere, Mittelmäßige, Mitteilbare erfunden — mit dem Reden vergemeinert sich der Redende schon."
   },
   {
     "id": 91,
-    "type": "procrastination",
-    "text": "Lasst uns nicht so handeln, als hätten wir tausend Jahre zu leben; solange du lebst, solange es in deiner Macht steht, strebe danach, gut zu werden."
+    "type": "identity",
+    "text": "Aber sofort bemerkte ich, dass, während ich so denken wollte, alles sei falsch, es notwendig sein müsse, dass ich, der ich so dachte, etwas sei; und da ich bemerkte, dass diese Wahrheit, ich denke, also bin ich, so gewiss und so sicher war..."
   },
   {
     "id": 92,
-    "type": "procrastination",
-    "text": "Wer gelernt hat zu sterben, hat verlernt, ein Sklave zu sein; wer sterben gelernt hat, hat verlernt zu dienen."
+    "type": "identity",
+    "text": "Die Größe und Kraft der Seele eines Menschen zeigt sich nicht darin, wie hoch er steigt oder wie weit er geht, sondern in seiner Herrschaft über sich selbst, indem er sein eigenes Leben als ein Feld behandelt, das sorgfältig bestellt werden muss."
   },
   {
     "id": 93,
-    "type": "procrastination",
-    "text": "Wir können nicht zweimal in denselben Fluss steigen, noch können wir dieselbe Gegenwart zweimal erfassen."
+    "type": "identity",
+    "text": "Wenn ich am innigsten in das eindringe, was ich mein Selbst nenne, stoße ich stets nur auf diese oder jene einzelne Wahrnehmung — von Wärme oder Kälte, Licht oder Schatten, Liebe oder Hass, Schmerz oder Freude. Ich kann mich selbst zu keinem Zeitpunkt ohne eine Wahrnehmung ertappen, und kann nichts anderes als die Wahrnehmung beobachten."
   },
   {
     "id": 94,
-    "type": "procrastination",
-    "text": "Lass niemals auf morgen, was du heute tun kannst."
+    "type": "identity",
+    "text": "Soweit sich dieses Bewusstsein rückwärts auf irgendeine vergangene Handlung oder einen Gedanken erstrecken kann, soweit reicht die Identität jener Person; es ist jetzt dasselbe Selbst wie damals, und es ist durch dasselbe Selbst mit diesem gegenwärtigen, das jetzt darüber nachdenkt, dass jene Handlung getan wurde."
   },
   {
     "id": 95,
-    "type": "procrastination",
-    "text": "Wir leben nie wirklich, sondern hoffen zu leben, und schauen immer erwartungsvoll auf das Glücklichsein voraus; die Gegenwart ist nie unser Ziel."
+    "type": "identity",
+    "text": "Ich wage zu behaupten, dass der Rest der Menschheit nichts als ein Bündel oder eine Sammlung verschiedener Wahrnehmungen ist, die mit unvorstellbarer Geschwindigkeit aufeinanderfolgen und sich in einem beständigen Fluss und einer beständigen Bewegung befinden."
   },
   {
     "id": 96,
-    "type": "procrastination",
-    "text": "Beschränke dich auf die Gegenwart; nur die Gegenwart, dieser kurze Augenblick, ist das, was ein Mensch verlieren kann, denn das ist alles, was er hat."
+    "type": "identity",
+    "text": "Soweit sich dieses Bewusstsein rückwärts auf irgendeine vergangene Handlung oder einen Gedanken erstrecken kann, soweit reicht die Identität jener Person; es ist durch dasselbe Bewusstsein, dass sie sich selbst zur selben Person macht."
   },
   {
     "id": 97,
-    "type": "insulted",
-    "text": "Es ist besser, Unrecht zu erleiden, als Unrecht zu tun."
+    "type": "identity",
+    "text": "Von den Dingen sind manche in unserer Macht, andere nicht. In unserer Macht sind Meinung, Streben, Begierde, Abneigung — kurz, alles, was unser eigenes Werk ist. Nicht in unserer Macht sind der Körper, der Besitz, der Ruf, die Ämter."
   },
   {
     "id": 98,
-    "type": "insulted",
-    "text": "Wenn dir berichtet wird, dass eine bestimmte Person schlecht über dich spricht, entschuldige dich nicht für das Gesagte, sondern antworte: Er kannte meine übrigen Fehler nicht, sonst hätte er nicht nur diese erwähnt."
+    "type": "identity",
+    "text": "Ich kann bezweifeln, dass ich einen Körper habe, und sogar bezweifeln, ob die ganze äußere Welt überhaupt existiert; aber während ich zweifle, muss dieses zweifelnde, denkende 'Ich' notwendig existieren — daran kann kein Zweifel etwas ändern."
   },
   {
     "id": 99,
-    "type": "insulted",
-    "text": "Die beste Rache ist, nicht wie dein Feind zu sein."
+    "type": "identity",
+    "text": "Man stelle sich vor, es gäbe eine Maschine, deren Konstruktion Denken, Fühlen und Wahrnehmen hervorbrächte; man könnte sie sich, unter Beibehaltung derselben Proportionen, so vergrößert denken, dass man wie in eine Mühle hineingehen könnte. Geht man hinein, so sieht man nur Teile, die einander stoßen, und niemals etwas, wodurch sich eine Wahrnehmung erklären ließe."
   },
   {
     "id": 100,
-    "type": "insulted",
-    "text": "Ein großer Geist bemüht sich niemals, über eine einzelne Kränkung zornig zu werden."
+    "type": "identity",
+    "text": "Das wirklich schwierige Problem des Bewusstseins ist das Problem der Erfahrung. Wenn wir denken und wahrnehmen, gibt es ein Wirbeln von Informationsverarbeitung, aber es gibt auch eine subjektive Seite."
   },
   {
     "id": 101,
-    "type": "insulted",
-    "text": "Nicht der Mensch, der dich beleidigt oder schlägt, tut dir Unrecht, sondern deine Meinung, dass diese Dinge beleidigend seien."
+    "type": "greeting",
+    "text": "Meine Seele ist so schwer, dass kein Gedanke sie mehr tragen kann, kein Flügelschlag sie mehr in die Höhe heben kann—und doch, morgen wird die Sonne wieder aufgehen."
   },
   {
     "id": 102,
-    "type": "insulted",
-    "text": "Ich würde lieber von der ganzen Welt ausgelacht werden, als gegen mein eigenes Gewissen zu handeln."
+    "type": "greeting",
+    "text": "Aufstehen, sich waschen, und dann warten, dass irgendeine unvorhersehbare Angst oder Schwermut hereinbricht—ich gäbe das ganze Universum, dazu Shakespeares gesamtes Werk, für einen Augenblick der Ruhe des Geistes."
   },
   {
     "id": 103,
-    "type": "insulted",
-    "text": "Das Unrecht eines anderen ist für mich kein Grund, zornig zu sein; wir sind zur Zusammenarbeit geschaffen, wie Füße, wie Hände, wie Augenlider."
+    "type": "greeting",
+    "text": "Als Alexander Diogenes fragte, was er sich wünsche, antwortete Diogenes: \"Ja—geh mir ein wenig aus der Sonne.\""
   },
   {
     "id": 104,
-    "type": "insulted",
-    "text": "Zorn ist ein kurzer Wahnsinn."
+    "type": "greeting",
+    "text": "Was, wenn dir eines Tages oder Nachts ein Dämon in deine einsamste Einsamkeit nachschliche und dir sagte: 'Dieses Leben, wie du es jetzt lebst und gelebt hast, wirst du noch einmal und noch unzählige Male leben müssen; und es wird nichts Neues daran sein... Willst du dies noch einmal und noch unzählige Male?'"
   },
   {
     "id": 105,
-    "type": "identity",
-    "text": "Ich denke, also bin ich."
+    "type": "greeting",
+    "text": "Wer gelernt hat zu sterben, hat verlernt, ein Sklave zu sein; zu philosophieren heißt sterben lernen, und erst dann erhebt sich der Mensch jeden Morgen wahrhaft frei."
   },
   {
     "id": 106,
-    "type": "identity",
-    "text": "Die Existenz geht dem Wesen voraus; der Mensch existiert zunächst, und erst danach definiert er sich selbst durch seine Entscheidungen."
+    "type": "greeting",
+    "text": "Manches steht in unserer Macht, anderes nicht; Körper, Besitz und Ansehen liegen nicht in unserer Macht, wohl aber unsere Meinungen und unser Wille—richte deshalb zu Beginn eines jeden Tages den Sinn auf das, was wirklich dein ist."
   },
   {
     "id": 107,
-    "type": "identity",
-    "text": "Zu werden, was man ist, ist die Arbeit eines ganzen Lebens."
+    "type": "greeting",
+    "text": "So begann Zarathustras Untergang: Was wäre dein Glück, du großes Gestirn, wenn du nicht die hättest, welchen du leuchtest? Er stieg vom Berge herab und machte jeden Sonnenaufgang zu einem Akt des Schenkens, nicht des bloßen Wartens."
   },
   {
     "id": 108,
-    "type": "identity",
-    "text": "Persönliche Identität besteht nicht in der Identität der Substanz, sondern in der Kontinuität des Bewusstseins."
+    "type": "greeting",
+    "text": "Es geschieht an einem gewöhnlichen Morgen, in einer Welt, die weder von Vergangenheit noch von Zukunft gefärbt ist, dass ein Mensch sich fragt 'warum'—und in diesem von Müdigkeit und Erstaunen durchzogenen Augenblick beginnt alles."
   },
   {
     "id": 109,
-    "type": "identity",
-    "text": "Werde, der du bist."
+    "type": "greeting",
+    "text": "Hast Du vergessen, dass der Mensch den Frieden, ja sogar den Tod, der Freiheit der Wahl zwischen Gut und Böse vorzieht? Der Mensch erträgt die Freiheit nicht und tauscht sie lieber gegen Brot und Wunder ein."
   },
   {
     "id": 110,
-    "type": "identity",
-    "text": "Charakter ist Schicksal."
+    "type": "general",
+    "text": "Ich weiß, dass ich nichts weiß."
   },
   {
     "id": 111,
-    "type": "identity",
-    "text": "Das Größte auf der Welt ist zu wissen, wie man sich selbst gehört."
+    "type": "general",
+    "text": "Wir sind, was wir wiederholt tun. Vortrefflichkeit ist also keine Handlung, sondern eine Gewohnheit."
   },
   {
     "id": 112,
-    "type": "identity",
-    "text": "Der Mensch ist zur Freiheit verurteilt; denn einmal in die Welt geworfen, ist er für alles verantwortlich, was er tut."
+    "type": "general",
+    "text": "Was sich überhaupt sagen lässt, lässt sich klar sagen; und wovon man nicht sprechen kann, darüber muss man schweigen."
   },
   {
     "id": 113,
-    "type": "greeting",
-    "text": "Wenn du morgens aufwachst, sage dir: Die Menschen, mit denen ich heute zu tun habe, werden aufdringlich und undankbar sein; aber ich werde nicht zornig sein, denn ich wurde geschaffen, um mit ihnen zu arbeiten."
+    "type": "general",
+    "text": "Kein Wissen eines Menschen kann über seine Erfahrung hinausgehen."
   },
   {
     "id": 114,
-    "type": "greeting",
-    "text": "Meine Formel für Größe im Menschen ist amor fati: dass man nichts anders haben will, als es ist, nicht bloß das Notwendige zu ertragen, sondern es zu lieben."
+    "type": "general",
+    "text": "Der gesunde Menschenverstand ist von allen Dingen unter den Menschen am gleichmäßigsten verteilt; denn jeder glaubt, so reichlich damit versehen zu sein, dass selbst diejenigen, die in allem anderen am schwersten zufriedenzustellen sind, gewöhnlich nicht mehr davon begehren, als sie bereits besitzen."
   },
   {
     "id": 115,
-    "type": "greeting",
-    "text": "Der Morgen ist die denkwürdigste Jahreszeit des Tages, die Stunde des Erwachens."
+    "type": "general",
+    "text": "Ein weiser Mensch richtet seinen Glauben stets nach dem Maß der Beweise."
   },
   {
     "id": 116,
-    "type": "greeting",
-    "text": "Wenn du morgens widerwillig aufstehst, lass diesen Gedanken gegenwärtig sein: Ich stehe auf, um das Werk eines Menschen zu tun."
+    "type": "general",
+    "text": "Gedanken ohne Inhalt sind leer, Anschauungen ohne Begriffe sind blind."
   },
   {
     "id": 117,
-    "type": "greeting",
-    "text": "Was mich nicht umbringt, macht mich stärker."
-  },
-  {
-    "id": 118,
-    "type": "greeting",
-    "text": "Jeder Morgen ist eine neue Einladung, wieder zu leben zu beginnen."
-  },
-  {
-    "id": 119,
-    "type": "greeting",
-    "text": "Die größte Errungenschaft der Weisheit ist es, den Menschen zu ermöglichen, glücklich zu leben."
-  },
-  {
-    "id": 120,
-    "type": "greeting",
-    "text": "Lass jeden Tag so gelebt werden, als wäre er der letzte, weder ängstlich an ihm festhaltend noch ihn leichtfertig fortwerfend."
-  },
-  {
-    "id": 121,
-    "type": "health",
-    "text": "Lass den Körper dein Maßstab sein."
-  },
-  {
-    "id": 122,
-    "type": "health",
-    "text": "Gesundheit des Körpers und Ruhe des Geistes sind das letzte Ziel des glücklichen Lebens."
-  },
-  {
-    "id": 123,
-    "type": "health",
-    "text": "Die Regungen des Geistes stehen in engem Zusammenhang mit der Gesundheit und Kraft des Körpers."
-  },
-  {
-    "id": 124,
-    "type": "health",
-    "text": "Je fähiger der Körper ist, auf vielfältige Weise beeinflusst zu werden, desto fähiger ist der Geist, auf vielfältige Weise wahrzunehmen."
-  },
-  {
-    "id": 125,
-    "type": "health",
-    "text": "Sowohl Übermaß als auch Mangel zerstören die Tugend; übermäßige oder unzureichende Bewegung zerstört die Kraft."
-  },
-  {
-    "id": 126,
-    "type": "health",
-    "text": "Dass ein gesunder Geist in einem gesunden Körper sei, ist das, worum ich beten sollte."
-  },
-  {
-    "id": 127,
-    "type": "health",
-    "text": "Ein schwacher Körper schwächt den Geist."
-  },
-  {
-    "id": 128,
-    "type": "health",
-    "text": "Von allen Gedanken und Schriften glaube ich nur an jene, die mit Blut geschrieben sind, aus der eigenen körperlichen Erfahrung heraus."
-  },
-  {
-    "id": 129,
-    "type": "existential",
-    "text": "Es gibt nur ein wirklich ernstes philosophisches Problem, und das ist der Selbstmord; zu beurteilen, ob das Leben lebenswert ist oder nicht, heißt, die Grundfrage der Philosophie zu beantworten."
-  },
-  {
-    "id": 130,
-    "type": "existential",
-    "text": "Der Mensch ist ein Sein zum Tode."
-  },
-  {
-    "id": 131,
-    "type": "existential",
-    "text": "Das Leben kann nur rückwärts verstanden werden, muss aber vorwärts gelebt werden."
-  },
-  {
-    "id": 132,
-    "type": "existential",
-    "text": "Die Hölle, das sind die anderen."
-  },
-  {
-    "id": 133,
-    "type": "existential",
-    "text": "Mitten im Winter lernte ich schließlich, dass in mir ein unbesiegbarer Sommer lag."
-  },
-  {
-    "id": 134,
-    "type": "existential",
-    "text": "Wer lange der lauteste unter den Donnerbringern war, muss lange die stillste unter den Wolken gewesen sein."
-  },
-  {
-    "id": 135,
-    "type": "existential",
-    "text": "Nur indem man dem eigenen Tod ins Auge sieht und ihn annimmt, kann man authentisch existieren."
-  },
-  {
-    "id": 136,
-    "type": "existential",
-    "text": "Der Mensch ist nur ein Schilfrohr, das schwächste Ding der Natur, aber er ist ein denkendes Schilfrohr."
-  },
-  {
-    "id": 137,
-    "type": "fortune",
-    "text": "Von den Dingen liegen manche in unserer Macht, andere nicht; unsere Meinungen, Wünsche und Abneigungen liegen in unserer Macht, aber der Körper, das Eigentum, der Ruf und die Ämter liegen nicht in unserer Macht."
-  },
-  {
-    "id": 138,
-    "type": "fortune",
-    "text": "Das Schicksal ist wie ein reißender Fluss, doch Menschen können Deiche und Dämme bauen, um ihn einzudämmen, bevor er über die Ufer tritt."
-  },
-  {
-    "id": 139,
-    "type": "fortune",
-    "text": "Das Schicksal kann dem Menschen nicht schaden, der aufgehört hat, von ihm abhängig zu sein."
-  },
-  {
-    "id": 140,
-    "type": "fortune",
-    "text": "Das Rad des Schicksals dreht sich unaufhörlich, wirft das Höchste nieder und hebt das Niedrigste empor."
-  },
-  {
-    "id": 141,
-    "type": "fortune",
-    "text": "Suche nicht, dass die Dinge geschehen, wie du es wünschst, sondern wünsche, dass die Dinge geschehen, wie sie sind, und du wirst einen ruhigen Fluss des Lebens haben."
-  },
-  {
-    "id": 142,
-    "type": "fortune",
-    "text": "Was immer das Schicksal dir bringt, nimm es an, denn es ist das, was am besten zu dir passt."
-  },
-  {
-    "id": 143,
-    "type": "fortune",
-    "text": "Das Schicksal hat nie fair gehandelt; es begünstigt die einen und zertritt die anderen."
-  },
-  {
-    "id": 144,
-    "type": "fortune",
-    "text": "Was die Menschen Schicksal nennen, ist nichts als ein Name, den wir den Ursachen der Dinge geben, deren Ordnung wir nicht kennen."
-  },
-  {
-    "id": 145,
-    "type": "decision",
-    "text": "Selbst wenn man nicht mit Sicherheit wissen kann, welcher Weg der beste ist, sollte man sich entschieden für eine Richtung entscheiden und ihr folgen, so wie ein im Wald verirrter Reisender niemals stehen bleiben sollte."
-  },
-  {
-    "id": 146,
-    "type": "decision",
-    "text": "Handle nur nach derjenigen Maxime, durch die du zugleich wollen kannst, dass sie ein allgemeines Gesetz werde."
-  },
-  {
-    "id": 147,
-    "type": "decision",
-    "text": "Klugheit ist eine wahre und vernünftige Fähigkeit, in Bezug auf das zu handeln, was für einen Menschen gut ist."
-  },
-  {
-    "id": 148,
-    "type": "decision",
-    "text": "Indem der Mensch für sich selbst wählt, wählt er für die ganze Menschheit – das ist die Quelle seiner Angst."
-  },
-  {
-    "id": 149,
-    "type": "decision",
-    "text": "Du musst wetten; es steht dir nicht frei, es nicht zu tun."
-  },
-  {
-    "id": 150,
-    "type": "decision",
-    "text": "Unentschlossenheit ist der schmerzhafteste aller Geisteszustände."
-  },
-  {
-    "id": 151,
-    "type": "decision",
-    "text": "Gut begonnen ist halb gewonnen."
-  },
-  {
-    "id": 152,
-    "type": "decision",
-    "text": "Unmündigkeit ist das Unvermögen, sich seines eigenen Verstandes ohne Anleitung eines anderen zu bedienen; Aufklärung ist der Ausgang des Menschen aus seiner selbstverschuldeten Unmündigkeit durch den Mut, sich seines eigenen Verstandes zu bedienen."
-  },
-  {
-    "id": 153,
-    "type": "general",
-    "text": "Der Mensch ist ein vernünftiges Tier."
-  },
-  {
-    "id": 154,
-    "type": "general",
-    "text": "Die Grenzen meiner Sprache bedeuten die Grenzen meiner Welt."
-  },
-  {
-    "id": 155,
-    "type": "general",
-    "text": "Der gesunde Menschenverstand ist das am gerechtesten verteilte Ding der Welt, denn jeder meint, er sei damit reichlich ausgestattet."
-  },
-  {
-    "id": 156,
-    "type": "general",
-    "text": "Ein weiser Mensch richtet seinen Glauben nach den Beweisen."
-  },
-  {
-    "id": 157,
-    "type": "general",
-    "text": "Aufklärung ist der Ausgang des Menschen aus seiner selbstverschuldeten Unmündigkeit."
-  },
-  {
-    "id": 158,
     "type": "general",
     "text": "Alle Menschen streben von Natur aus nach Wissen."
   },
   {
-    "id": 159,
+    "id": 118,
     "type": "general",
-    "text": "Die ganze Würde des Menschen besteht im Denken."
+    "text": "Die Grenzen meiner Sprache bedeuten die Grenzen meiner Welt."
   },
   {
-    "id": 160,
+    "id": 119,
     "type": "general",
-    "text": "Der Geist gleicht zunächst einem unbeschriebenen Blatt, und alles Wissen, all sein Stoff, kommt aus der Erfahrung."
+    "text": "Wenn ein Löwe sprechen könnte, wir könnten ihn nicht verstehen."
   },
   {
-    "id": 161,
+    "id": 120,
+    "type": "general",
+    "text": "Der Affekt, der ein Leiden ist, hört auf, ein Leiden zu sein, sobald wir uns eine klare und deutliche Vorstellung von ihm bilden."
+  },
+  {
+    "id": 121,
+    "type": "general",
+    "text": "Der Affekt, der ein Leiden ist, hört auf, ein Leiden zu sein, sobald wir uns eine klare und deutliche Vorstellung von ihm bilden."
+  },
+  {
+    "id": 122,
+    "type": "general",
+    "text": "Menschliches Wissen und menschliche Macht fallen in eins zusammen; denn wo die Ursache nicht bekannt ist, kann die Wirkung nicht hervorgebracht werden. Die Natur wird nur durch Gehorsam beherrscht."
+  },
+  {
+    "id": 123,
+    "type": "general",
+    "text": "Bisher hat sich niemand gefunden, der geistig und willentlich so gefestigt war, sich entschlossen dazu zu zwingen, alle Theorien und gängigen Vorstellungen hinwegzufegen und den so unvoreingenommen und ausgeglichen gemachten Verstand einer erneuten Prüfung der Einzelheiten zu unterziehen. So kommt es, dass das menschliche Wissen, wie wir es besitzen, nichts als ein wirres und schlecht verdautes Gemisch ist, zusammengesetzt aus viel Leichtgläubigkeit und viel Zufall sowie aus den kindlichen Vorstellungen, die wir anfangs in uns aufgenommen haben."
+  },
+  {
+    "id": 124,
+    "type": "general",
+    "text": "Der Glaube besteht darin, nicht das zu glauben, was wahr erscheint, sondern das, was unserem Verstand falsch erscheint."
+  },
+  {
+    "id": 125,
+    "type": "general",
+    "text": "Nehmen wir also an, der Geist sei, wie wir sagen, ein weißes Blatt Papier, ohne jegliche Schriftzeichen, ohne jegliche Vorstellungen. Wie kommt es dazu, gefüllt zu werden?"
+  },
+  {
+    "id": 126,
+    "type": "general",
+    "text": "Betrachten wir aufmerksam neugeborene Kinder, so haben wir wenig Grund zu glauben, dass sie viele Vorstellungen mit auf die Welt bringen."
+  },
+  {
+    "id": 127,
+    "type": "general",
+    "text": "In der Philosophie sollte ein Lernender an den Dingen zweifeln, die er zu leicht zu verstehen glaubt, ebenso sehr wie an jenen, die er überhaupt nicht versteht."
+  },
+  {
+    "id": 128,
+    "type": "general",
+    "text": "Aufklärung ist der Ausgang des Menschen aus seiner selbstverschuldeten Unmündigkeit. Unmündigkeit ist das Unvermögen, sich seines Verstandes ohne Leitung eines anderen zu bedienen. Selbstverschuldet ist diese Unmündigkeit, wenn die Ursache derselben nicht am Mangel des Verstandes, sondern der Entschließung und des Mutes liegt, sich seiner ohne Leitung eines anderen zu bedienen."
+  },
+  {
+    "id": 129,
+    "type": "general",
+    "text": "Faulheit und Feigheit sind die Ursachen, warum ein so großer Teil der Menschen, ihr ganzes Leben hindurch unmündig bleibt."
+  },
+  {
+    "id": 130,
+    "type": "general",
+    "text": "Das ganze Problem der Welt besteht darin, dass Narren und Fanatiker sich stets ihrer selbst so gewiss sind, während klügere Menschen so voller Zweifel sind."
+  },
+  {
+    "id": 131,
     "type": "society",
-    "text": "Die allgemeine Neigung der ganzen Menschheit ist ein beständiges und ruheloses Verlangen nach Macht über Macht, das erst mit dem Tod endet; die größte aller Leidenschaften ist die Furcht vor einem gewaltsamen Tod."
+    "text": "Der Mensch ist von Natur aus ein politisches Lebewesen; wer ohne die Polis auszukommen vermag, ist entweder ein Tier oder ein Gott.—Der Mensch ist nicht von Natur aus zur bürgerlichen Gesellschaft geeignet, sondern wird durch Erziehung erst dazu gemacht."
   },
   {
-    "id": 162,
+    "id": 132,
     "type": "society",
-    "text": "Wo es kein Gesetz gibt, gibt es keine Freiheit."
+    "text": "Der Mensch ist frei geboren, und überall liegt er in Ketten.—Bevor die bürgerliche Gesellschaft errichtet wurde, befand sich die Menschheit in einem Zustand des Krieges aller gegen alle."
   },
   {
-    "id": 163,
+    "id": 133,
     "type": "society",
-    "text": "Es ist eine durch die ständige Erfahrung aller Zeitalter bestätigte Wahrheit, dass jeder Mensch, der Macht besitzt, dazu neigt, sie zu missbrauchen."
+    "text": "Es ist eine durch die Erfahrung bestätigte Wahrheit, dass jeder Mensch, der Macht besitzt, dazu neigt, sie zu missbrauchen; um diesen Missbrauch zu verhindern, muss die Macht durch die Macht begrenzt werden.—Die Souveränität ist unteilbar; indem man sie in ihren Gegenständen zerteilt hat, haben die politischen Theoretiker den Souverän zu einem aus verschiedenen Gliedern zusammengesetzten Ungeheuer gemacht und damit die Einheit des Gemeinwillens zerrissen."
   },
   {
-    "id": 164,
+    "id": 134,
     "type": "society",
-    "text": "Wenn die gesamte Menschheit bis auf einen einzigen Menschen einer Meinung wäre, wäre die Menschheit nicht mehr berechtigt, diesen einen zum Schweigen zu bringen, als er, hätte er die Macht, berechtigt wäre, die Menschheit zum Schweigen zu bringen."
+    "text": "Ein großer demokratischer Staat wurde stets nur bewahrt, entweder durch einen Feind vor den Toren, oder durch das Ansehen eines einzelnen Bürgers, oder durch die gegenseitige Furcht rivalisierender Parteien—niemals jedoch durch öffentliche Beratung in der Versammlung."
   },
   {
-    "id": 165,
+    "id": 135,
     "type": "society",
-    "text": "Der erste Definitivartikel zum ewigen Frieden lautet, dass die bürgerliche Verfassung eines jeden Staates republikanisch sein soll."
+    "text": "Die Geschichte aller bisherigen Gesellschaft ist die Geschichte von Klassenkämpfen.—Das Volk gibt seine Freiheiten niemals auf, außer unter dem Einfluss irgendeiner Täuschung."
   },
   {
-    "id": 166,
+    "id": 136,
     "type": "society",
-    "text": "Es ist viel sicherer, gefürchtet als geliebt zu werden, wenn eines von beiden fehlen muss."
+    "text": "Der Zweck der Gesetze war nicht, die Freiheit abzuschaffen oder einzuschränken, sondern sie zu bewahren und zu vergrößern; damit die Menschen einander nicht schaden, sondern einander helfen und sich gegen einen gemeinsamen Feind vereinigen."
   },
   {
-    "id": 167,
+    "id": 137,
     "type": "society",
-    "text": "Das Erschreckendste an totalitärer Herrschaft ist nicht, dass sie menschliche Körper zerstört, sondern dass sie versucht, die Fähigkeit des Menschen zu unabhängigem Denken und Urteilen zu zerstören."
+    "text": "Nur zwei Dinge können ein Ereignis bewundernswert erscheinen lassen: entweder ist es seltsam und selten gesehen, oder wir können uns nicht vorstellen, dass es durch natürliche Ursachen zustande gekommen sei. Erkennen wir jedoch eine mögliche natürliche Ursache, so hören wir auf, uns darüber zu wundern, so selten das Ereignis auch sei, und betrachten es nicht mehr als ein Wunder."
   },
   {
-    "id": 168,
+    "id": 138,
     "type": "society",
-    "text": "Ein Staat ist eine menschliche Gemeinschaft, die innerhalb eines bestimmten Gebiets erfolgreich das Monopol der legitimen physischen Gewaltanwendung für sich beansprucht."
+    "text": "Da das Denken frei ist, bleibt es jedem Menschen freigestellt, selbst zu urteilen, ob ein angebliches Wunder glaubwürdig ist, indem er abwägt, welchen Vorteil diejenigen, die es behaupten oder unterstützen, daraus ziehen, und danach zu beurteilen, ob die Sache ein wahres Wunder oder ein Betrug sei."
   },
   {
-    "id": 169,
+    "id": 139,
+    "type": "society",
+    "text": "Krieg ist ein Massaker von Menschen, die einander nicht kennen, zum Vorteil von Menschen, die einander kennen, sich aber nicht gegenseitig massakrieren.—Angesichts eines schweren Unrechts, das nur durch Gewalt gestoppt werden kann, den Frieden zu bewahren, ist selbst eine Art Sünde."
+  },
+  {
+    "id": 140,
+    "type": "society",
+    "text": "So setze ich an erster Stelle als eine allgemeine Neigung der ganzen Menschheit ein beständiges und rastloses Verlangen nach Macht über Macht, das erst mit dem Tode endet."
+  },
+  {
+    "id": 141,
+    "type": "society",
+    "text": "Die Sicherheit des Volkes erfordert ferner von demjenigen oder denjenigen, die die souveräne Macht innehaben, dass die Gerechtigkeit allen Menschen gleichermaßen zuteilwerde; und dass niemandem gestattet sei, eine größere Strafe zu verhängen als der Souverän, bei Strafe der Auflösung des Gemeinwesens."
+  },
+  {
+    "id": 142,
+    "type": "society",
+    "text": "Der Zweck des Gesetzes ist nicht, die Freiheit abzuschaffen oder einzuschränken, sondern sie zu bewahren und zu vergrößern.—Die Freiheit der Wölfe hat für die Schafe oft den Tod bedeutet."
+  },
+  {
+    "id": 143,
+    "type": "society",
+    "text": "Die Öffentlichkeit muss an ihren Platz verwiesen werden... eine verwirrte Herde, die von einer spezialisierten Klasse regiert werden muss, deren Interesse über die Lokalität hinausreicht.—Das Problem liegt nicht darin, dass die einfachen Menschen von Natur aus unfähig wären, öffentliche Angelegenheiten zu verstehen, sondern darin, dass die bestehenden Methoden und Bedingungen der Debatte, Diskussion und Überzeugung zu dürftig sind; verbessert man diese, kann die Öffentlichkeit voll und ganz an der Beurteilung ihrer eigenen Angelegenheiten teilnehmen, ja sie sogar anleiten."
+  },
+  {
+    "id": 144,
+    "type": "society",
+    "text": "Der erste Definitivartikel zum ewigen Frieden lautet: Die bürgerliche Verfassung in jedem Staate soll republikanisch sein.—Dieser liberale Mechanismus der Gewaltenteilung, der die konkrete politische Entscheidung durch endlose Verhandlung und Rechtsverfahren ersetzen will, glaubt, die Tyrannei abgeschafft zu haben, löst in Wirklichkeit aber die politische Einheit auf und degradiert den Staat, durch inneren Verschleiß, zu einem mittelmäßigen Schauplatz von Interessenverhandlungen."
+  },
+  {
+    "id": 145,
+    "type": "society",
+    "text": "Es ist weit sicherer, gefürchtet als geliebt zu werden, wenn man auf eines von beiden verzichten muss.—Doch ein allein durch Furcht aufrechterhaltener Frieden ist nichts als unentzündete Feindseligkeit; eine Sicherheit, die niemals die Vernunft und Zustimmung der Untertanen gewonnen hat, wird am Ende durch den von der Furcht aufgestauten Groll selbst zerstört."
+  },
+  {
+    "id": 146,
+    "type": "society",
+    "text": "Diktatur ist die Ausübung der Staatsgewalt unter Beseitigung sonst bestehender rechtlicher Schranken, um einem Ausnahmezustand zu begegnen.—Der Ausnahmezustand war stets der Vorwand, durch den die Garantien der individuellen Freiheit ausgehöhlt wurden."
+  },
+  {
+    "id": 147,
+    "type": "society",
+    "text": "Ein Staat ist eine menschliche Gemeinschaft, die innerhalb eines bestimmten Gebietes das Monopol legitimer physischer Gewaltsamkeit erfolgreich für sich beansprucht.—Krieg ist ein notwendiges Instrument des Staates, und Frieden ist oft nicht mehr als die Vorbereitung auf den nächsten Krieg."
+  },
+  {
+    "id": 148,
     "type": "society",
     "text": "Die größte Gefahr in einer Demokratie ist nicht die Tyrannei, sondern die Tyrannei der Mehrheit, die Unterdrückung der Minderheit im Namen der Freiheit."
   },
   {
-    "id": 170,
+    "id": 149,
     "type": "society",
-    "text": "Nicht dem Wohlwollen des Metzgers, des Brauers oder des Bäckers verdanken wir unser Mittagessen, sondern der Rücksicht auf ihr eigenes Interesse."
+    "text": "Der Krieg ist nichts als eine Fortsetzung der Politik mit anderen Mitteln, weshalb die Gerechtigkeit eines Krieges nicht losgelöst von dem politischen Zweck beurteilt werden kann, dem er dient."
   },
   {
-    "id": 171,
+    "id": 150,
     "type": "society",
-    "text": "Das Böse entspringt nicht dem Fanatismus oder der Perversion, sondern der Banalität; das Erschreckendste am Totalitarismus ist, dass er versucht, die Fähigkeit des Menschen zu unabhängigem Denken und Urteilen zu zerstören."
+    "text": "Das Böse kommt nicht aus Fanatismus oder Perversion, sondern aus Banalität—das Erschreckendste an der totalitären Herrschaft ist, dass sie die Fähigkeit des Menschen zu unabhängigem Denken und Urteilen zu zerstören sucht."
   },
   {
-    "id": 172,
+    "id": 151,
     "type": "society",
-    "text": "Gewalt schafft kein Recht, und kein Mensch hat eine natürliche Autorität über seine Mitmenschen; Gehorsam, der allein durch Gewalt erzwungen wird, erzeugt kein echtes Recht und keine Verpflichtung, es sei denn, er wird freiwillig geleistet."
+    "text": "Gewalt schafft kein Recht, und kein durch bloße Gewalt erzwungener Gehorsam erzeugt ein wahres Recht oder eine wahre Pflicht, es sei denn, er wird freiwillig geleistet.—Verträge ohne das Schwert sind nichts als Worte, ohne jede Kraft, einen Menschen zu schützen."
   },
   {
-    "id": 173,
+    "id": 152,
     "type": "society",
-    "text": "Der Mensch ist von Natur aus ein politisches Wesen; die größte aller menschlichen Leidenschaften ist die Furcht vor einem gewaltsamen Tod und das ruhelose Verlangen nach Macht über Macht, das erst mit dem Tod endet."
+    "text": "Sie sind von ihrem Schöpfer mit gewissen unveräußerlichen Rechten ausgestattet.—Natürliche Rechte sind schlichter Unsinn: natürliche und unverjährbare Rechte, rhetorischer Unsinn—Unsinn auf Stelzen."
   },
   {
-    "id": 174,
+    "id": 153,
     "type": "society",
-    "text": "Die Proletarier haben in dieser Revolution nichts zu verlieren als ihre Ketten; sie haben eine Welt zu gewinnen. Der Weg zur Hölle ist mit guten Vorsätzen gepflastert."
+    "text": "Die Proletarier haben in dieser Revolution nichts zu verlieren als ihre Ketten; sie haben eine Welt zu gewinnen.—Der Weg zur Hölle ist mit guten Vorsätzen gepflastert."
   },
   {
-    "id": 175,
+    "id": 154,
     "type": "society",
-    "text": "Verträge ohne das Schwert sind nur Worte, ohne jede Kraft, einen Menschen wirklich zu schützen."
+    "text": "Verträge ohne das Schwert sind nichts als Worte, ohne jede Kraft, einen Menschen zu schützen."
   },
   {
-    "id": 176,
+    "id": 155,
     "type": "society",
-    "text": "Das Böse entspringt nicht dem Fanatismus oder der Perversion, sondern der Banalität; es ist das Nichtdenken, das es Menschen ermöglicht, die größten Verbrechen zu begehen."
+    "text": "Ein Fürst muss sowohl den Fuchs als auch den Löwen nachzuahmen wissen, denn der Löwe kann sich nicht vor Fallen schützen, noch der Fuchs vor Wölfen.—Die Menschen urteilen im Allgemeinen mehr nach dem Anschein als nach den Taten eines Fürsten, und am Ende zählt nur, ob er seinen Staat bewahrt und gesiegt hat."
   },
   {
-    "id": 177,
+    "id": 156,
     "type": "society",
-    "text": "Das größte Glück der größten Zahl ist der Maßstab für Recht und Unrecht; jeder Mensch soll als Zweck an sich selbst behandelt werden, niemals bloß als Mittel."
+    "text": "Der wichtigste Wegweiser, der dem politischen Realismus hilft, sich in der Landschaft der internationalen Politik zurechtzufinden, ist der Begriff des als Macht definierten Interesses—der wahre Antrieb staatlichen Handelns ist niemals Ideal oder Gerechtigkeit, sondern die nackte Berechnung von Interesse und Kräfteverhältnis."
   },
   {
-    "id": 178,
+    "id": 157,
     "type": "society",
-    "text": "Wer mit Ungeheuern kämpft, mag zusehen, dass er dabei nicht selbst zum Ungeheuer wird. Krieg ist Frieden, Freiheit ist Sklaverei, Unwissenheit ist Stärke."
+    "text": "Eine internationale Ordnung, gegründet auf offener Diplomatie, Selbstbestimmung und kollektiver Sicherheit, die durch einen Völkerbund das alte Gleichgewichtsspiel der Mächte ersetzt, könnte, wäre sie nur transparent und demokratisch genug aufgebaut, die eigentlichen Wurzeln des Krieges beseitigen."
   },
   {
-    "id": 179,
+    "id": 158,
     "type": "society",
-    "text": "Der Baum der Freiheit muss von Zeit zu Zeit mit dem Blut von Patrioten und Tyrannen erneuert werden. Auge um Auge macht am Ende die ganze Welt blind."
+    "text": "Selbst wenn Gesellschaften von unterschiedlichen Voraussetzungen ausgehen, können liberale und nicht-liberale, aber anständige Gesellschaften, solange sie einer Reihe vernünftiger Grundregeln folgen, auf der Basis gegenseitigen Respekts zusammenleben und zusammenarbeiten."
   },
   {
-    "id": 180,
+    "id": 159,
     "type": "society",
-    "text": "Gerechtigkeit ist die erste Tugend gesellschaftlicher Institutionen, wie die Wahrheit es für Denksysteme ist; eine Theorie, so elegant und sparsam sie auch sei, muss verworfen oder revidiert werden, wenn sie unwahr ist, und Gesetze und Institutionen, mögen sie noch so effizient und wohlgeordnet sein, müssen reformiert oder abgeschafft werden, wenn sie ungerecht sind."
+    "text": "Gerechtigkeit ist die erste Tugend gesellschaftlicher Institutionen, so wie Wahrheit die erste Tugend von Gedankensystemen ist; eine noch so elegante Theorie muss verworfen werden, wenn sie unwahr ist, ebenso müssen Gesetze, so wirksam sie auch seien, reformiert werden, wenn sie ungerecht sind.—Gerechtigkeit ist letztlich nichts als eine Verfeinerung des Rachegefühls."
   }
 ]

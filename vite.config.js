@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
       minify: 'terser', // 核心：使用 Terser 进行深度混淆
       terserOptions: {
         compress: {
-          drop_console: false, // true移除/false保留 console
+          drop_console: true, // true移除/false保留 console
           drop_debugger: true, // 移除 debugger
         },
         mangle: true, // 核心：变量名混淆

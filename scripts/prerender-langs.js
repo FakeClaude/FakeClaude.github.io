@@ -1,93 +1,100 @@
 // prerender-langs.js
 // 用法: node prerender-langs.js
-// 作用: 构建完成后，为每种语言在 dist/<lang>/ 下生成一份静态 index.html
+// 作用: 构建完成后，为每种语言在 docs/<lang>/ 下生成一份静态 index.html
 
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const distDir = path.resolve(__dirname, "../dist");
+const distDir = path.resolve(__dirname, "../docs");
 const srcIndexPath = path.join(distDir, "index.html");
 
-// 语言元数据表：key 为 URL 路径段 (dist/<lang>/index.html)
+// 语言元数据表：key 为 URL 路径段 (docs/<lang>/index.html)
 const LANGS = {
+  en: {
+    htmlLang: "en",
+    title: "FakeClaude - The Dumbest AI",
+    description: "Breaking the record for the stupidest AI in history",
+    h1: "FakeClaude",
+    p: "Breaking the record for the stupidest AI in history",
+  },
   zh: {
     htmlLang: "zh",
-    title: "PossMap - 概率走势图",
-    description: "贝叶斯式推演-概率走势图：追踪黑天鹅事件，溯源因果链条。",
-    h1: "PossMap - 概率走势图",
-    p: "贝叶斯式推演：追踪黑天鹅事件，溯源因果链条。",
+    title: "FakeClaude - 山寨克劳德",
+    description: "成为人类历史上最愚蠢的人工智能",
+    h1: "FakeClaude",
+    p: "山寨克劳德 - 成为人类历史上最愚蠢的人工智能",
   },
   fr: {
     htmlLang: "fr",
-    title: "PossMap - Graphique de Tendance des Probabilités",
-    description: "Inférence bayésienne - Graphique de tendance des probabilités : suivez les événements cygnes noirs, remontez les chaînes causales.",
-    h1: "PossMap - Graphique de Tendance des Probabilités",
-    p: "Inférence bayésienne : suivez les événements cygnes noirs, remontez les chaînes causales.",
+    title: "FakeClaude - L'IA la Plus Stupide",
+    description: "Battre le record de l'IA la plus stupide de l'histoire",
+    h1: "FakeClaude",
+    p: "Battre le record de l'IA la plus stupide de l'histoire",
   },
   de: {
     htmlLang: "de",
-    title: "PossMap - Wahrscheinlichkeitstrend-Diagramm",
-    description: "Bayesianische Inferenz - Wahrscheinlichkeitstrend-Diagramm: Black-Swan-Ereignisse verfolgen, Kausalketten zurückverfolgen.",
-    h1: "PossMap - Wahrscheinlichkeitstrend-Diagramm",
-    p: "Bayesianische Inferenz: Black-Swan-Ereignisse verfolgen, Kausalketten zurückverfolgen.",
+    title: "FakeClaude - Die Dümmste KI",
+    description: "Den Rekord für die dümmste KI der Geschichte brechen",
+    h1: "FakeClaude",
+    p: "Den Rekord für die dümmste KI der Geschichte brechen",
   },
   es: {
     htmlLang: "es",
-    title: "PossMap - Gráfico de Tendencias de Probabilidad",
-    description: "Inferencia bayesiana - Gráfico de tendencias de probabilidad: rastree eventos de cisne negro, rastree cadenas causales.",
-    h1: "PossMap - Gráfico de Tendencias de Probabilidad",
-    p: "Inferencia bayesiana: rastree eventos de cisne negro, rastree cadenas causales.",
+    title: "FakeClaude - La IA Más Tonta",
+    description: "Batiendo el récord de la IA más tonta de la historia",
+    h1: "FakeClaude",
+    p: "Batiendo el récord de la IA más tonta de la historia",
   },
   ja: {
     htmlLang: "ja",
-    title: "PossMap - 確率トレンドチャート",
-    description: "ベイズ的推論 - 確率トレンドチャート：ブラックスワン事象を追跡し、因果の連鎖を遡る。",
-    h1: "PossMap - 確率トレンドチャート",
-    p: "ベイズ的推論：ブラックスワン事象を追跡し、因果の連鎖を遡る。",
+    title: "FakeClaude - 史上最も愚かなAI",
+    description: "史上最も愚かなAIの記録に挑戦",
+    h1: "FakeClaude",
+    p: "史上最も愚かなAIの記録に挑戦",
   },
   ko: {
     htmlLang: "ko",
-    title: "PossMap - 확률 트렌드 차트",
-    description: "베이지안 추론 - 확률 트렌드 차트: 블랙 스완 이벤트 추적, 인과 관계의 사슬 규명.",
-    h1: "PossMap - 확률 트렌드 차트",
-    p: "베이지안 추론: 블랙 스완 이벤트 추적, 인과 관계의 사슬 규명.",
+    title: "FakeClaude - 역사상 가장 멍청한 AI",
+    description: "역사상 가장 멍청한 AI 기록에 도전",
+    h1: "FakeClaude",
+    p: "역사상 가장 멍청한 AI 기록에 도전",
   },
   pt: {
     htmlLang: "pt",
-    title: "PossMap - Gráfico de Tendências de Probabilidade",
-    description: "Inferência bayesiana - Gráfico de tendências de probabilidade: rastreie eventos de cisne negro, rastreie cadeias causais.",
-    h1: "PossMap - Gráfico de Tendências de Probabilidade",
-    p: "Inferência bayesiana: rastreie eventos de cisne negro, rastreie cadeias causais.",
+    title: "FakeClaude - A IA Mais Burra",
+    description: "Quebrando o recorde da IA mais burra da história",
+    h1: "FakeClaude",
+    p: "Quebrando o recorde da IA mais burra da história",
   },
   ru: {
     htmlLang: "ru",
-    title: "PossMap - График Трендов Вероятностей",
-    description: "Байесовский вывод - График трендов вероятностей: отслеживание событий «черный лебедь» и причинно-следственных цепочек.",
-    h1: "PossMap - График Трендов Вероятностей",
-    p: "Байесовский вывод: отслеживание событий «черный лебедь» и причинно-следственных цепочек.",
+    title: "FakeClaude - Самый Глупый ИИ",
+    description: "Побивая рекорд самого глупого ИИ в истории",
+    h1: "FakeClaude",
+    p: "Побивая рекорд самого глупого ИИ в истории",
   },
   ar: {
     htmlLang: "ar",
-    title: "PossMap - مخطط اتجاه الاحتمالات",
-    description: "الاستدلال البايزي - مخطط اتجاه الاحتمالات: تتبع أحداث البجعة السوداء، وتتبع السلاسل السببية.",
-    h1: "PossMap - مخطط اتجاه الاحتمالات",
-    p: "الاستدلال البايزي: تتبع أحداث البجعة السوداء، وتتبع السلاسل السببية.",
+    title: "FakeClaude - أغبى ذكاء اصطناعي",
+    description: "تحطيم الرقم القياسي لأغبى ذكاء اصطناعي في التاريخ",
+    h1: "FakeClaude",
+    p: "تحطيم الرقم القياسي لأغبى ذكاء اصطناعي في التاريخ",
   },
   hi: {
     htmlLang: "hi",
-    title: "PossMap - संभाव्यता रुझान चार्ट",
-    description: "बेयेसियन अनुमान - संभाव्यता रुझान चार्ट: ब्लैक स्वान घटनाओं को ट्रैक करें, कारण श्रृंखलाओं का पता लगाएं।",
-    h1: "PossMap - संभाव्यता रुझान चार्ट",
-    p: "बेयेसियन अनुमान: ब्लैक स्वान घटनाओं को ट्रैक करें, कारण श्रृंखलाओं का पता लगाएं।",
+    title: "FakeClaude - सबसे मूर्ख AI",
+    description: "इतिहास में सबसे मूर्ख AI का रिकॉर्ड तोड़ना",
+    h1: "FakeClaude",
+    p: "इतिहास में सबसे मूर्ख AI का रिकॉर्ड तोड़ना",
   },
 };
 
-const SITE_URL = "https://possmap.web.app";
+const SITE_URL = "https://fakeclaude.pages.dev";
 
 /**
- * 把原始 dist/index.html 转换为指定语言版本
+ * 把原始 docs/index.html 转换为指定语言版本
  */
 function transformHtml(html, langCode, meta) {
   let out = html;
@@ -128,7 +135,7 @@ function transformHtml(html, langCode, meta) {
 function main() {
 
   if (!fs.existsSync(srcIndexPath)) {
-    console.error("[prerender-langs] 找不到 dist/index.html，请先执行 `npm run build`");
+    console.error("[prerender-langs] 找不到 docs/index.html，请先执行 `npm run build`");
     process.exit(1);
   }
 

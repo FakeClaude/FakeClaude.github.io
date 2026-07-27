@@ -237,7 +237,7 @@ var TYPE_EXAMPLES2 = {
   ]
 };
 var TYPE_WHITELIST = Object.keys(TYPE_EXAMPLES2);
-var SIMILARITY_THRESHOLD = 0.55;
+var SIMILARITY_THRESHOLD = 0.4;
 var ANCHOR_VECTORS = {
   "work": [
     -0.009777450561523437,
@@ -13640,8 +13640,10 @@ async function onRequestPost(context) {
     seenIds = {};
   }
   const table = TABLE_MAP[lang] ?? DEFAULT_TABLE;
-  const excludeIds = Array.isArray(seenIds?.[table]) ? seenIds[table].filter((id) => Number.isInteger(id)) : [];
   const type = userText ? await classifyType(env, userText) : null;
+  const seenGroup = seenIds && typeof seenIds[table] === "object" && seenIds[table] !== null ? seenIds[table] : {};
+  const excludeIds = type && Array.isArray(seenGroup[type]) ? seenGroup[type].filter((id) => Number.isInteger(id)) : [];
+  const excludeIdsAll = Object.values(seenGroup).filter((list) => Array.isArray(list)).flat().filter((id) => Number.isInteger(id));
   let result = null;
   let wasReset = false;
   async function queryOne(tableName, typeFilter, excludeList) {
@@ -13669,7 +13671,7 @@ async function onRequestPost(context) {
     }
   }
   if (!result) {
-    result = await queryOne(table, null, excludeIds);
+    result = await queryOne(table, null, excludeIdsAll);
   }
   if (!result) {
     result = await queryOne(table, null, []);
@@ -14204,7 +14206,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-EIjM9S/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-NRUanC/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -14236,7 +14238,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-EIjM9S/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-NRUanC/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

@@ -97,7 +97,7 @@ const TYPE_EXAMPLES = {
 const TYPE_WHITELIST = Object.keys(TYPE_EXAMPLES);
 
 // 分类置信度阈值：最高相似度低于这个值，认为判断不可靠，返回 null 走兜底逻辑
-const SIMILARITY_THRESHOLD = 0.55;
+const SIMILARITY_THRESHOLD = 0.4;
 
 // 预先算好的锚点向量，写死在代码里，不用每次冷启动都重新计算
 const ANCHOR_VECTORS = {
@@ -13515,13 +13515,24 @@ try {
 
   const table = TABLE_MAP[lang] ?? DEFAULT_TABLE;
 
-  // 只保留合法的整数 id，防止异常数据混进 SQL
-  const excludeIds = Array.isArray(seenIds?.[table])
-      ? seenIds[table].filter((id) => Number.isInteger(id))
-      : [];
-
   // 用 embedding 判断语意类型，失败则 type 为 null（后面走不限定 type 的随机逻辑）
   const type = userText ? await classifyType(env, userText) : null;
+
+  // seenIds 现在是嵌套结构: { [table]: { [type]: [ids] } }
+  const seenGroup = (seenIds && typeof seenIds[table] === "object" && seenIds[table] !== null)
+      ? seenIds[table]
+      : {};
+
+  // 有 type 时：只排除该 type 下看过的 id
+  const excludeIds = (type && Array.isArray(seenGroup[type]))
+      ? seenGroup[type].filter((id) => Number.isInteger(id))
+      : [];
+
+  // 不限定 type 的兜底查询：排除所有 type 下看过的 id（把 seenGroup 里所有数组合并去重）
+  const excludeIdsAll = Object.values(seenGroup)
+      .filter((list) => Array.isArray(list))
+      .flat()
+      .filter((id) => Number.isInteger(id));
 
   let result = null;
   let wasReset = false;
@@ -13558,7 +13569,7 @@ try {
   }
 
   if (!result) {
-    result = await queryOne(table, null, excludeIds);
+     result = await queryOne(table, null, excludeIdsAll);
   }
   if (!result) {
     result = await queryOne(table, null, []);

@@ -118,11 +118,13 @@ export default function Home() {
   const data = await res.json();
   setSeenIdsMap((prev) => {
     const updated = { ...prev };
-    const list = data.wasReset ? [] : (updated[data.replies] || []);
+    const group = { ...(updated[data.replies] || {}) };
+    const list = data.wasReset ? [] : (group[data.type] || []);
     if (data.id != null && !list.includes(data.id)) {
       list.push(data.id);
     }
-    updated[data.replies] = list;
+    group[data.type] = list;
+    updated[data.replies] = group;
     idb.set("seenIds", updated);
     return updated;
   });

@@ -239,7 +239,7 @@ var TYPE_EXAMPLES2 = {
   ]
 };
 var TYPE_WHITELIST = Object.keys(TYPE_EXAMPLES2);
-var SIMILARITY_THRESHOLD = 0.55;
+var SIMILARITY_THRESHOLD = 0.4;
 var ANCHOR_VECTORS = {
   "work": [
     -0.009777450561523437,
@@ -13644,8 +13644,10 @@ async function onRequestPost(context) {
     seenIds = {};
   }
   const table = TABLE_MAP[lang] ?? DEFAULT_TABLE;
-  const excludeIds = Array.isArray(seenIds?.[table]) ? seenIds[table].filter((id) => Number.isInteger(id)) : [];
   const type = userText ? await classifyType(env, userText) : null;
+  const seenGroup = seenIds && typeof seenIds[table] === "object" && seenIds[table] !== null ? seenIds[table] : {};
+  const excludeIds = type && Array.isArray(seenGroup[type]) ? seenGroup[type].filter((id) => Number.isInteger(id)) : [];
+  const excludeIdsAll = Object.values(seenGroup).filter((list) => Array.isArray(list)).flat().filter((id) => Number.isInteger(id));
   let result = null;
   let wasReset = false;
   async function queryOne(tableName, typeFilter, excludeList) {
@@ -13674,7 +13676,7 @@ async function onRequestPost(context) {
     }
   }
   if (!result) {
-    result = await queryOne(table, null, excludeIds);
+    result = await queryOne(table, null, excludeIdsAll);
   }
   if (!result) {
     result = await queryOne(table, null, []);

@@ -110,7 +110,7 @@ export default function Home() {
   thinkingStartTime.current = Date.now();
 
   // 把检测到的语言传给后端,让它按这个语言回复
-  const res = await fetch("/api/reply", {
+  const res = await fetch("https://fakeclaude.pages.dev/api/reply", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ text: userText, lang: finalLang, seenIds: seenIdsMap }),

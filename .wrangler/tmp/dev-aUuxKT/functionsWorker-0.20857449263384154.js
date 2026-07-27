@@ -13695,11 +13695,25 @@ async function onRequestPost(context) {
     replies: table,
     wasReset
   }), {
-    headers: { "Content-Type": "application/json" }
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "https://fakeclaude.github.io"
+    }
   });
 }
 __name(onRequestPost, "onRequestPost");
 __name2(onRequestPost, "onRequestPost");
+async function onRequestOptions() {
+  return new Response(null, {
+    headers: {
+      "Access-Control-Allow-Origin": "https://fakeclaude.github.io",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type"
+    }
+  });
+}
+__name(onRequestOptions, "onRequestOptions");
+__name2(onRequestOptions, "onRequestOptions");
 var routes = [
   {
     routePath: "/api/generate-anchors",
@@ -13707,6 +13721,13 @@ var routes = [
     method: "GET",
     middlewares: [],
     modules: [onRequestGet]
+  },
+  {
+    routePath: "/api/reply",
+    mountPath: "/api",
+    method: "OPTIONS",
+    middlewares: [],
+    modules: [onRequestOptions]
   },
   {
     routePath: "/api/reply",

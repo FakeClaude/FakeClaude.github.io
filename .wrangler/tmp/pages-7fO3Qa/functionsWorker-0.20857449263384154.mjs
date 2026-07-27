@@ -13690,10 +13690,23 @@ async function onRequestPost(context) {
     replies: table,
     wasReset
   }), {
-    headers: { "Content-Type": "application/json" }
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "https://fakeclaude.github.io"
+    }
   });
 }
 __name(onRequestPost, "onRequestPost");
+async function onRequestOptions() {
+  return new Response(null, {
+    headers: {
+      "Access-Control-Allow-Origin": "https://fakeclaude.github.io",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type"
+    }
+  });
+}
+__name(onRequestOptions, "onRequestOptions");
 
 // ../.wrangler/tmp/pages-7fO3Qa/functionsRoutes-0.961025323797217.mjs
 var routes = [
@@ -13703,6 +13716,13 @@ var routes = [
     method: "GET",
     middlewares: [],
     modules: [onRequestGet]
+  },
+  {
+    routePath: "/api/reply",
+    mountPath: "/api",
+    method: "OPTIONS",
+    middlewares: [],
+    modules: [onRequestOptions]
   },
   {
     routePath: "/api/reply",
@@ -14206,7 +14226,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-NRUanC/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-8MpHIp/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -14238,7 +14258,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-NRUanC/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-8MpHIp/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

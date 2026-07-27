@@ -13590,6 +13590,19 @@ try {
     replies: table,
     wasReset,
   }), {
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "https://fakeclaude.github.io",
+  },
 });
+}
+
+export async function onRequestOptions() {
+  return new Response(null, {
+    headers: {
+      "Access-Control-Allow-Origin": "https://fakeclaude.github.io",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
 }

@@ -1,0 +1,1 @@
+const e={"Your Excellency":"閣下","Good morning":"早上好","Good afternoon":"下午好","Good evening":"晚上好","Write a message…":"輸入消息…","How can I help you today?":"今天我能幫你什麼？","FakeClaude can make mistakes, But makes far fewer mistakes than humans":"FakeClaude 可能會出錯，但錯誤遠比人類少",Thinking:"思考中"},a={home:e};export{a as default,e as home};

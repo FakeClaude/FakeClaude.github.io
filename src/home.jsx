@@ -59,8 +59,8 @@ export default function Home() {
   const thinkingStartTime = useRef(null);
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingSvg, setThinkingSvg] = useState(null);
-  const [userName] = useState(t("home.Idiot"));
-  const [model] = useState("Idiot 5");
+  const [userName] = useState(t("home.Your Excellency"));
+  const [model] = useState("Idiot 6");
   const [effort] = useState("Max");
   const [seenIdsMap, setSeenIdsMap] = useState({});
   const [text, setText] = useState("");

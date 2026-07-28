@@ -31,14 +31,6 @@ async function loadLocalJson(lang) {
   }
 }
 
-export async function ensureLanguageLoaded(lang) {
-  if (i18n.hasResourceBundle(lang, "translation")) return;
-  const data = await loadLocalJson(lang);
-  if (data) {
-    i18n.addResourceBundle(lang, "translation", data, true, true);
-  }
-}
-
 const initialLang = detectLanguage();
 
 if (initialLang !== "en" && location.pathname === "/") {

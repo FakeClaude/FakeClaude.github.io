@@ -1,7 +1,6 @@
 // src/game.jsx
-// 所有游戏共用的引擎：负责解锁记录（IndexedDB）+ 决定当前该加载哪个游戏
-// 第一步：只做 IDB 初始化 + 读取解锁列表 + 占位展示，不接入具体游戏
 import { useEffect, useState } from "preact/hooks";
+import DinoJump from "./utils/game/DinoJump.jsx";
 
 // ------------------------------
 // 1. 游戏顺序表（以后每加一个游戏，往这里加一个 key 即可）
@@ -77,6 +76,7 @@ export function getNextGameToLoad(unlockedList) {
 // 4. 占位组件：先只打印状态，不渲染具体游戏
 // ------------------------------
 export default function Game() {
+
   const [unlocked, setUnlocked] = useState(null); // null = 加载中
   const [nextGame, setNextGame] = useState(null);
   const [error, setError] = useState(null);
@@ -106,10 +106,5 @@ export default function Game() {
     return <div>加载中...</div>;
   }
 
-  return (
-    <div style={{ padding: 20, fontFamily: "monospace" }}>
-      <div>已解锁游戏列表: {unlocked.length ? unlocked.join(", ") : "（空）"}</div>
-      <div>当前应该加载: {nextGame ?? "全部已解锁，可自由选择"}</div>
-    </div>
-  );
+  return <DinoJump />;
 }

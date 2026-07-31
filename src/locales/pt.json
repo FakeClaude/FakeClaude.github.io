@@ -8,6 +8,11 @@
     "How can I help you today?": "Como posso ajudá-lo hoje?",
     "FakeClaude can make mistakes, But makes far fewer mistakes than humans":
     "FakeClaude pode cometer erros, Mas muito menos do que os humanos",
-    "Thinking": "Pensando"
-  }
+    "Thinking": "Pensando",
+    "Token": "Token"
+  },
+  "game": {
+  "Click to start": "Clique para começar",
+  "Game over, click to restart": "Fim de jogo, clique para reiniciar"
+}
 }

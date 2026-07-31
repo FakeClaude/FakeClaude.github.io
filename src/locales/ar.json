@@ -7,6 +7,11 @@
     "Write a message…": "اكتب رسالة…",
     "How can I help you today?": "كيف يمكنني مساعدتك اليوم؟",
     "FakeClaude can make mistakes, But makes far fewer mistakes than humans": "قد يرتكب FakeClaude أخطاء، لكنها أقل بكثير من أخطاء البشر.",
-    "Thinking": "جارٍ التفكير"
-  }
+    "Thinking": "جارٍ التفكير",
+    "Token": "رمز"
+  },
+  "game": {
+  "Click to start": "انقر للبدء",
+  "Game over, click to restart": "انتهت اللعبة، انقر لإعادة البدء"
+}
 }

@@ -51,7 +51,7 @@ function TypewriterText({ text, onChunkVisible, isLatest, instant }) {
   );
 }
 
-export default function Home() {
+export default function Home({ onEnterGame }) {
 
   // <editor-fold desc="const">
   const { t } = useTranslation();
@@ -60,8 +60,8 @@ export default function Home() {
   const [isThinking, setIsThinking] = useState(false);
   const [thinkingSvg, setThinkingSvg] = useState(null);
   const [userName] = useState(t("home.Your Excellency"));
-  const [model] = useState("Idiot 6");
-  const [effort] = useState("Max");
+  const [tokenCount, setTokenCount] = useState("10");
+  const [tokenLabel] = useState(t("home.Token"));
   const [seenIdsMap, setSeenIdsMap] = useState({});
   const [text, setText] = useState("");
   const textareaRef = useRef(null);
@@ -85,6 +85,9 @@ export default function Home() {
   }
   async function handleSend() {
   if (!text.trim()) return;
+  const newTokenValue = Number(tokenCount) - 1;
+setTokenCount(String(newTokenValue));
+idb.set("token", { tokenLabel: String(newTokenValue) });
   userScrolledUp.current = false;
   const userText = text;
 
@@ -171,6 +174,15 @@ export default function Home() {
   window.scrollTo(0, target);
 }
 
+  useEffect(() => {
+  idb.get("token").then((saved) => {
+    if (saved && saved.tokenLabel != null) {
+      setTokenCount(saved.tokenLabel);
+    } else {
+      idb.set("token", { tokenLabel: "10" });
+    }
+  });
+}, []);
   useEffect(() => {
   idb.get("seenIds").then((saved) => {
     if (saved) setSeenIdsMap(saved);
@@ -273,10 +285,13 @@ export default function Home() {
             onKeyDown={handleKeyDown}
         />
             <div className="input-toolbar" >
-              <div className="model-select" >
-                <span className="model-name" >{model}</span >
-                <span className="effort-label" >{effort}</span >
-                <span className="chevron" > </span >
+
+              <div className="token-select"
+                   onClick={onEnterGame}
+              >
+                <span className="token-name" >{tokenLabel}</span >
+                <span className="token-label" >{tokenCount}</span >
+                <span className="token-chevron" > </span >
               </div >
 
               <div

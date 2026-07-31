@@ -1,19 +1,15 @@
 // src/game.jsx
 import { useEffect, useState } from "preact/hooks";
 import DinoJump from "./utils/game/DinoJump.jsx";
+import {h} from "preact";
+import { useTranslation } from "react-i18next";
+import { idb } from "./utils/IndexedDB";
 
-// ------------------------------
-// 1. 游戏顺序表（以后每加一个游戏，往这里加一个 key 即可）
-// ------------------------------
+// 游戏顺序表
 export const GAME_ORDER = ["tetris"]; // 后面依次追加 "minesweeper", "2048" ...
-
-// ------------------------------
-// 2. IndexedDB 基础封装
-// ------------------------------
 const DB_NAME = "token-games-db";
 const DB_VERSION = 1;
 const STORE_NAME = "unlocked-games";
-
 function openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -30,7 +26,6 @@ function openDB() {
     req.onerror = (e) => reject(e.target.error);
   });
 }
-
 // 读取所有已解锁的游戏 key 列表
 async function getUnlockedGames() {
   const db = await openDB();
@@ -45,8 +40,7 @@ async function getUnlockedGames() {
     req.onerror = (e) => reject(e.target.error);
   });
 }
-
-// 标记某个游戏为已解锁（第二步会在游戏得分成功时调用它，这一步先只导出，不接入）
+// 标记某个游戏为已解锁
 export async function markGameUnlocked(gameKey) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -57,12 +51,6 @@ export async function markGameUnlocked(gameKey) {
     req.onerror = (e) => reject(e.target.error);
   });
 }
-
-// ------------------------------
-// 3. 决定当前应该加载哪个游戏
-//    规则：找 GAME_ORDER 里第一个"未解锁"的游戏
-//    如果全解锁了，返回 null（表示用户可以在已解锁列表里任选，但不能跳选未解锁的）
-// ------------------------------
 export function getNextGameToLoad(unlockedList) {
   for (const key of GAME_ORDER) {
     if (!unlockedList.includes(key)) {
@@ -72,14 +60,13 @@ export function getNextGameToLoad(unlockedList) {
   return null; // 全部已解锁
 }
 
-// ------------------------------
-// 4. 占位组件：先只打印状态，不渲染具体游戏
-// ------------------------------
-export default function Game() {
-
+export default function Game({ onClose }) {
+  const { t } = useTranslation();
   const [unlocked, setUnlocked] = useState(null); // null = 加载中
   const [nextGame, setNextGame] = useState(null);
   const [error, setError] = useState(null);
+  const [tokenValue, setTokenValue] = useState(null); // null = 还没从 idb 读到；读到之后是数字
+  const [tokenToasts, setTokenToasts] = useState([]); // 得/减分动效队列，每项 { id, delta }
 
   useEffect(() => {
     let cancelled = false;
@@ -98,6 +85,32 @@ export default function Game() {
     };
   }, []);
 
+  useEffect(() => {
+    idb.get("token").then((saved) => {
+      if (saved && saved.tokenLabel != null) {
+        setTokenValue(Number(saved.tokenLabel));
+      } else {
+        idb.set("token", { tokenLabel: "10" });
+        setTokenValue(10);
+      }
+    });
+  }, []);
+
+  // DinoJump 里翻山 +1 / 死亡 -1 时会调用这个，负责写回 idb、刷新页面数字、弹出动效
+  function handleTokenChange(newValue, delta) {
+    setTokenValue(newValue);
+    idb.set("token", { tokenLabel: String(newValue) });
+
+    if (delta) {
+      const toastId = Date.now() + Math.random();
+      setTokenToasts((prev) => [...prev, { id: toastId, delta }]);
+      // 动画播放完毕（900ms，和下面 CSS 动画时长保持一致）后自动移除，避免堆积
+      setTimeout(() => {
+        setTokenToasts((prev) => prev.filter((t) => t.id !== toastId));
+      }, 900);
+    }
+  }
+
   if (error) {
     return <div>IndexedDB 出错: {error}</div>;
   }
@@ -106,5 +119,25 @@ export default function Game() {
     return <div>加载中...</div>;
   }
 
-  return <DinoJump />;
+  return (
+    <>
+      <div className="home-token">
+        <span className="token-name" >{t("home.Token")}</span >
+        <span className="token-label" >{" "}{tokenValue ?? "…"}</span >
+        {tokenToasts.map((toast) => (
+          <span
+            key={toast.id}
+            className={`token-toast ${toast.delta > 0 ? "token-toast-up" : "token-toast-down"}`}
+          >
+            {toast.delta > 0 ? `+${toast.delta}` : toast.delta}
+          </span>
+        ))}
+      </div>
+      <div className="game-close" onClick={onClose}></div>
+      {tokenValue !== null && (
+        <DinoJump initialToken={tokenValue} onTokenChange={handleTokenChange} />
+      )}
+    </>
+  );
+
 }

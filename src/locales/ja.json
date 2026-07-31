@@ -7,6 +7,11 @@
     "Write a message…": "メッセージを入力…",
     "How can I help you today?": "今日はどのようにお手伝いしましょうか？",
     "FakeClaude can make mistakes, But makes far fewer mistakes than humans": "FakeClaudeは間違えることがありますが、人間よりもはるかにミスは少ないです",
-    "Thinking": "考え中"
-  }
+    "Thinking": "考え中",
+    "Token": "トークン"
+  },
+  "game": {
+  "Click to start": "クリックしてスタート",
+  "Game over, click to restart": "ゲームオーバー、クリックしてリスタート"
+}
 }

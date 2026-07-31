@@ -8,6 +8,11 @@
     "How can I help you today?": "Чем я могу помочь вам сегодня?",
     "FakeClaude can make mistakes, But makes far fewer mistakes than humans":
     "FakeClaude может ошибаться, но гораздо реже, чем люди",
-    "Thinking": "Думаю"
-  }
+    "Thinking": "Думаю",
+    "Token": "Токен"
+  },
+  "game": {
+  "Click to start": "Нажмите, чтобы начать",
+  "Game over, click to restart": "Игра окончена, нажмите, чтобы начать заново"
+}
 }

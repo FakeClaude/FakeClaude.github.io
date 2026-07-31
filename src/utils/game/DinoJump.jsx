@@ -4,13 +4,10 @@
 // 第二步会在这个基础上加"碰仙人掌触发隐藏山"的反转逻辑
 
 import { useEffect, useRef, useState } from "preact/hooks";
+import { useTranslation } from "react-i18next";
 
-// ------------------------------
-// 简笔素材：直接复用原 SVG 里的 path "d" 数据，用 Path2D 在 canvas 上矢量绘制
-// 不再经过 <img> / base64 栅格化，因此不会有缩放模糊问题
-// 每个 path 都有自己的 viewBox 尺寸（vbW/vbH），绘制时按目标宽高做等比缩放
+
 // 后续换皮肤：直接改这几个 path 字符串（可以从别的 SVG 里复制 <path d="..."> 的内容）
-// ------------------------------
 function readThemeColor(varName, fallback) {
   const val = getComputedStyle(document.documentElement)
     .getPropertyValue(varName)
@@ -35,12 +32,11 @@ const CACTUS_VB_H = 13;
 const PATH_CACTUS = new Path2D("M4 13H2V8H1L0 7V3h1v4h1V0h2v5h1V2h1v3L5 6H4z");
 
 // 山
-const MOUNTAIN_VB_W = 9;
+const MOUNTAIN_VB_W = 10;
 const MOUNTAIN_VB_H = 6;
-const PATH_MOUNTAIN = new Path2D("M9 6H0V4h1l.5-4L2 4h2l.5-4L5 4h2l.5-4L8 4h1z");
+const PATH_MOUNTAIN = new Path2D("M2 6H0l1-6zm4 0H4l1-6zm4 0H8l1-6z");
 
-// 通用绘制函数：把某个 Path2D（在它自己的 viewBox 坐标系里）等比缩放并平移到 canvas 上的目标区域
-// x, y 是目标区域左上角，w, h 是目标区域宽高，vbW, vbH 是该 path 的原始 viewBox 尺寸
+// 通用绘制函数：把某个 Path2D（在它自己的 viewBox 坐标系里）等比缩放并平移到 canvas
 function drawPath(ctx, path, x, y, w, h, vbW, vbH, color) {
   ctx.save();
   ctx.translate(x, y);
@@ -50,21 +46,15 @@ function drawPath(ctx, path, x, y, w, h, vbW, vbH, color) {
   ctx.restore();
 }
 
-// ------------------------------
 // 游戏参数
-// ------------------------------
 const GRAVITY = 0.6;
 const JUMP_V = -12;
 const DINO_W = 44;
 const DINO_H = 47;
-const MOUNTAIN_GAP = 130; // 山相对仙人掌的初始水平偏移（决定仙人掌和山在视觉上隔多远，纯粹是空间布局）
-// 显形/碰撞的安全距离现在由下面循环里的 REVEAL_DISTANCE 控制，不依赖这个值
+const MOUNTAIN_GAP = 130; // 山相对仙人掌的初始水平偏移
 const MOUNTAIN_SCORE = 10; // 成功越过一座显形的山，加这么多分
 
 // 真假仙人掌序列生成器：
-// 假仙人掌连续出现次数按 1,2,3,4... 递增，每组假仙人掌结束后插入 1 个真仙人掌
-// 例如仙人掌出现顺序为：假(第1组共1个) 真 假(第2组共2个) 真 假(第3组共3个) 真 ...
-// 调用一次即消费掉序列中的下一个位置，并返回该位置是否为"真仙人掌"
 function nextIsTrueCactus(s) {
   if (s.cactusGroupProgress < s.cactusGroupLength) {
     s.cactusGroupProgress += 1;
@@ -76,11 +66,13 @@ function nextIsTrueCactus(s) {
   return true; // 真仙人掌
 }
 
-export default function DinoJump({ onScore }) {
+export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
+  const { t } = useTranslation();
   const canvasRef = useRef(null);
   const [running, setRunning] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
+  const [tokenLabel, setTokenLabel] = useState(0); // 翻过一座山(仙人掌不算) +1；死亡 -1；可以为负数
   // 画布尺寸改为跟随窗口大小的全屏尺寸，随 resize 更新
   const [dims, setDims] = useState({
     w: typeof window !== "undefined" ? window.innerWidth : 800,
@@ -106,6 +98,7 @@ export default function DinoJump({ onScore }) {
     frameCount: 0,
     spawnTimer: 0,
     scoreAcc: 0,
+    tokenAcc: initialToken, // 翻山+1/死亡-1 的累计值，初始值来自外部传入（真实 token 余额）
     // 真假仙人掌序列生成器状态：
     // 假仙人掌连续出现次数按 1,2,3,4... 递增，每组假仙人掌后插入 1 个真仙人掌
     // 例：假(1个) 真 假(2个) 真 假(3个) 真 ...
@@ -113,22 +106,26 @@ export default function DinoJump({ onScore }) {
     cactusGroupProgress: 0,
   });
 
+  function handleAction() {
+    if (gameOver) {
+      restart();
+      return;
+    }
+    if (!running) {
+      setRunning(true);
+    }
+    const s = stateRef.current;
+    if (s.onGround) {
+      s.dinoVY = JUMP_V;
+      s.onGround = false;
+    }
+  }
+
   useEffect(() => {
     function handleKey(e) {
       if (e.code === "Space" || e.code === "ArrowUp") {
         e.preventDefault();
-        if (gameOver) {
-          restart();
-          return;
-        }
-        if (!running) {
-          setRunning(true);
-        }
-        const s = stateRef.current;
-        if (s.onGround) {
-          s.dinoVY = JUMP_V;
-          s.onGround = false;
-        }
+        handleAction();
       }
     }
     window.addEventListener("keydown", handleKey);
@@ -136,6 +133,7 @@ export default function DinoJump({ onScore }) {
   }, [running, gameOver]);
 
   function restart() {
+    const prevTokenAcc = stateRef.current.tokenAcc; // token 余额跨局保留，不因重开而清零
     stateRef.current = {
       dinoY: groundY - DINO_H,
       dinoVY: 0,
@@ -145,6 +143,7 @@ export default function DinoJump({ onScore }) {
       frameCount: 0,
       spawnTimer: 0,
       scoreAcc: 0,
+      tokenAcc: prevTokenAcc,
       cactusGroupLength: 1,
       cactusGroupProgress: 0,
     };
@@ -216,6 +215,7 @@ export default function DinoJump({ onScore }) {
 
       let hit = false;
       let newlyScored = 0;
+      let crossedCount = 0; // 本帧成功翻过的山的数量（仙人掌不算），用于 tokenLabel +1
 
       for (const ob of s.obstacles) {
         ob.cactusX -= s.speed;
@@ -262,11 +262,12 @@ export default function DinoJump({ onScore }) {
               hit = true;
             }
 
-            // 山已完全越过身后，且之前没结算过 -> 加分
+            // 山已完全越过身后，且之前没结算过 -> 加分 + token +1
             if (!ob.cleared && mountainRight < dinoLeft) {
               ob.cleared = true;
               if (!touchMountain) {
                 newlyScored += MOUNTAIN_SCORE;
+                crossedCount += 1;
               }
             }
           }
@@ -280,6 +281,11 @@ export default function DinoJump({ onScore }) {
         s.scoreAcc += newlyScored;
         setScore(s.scoreAcc);
       }
+      if (crossedCount > 0) {
+        s.tokenAcc += crossedCount;
+        setTokenLabel(s.tokenAcc);
+        onTokenChange?.(s.tokenAcc, crossedCount); // 第二个参数是本次变化量，正数表示加分
+      }
       s.frameCount++;
       if (s.frameCount % 300 === 0 && s.speed < 14) {
         s.speed += 0.5;
@@ -289,6 +295,7 @@ export default function DinoJump({ onScore }) {
       ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
       ctx.strokeStyle = readThemeColor("--line", "rgba(0,0,0,0.2)");
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, GROUND_Y);
       ctx.lineTo(CANVAS_W, GROUND_Y);
@@ -332,7 +339,7 @@ export default function DinoJump({ onScore }) {
       }
 
       // 分数 / 状态文字：画在画布正中间，带背景色块防止和地面/障碍物重叠看不清
-      const statusText = `分数: ${s.scoreAcc}`;
+      const statusText = ``;
       ctx.font = "bold 20px monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -351,6 +358,9 @@ export default function DinoJump({ onScore }) {
       ctx.textBaseline = "alphabetic";
 
           if (hit) {
+        s.tokenAcc -= 1; // 死亡 -1，可以为负数
+        setTokenLabel(s.tokenAcc);
+        onTokenChange?.(s.tokenAcc, -1); // 第二个参数是本次变化量，负数表示扣分
         setGameOver(true);
         setRunning(false);
         setScore(s.scoreAcc);
@@ -385,6 +395,7 @@ export default function DinoJump({ onScore }) {
 
       // 地面线
       ctx.strokeStyle = readThemeColor("--line", "rgba(0,0,0,0.2)");
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, groundY);
       ctx.lineTo(CANVAS_W, groundY);
@@ -407,8 +418,8 @@ export default function DinoJump({ onScore }) {
 
     // 居中文字
     const statusText = gameOver
-      ? `分数: ${score}  —— 游戏结束，按空格重新开始`
-      : `分数: ${score}（按空格 / ↑ 开始）`;
+      ? t("game.Game over, click to restart")
+      : t("game.Click to start");
     ctx.font = "bold 20px monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -421,7 +432,7 @@ export default function DinoJump({ onScore }) {
     const centerY = CANVAS_H / 4;
     ctx.fillStyle = readThemeColor("--home-bg", "rgba(255,255,255,0.85)");
     ctx.fillRect(centerX - boxW / 2, centerY - boxH / 2, boxW, boxH);
-    ctx.fillStyle = readThemeColor("--text-main", "#535353");
+    ctx.fillStyle = readThemeColor("--text-white", "#535353");
     ctx.fillText(statusText, centerX, centerY);
     ctx.textAlign = "start";
     ctx.textBaseline = "alphabetic";
@@ -429,6 +440,7 @@ export default function DinoJump({ onScore }) {
 
   return (
     <div
+      onClick={handleAction}
       style={{
         position: "fixed",
         top: 0,
@@ -436,7 +448,7 @@ export default function DinoJump({ onScore }) {
         width: "100vw",
         height: "100vh",
         fontFamily: "monospace",
-        color: "var(--text-main)",
+        color: "var(--text-white)",
         overflow: "hidden",
       }}
     >
@@ -446,7 +458,7 @@ export default function DinoJump({ onScore }) {
         height={dims.h}
         style={{
           display: "block",
-          background: "var(--card-bg)",
+          background: "var(--home-bg)",
         }}
       />
     </div>

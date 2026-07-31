@@ -7,6 +7,11 @@
     "Write a message…": "메시지를 입력하세요…",
     "How can I help you today?": "오늘 무엇을 도와드릴까요?",
     "FakeClaude can make mistakes, But makes far fewer mistakes than humans": "FakeClaude도 실수를 할 수 있지만, 인간보다 훨씬 적게 실수합니다",
-    "Thinking": "생각 중"
-  }
+    "Thinking": "생각 중",
+    "Token": "토큰"
+  },
+  "game": {
+  "Click to start": "클릭하여 시작",
+  "Game over, click to restart": "게임 오버, 클릭하여 재시작"
+}
 }

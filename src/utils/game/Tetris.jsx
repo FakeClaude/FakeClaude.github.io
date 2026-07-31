@@ -38,8 +38,31 @@ function createEmptyBoard() {
   return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
 }
 
-function spawnPiece(excludeKeys = []) {
-  const key = randomShapeKey(excludeKeys);
+// ------------------------------
+// 抽包（bag）随机：把 5 种形状洗牌放进一个包，一次抽完再开新包。
+// 目的：保证每连续 5 个方块里 I/O/T/L/Z 各出现恰好一次，杜绝纯均匀随机可能出现的
+// "连续很多次抽不到某个关键形状（比如拼阶梯墙必需的竖直 I）"这种极端厄运。
+// 这样只要玩家操作到位，任何一局都能在有限步数内攒够拼出 k=9 三角形（45 分）所需的形状，
+// 而不用依赖"随机数运气好"。
+// ------------------------------
+function createShuffledBag() {
+  const bag = [...SHAPE_KEYS];
+  for (let i = bag.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [bag[i], bag[j]] = [bag[j], bag[i]];
+  }
+  return bag;
+}
+
+function drawFromBag(bagRef) {
+  if (!bagRef.current || bagRef.current.length === 0) {
+    bagRef.current = createShuffledBag();
+  }
+  return bagRef.current.shift();
+}
+
+function spawnPiece(bagRef) {
+  const key = drawFromBag(bagRef);
   return {
     shapeKey: key,
     cells: SHAPES[key],
@@ -48,9 +71,17 @@ function spawnPiece(excludeKeys = []) {
   };
 }
 
-// 开局第一个方块专用：排除 O、I、L
+// 开局第一个方块专用：排除 O、I、L。
+// 注意这里故意不走抽包（bag），只是单独随机挑一个形状——
+// 这样"包"从第 2 个方块才正式开始，保证之后每连续 5 个方块里 5 种形状各出现一次。
 function spawnFirstPiece() {
-  return spawnPiece(["O", "I", "L"]);
+  const key = randomShapeKey(["O", "I", "L"]);
+  return {
+    shapeKey: key,
+    cells: SHAPES[key],
+    row: 0,
+    col: Math.floor(COLS / 2) - 1,
+  };
 }
 
 function getAbsoluteCells(piece) {
@@ -177,6 +208,7 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
   const [score, setScore] = useState(0);
   const intervalRef = useRef(null);
   const boardRef = useRef(null);
+  const bagRef = useRef([]); // 抽包状态：当前包里还没抽出的形状队列
   // token 余额跟随外部传入的 initialToken；只展示（不参与游戏逻辑），
   // 堆到顶结算时把三角形分数直接加到这个值上，再通过 onTokenChange 回传给上层
   const tokenRef = useRef(initialToken);
@@ -193,7 +225,7 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
   // 固定当前方块、生成下一个；若新方块一出生就冲突，说明堆到顶了 —— 结算一次阶梯判定
   const lockPieceAndSpawnNext = useCallback((prevBoard, prevPiece) => {
     const merged = mergePieceToBoard(prevBoard, prevPiece);
-    const next = spawnPiece();
+    const next = spawnPiece(bagRef);
     if (!isValidPosition(merged, next)) {
       setGameOver(true);
       const gained = getStaircaseScore(merged);

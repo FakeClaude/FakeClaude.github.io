@@ -34,7 +34,7 @@ async function loadLocalJson(lang) {
 const initialLang = detectLanguage();
 
 if (initialLang !== "en" && location.pathname === "/") {
-  location.replace("/" + initialLang);
+  location.replace("/" + initialLang + location.hash);
 }
 
 export const i18nPromise = (async () => {

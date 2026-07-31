@@ -12,6 +12,7 @@
   },
   "game": {
   "Click to start": "クリックしてスタート",
-  "Game over, click to restart": "ゲームオーバー、クリックしてリスタート"
+  "Game over, click to restart": "ゲームオーバー、クリックしてリスタート",
+    "Level complete, click to enter next level": "レベル完了、クリックして次のレベルへ"
 }
 }

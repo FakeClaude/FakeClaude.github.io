@@ -12,6 +12,7 @@
   },
   "game": {
   "Click to start": "انقر للبدء",
-  "Game over, click to restart": "انتهت اللعبة، انقر لإعادة البدء"
+  "Game over, click to restart": "انتهت اللعبة، انقر لإعادة البدء",
+    "Level complete, click to enter next level": "اكتمل المستوى، انقر للدخول إلى المستوى التالي"
 }
 }

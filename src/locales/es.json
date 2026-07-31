@@ -12,6 +12,7 @@
   },
   "game": {
   "Click to start": "Haz clic para empezar",
-  "Game over, click to restart": "Juego terminado, haz clic para reiniciar"
+  "Game over, click to restart": "Juego terminado, haz clic para reiniciar",
+    "Level complete, click to enter next level": "Nivel completado, haz clic para entrar al siguiente nivel"
 }
 }

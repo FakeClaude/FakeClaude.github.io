@@ -1,12 +1,13 @@
 // src/game.jsx
 import { useEffect, useState } from "preact/hooks";
 import DinoJump from "./utils/game/DinoJump.jsx";
+import Tetris from "./utils/game/Tetris.jsx";
 import {h} from "preact";
 import { useTranslation } from "react-i18next";
 import { idb } from "./utils/IndexedDB";
 
 // 游戏顺序表
-export const GAME_ORDER = ["tetris"]; // 后面依次追加 "minesweeper", "2048" ...
+export const GAME_ORDER = ["tetris"];
 const DB_NAME = "token-games-db";
 const DB_VERSION = 1;
 const STORE_NAME = "unlocked-games";
@@ -66,7 +67,9 @@ export default function Game({ onClose }) {
   const [nextGame, setNextGame] = useState(null);
   const [error, setError] = useState(null);
   const [tokenValue, setTokenValue] = useState(null); // null = 还没从 idb 读到；读到之后是数字
+  const [displayedToken, setDisplayedToken] = useState(null); // 页面上实际展示的数字，逐步 +1/-1 追向 tokenValue
   const [tokenToasts, setTokenToasts] = useState([]); // 得/减分动效队列，每项 { id, delta }
+  const [currentGame, setCurrentGame] = useState(null); // null = 还没从 idb 读到；"DinoJump" | "Tetris"
 
   useEffect(() => {
     let cancelled = false;
@@ -96,6 +99,23 @@ export default function Game({ onClose }) {
     });
   }, []);
 
+  useEffect(() => {
+    idb.get("game").then((saved) => {
+      if (saved) {
+        setCurrentGame(saved);
+      } else {
+        idb.set("game", "DinoJump");
+        setCurrentGame("DinoJump");
+      }
+    });
+  }, []);
+
+  // 闯关成功时由 DinoJump 调用：把当前游戏记录切换成 Tetris，写回 idb.FakeClaudeDB.replies.game
+  function handleLevelComplete() {
+    idb.set("game", "Tetris");
+    setCurrentGame("Tetris");
+  }
+
   // DinoJump 里翻山 +1 / 死亡 -1 时会调用这个，负责写回 idb、刷新页面数字、弹出动效
   function handleTokenChange(newValue, delta) {
     setTokenValue(newValue);
@@ -111,19 +131,49 @@ export default function Game({ onClose }) {
     }
   }
 
+  // token 数字滚动动效：不直接跳到目标值，而是每隔一小段时间 +1/-1 逐步逼近
+  // 首次读到 tokenValue 时（displayedToken 还是 null）直接同步，不做动画
+  useEffect(() => {
+    if (tokenValue === null) return;
+    if (displayedToken === null) {
+      setDisplayedToken(tokenValue);
+      return;
+    }
+    if (displayedToken === tokenValue) return;
+
+    const diff = tokenValue - displayedToken;
+    const step = diff > 0 ? 1 : -1;
+    const totalSteps = Math.abs(diff);
+    // 差值大时加快节奏，避免涨分很多时动画拖太久；差值小时保持能看清的速度
+    const stepDuration = Math.max(15, Math.min(80, 600 / totalSteps));
+
+    const timer = setInterval(() => {
+      setDisplayedToken((prev) => {
+        if (prev === null) return prev;
+        const next = prev + step;
+        if (next === tokenValue) {
+          clearInterval(timer);
+        }
+        return next;
+      });
+    }, stepDuration);
+
+    return () => clearInterval(timer);
+  }, [tokenValue]);
+
   if (error) {
     return <div>IndexedDB 出错: {error}</div>;
   }
 
-  if (unlocked === null) {
+  if (unlocked === null || currentGame === null) {
     return <div>加载中...</div>;
   }
 
   return (
-    <>
+    <div className="game">
       <div className="home-token">
         <span className="token-name" >{t("home.Token")}</span >
-        <span className="token-label" >{" "}{tokenValue ?? "…"}</span >
+        <span className="token-label" >{" "}{displayedToken ?? "…"}</span >
         {tokenToasts.map((toast) => (
           <span
             key={toast.id}
@@ -134,10 +184,17 @@ export default function Game({ onClose }) {
         ))}
       </div>
       <div className="game-close" onClick={onClose}></div>
-      {tokenValue !== null && (
-        <DinoJump initialToken={tokenValue} onTokenChange={handleTokenChange} />
+      {tokenValue !== null && currentGame === "DinoJump" && (
+        <DinoJump
+          initialToken={tokenValue}
+          onTokenChange={handleTokenChange}
+          onLevelComplete={handleLevelComplete}
+        />
       )}
-    </>
+      {tokenValue !== null && currentGame === "Tetris" && (
+        <Tetris initialToken={tokenValue} onTokenChange={handleTokenChange} />
+      )}
+    </div>
   );
 
 }

@@ -13,6 +13,7 @@
   },
   "game": {
   "Click to start": "Нажмите, чтобы начать",
-  "Game over, click to restart": "Игра окончена, нажмите, чтобы начать заново"
+  "Game over, click to restart": "Игра окончена, нажмите, чтобы начать заново",
+    "Level complete, click to enter next level": "Уровень пройден, нажмите, чтобы перейти на следующий уровень"
 }
 }

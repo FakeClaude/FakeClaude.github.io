@@ -12,6 +12,7 @@
   },
   "game": {
   "Click to start": "클릭하여 시작",
-  "Game over, click to restart": "게임 오버, 클릭하여 재시작"
+  "Game over, click to restart": "게임 오버, 클릭하여 재시작",
+    "Level complete, click to enter next level": "레벨 완료, 클릭하여 다음 레벨로 이동"
 }
 }

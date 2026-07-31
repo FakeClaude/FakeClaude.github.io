@@ -12,6 +12,7 @@
   },
   "game": {
   "Click to start": "शुरू करने के लिए क्लिक करें",
-  "Game over, click to restart": "गेम ओवर, फिर से शुरू करने के लिए क्लिक करें"
+  "Game over, click to restart": "गेम ओवर, फिर से शुरू करने के लिए क्लिक करें",
+    "Level complete, click to enter next level": "स्तर पूरा हुआ, अगले स्तर में प्रवेश करने के लिए क्लिक करें"
 }
 }

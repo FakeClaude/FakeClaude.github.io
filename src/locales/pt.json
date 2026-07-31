@@ -13,6 +13,7 @@
   },
   "game": {
   "Click to start": "Clique para começar",
-  "Game over, click to restart": "Fim de jogo, clique para reiniciar"
+  "Game over, click to restart": "Fim de jogo, clique para reiniciar",
+    "Level complete, click to enter next level": "Nível concluído, clique para entrar no próximo nível"
 }
 }

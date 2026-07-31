@@ -53,6 +53,7 @@ const DINO_W = 44;
 const DINO_H = 47;
 const MOUNTAIN_GAP = 130; // 山相对仙人掌的初始水平偏移
 const MOUNTAIN_SCORE = 10; // 成功越过一座显形的山，加这么多分
+const LEVEL_COMPLETE_BONUS = 10; // 闯关成功（累计翻过15座山）额外加这么多 token
 
 // 真假仙人掌序列生成器：
 function nextIsTrueCactus(s) {
@@ -66,11 +67,12 @@ function nextIsTrueCactus(s) {
   return true; // 真仙人掌
 }
 
-export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
+export default function DinoJump({ onScore, initialToken = 0, onTokenChange, onLevelComplete }) {
   const { t } = useTranslation();
   const canvasRef = useRef(null);
   const [running, setRunning] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [levelComplete, setLevelComplete] = useState(false); // 累计翻过 1+2+3+4+5=15 座山后触发
   const [score, setScore] = useState(0);
   const [tokenLabel, setTokenLabel] = useState(0); // 翻过一座山(仙人掌不算) +1；死亡 -1；可以为负数
   // 画布尺寸改为跟随窗口大小的全屏尺寸，随 resize 更新
@@ -99,6 +101,8 @@ export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
     spawnTimer: 0,
     scoreAcc: 0,
     tokenAcc: initialToken, // 翻山+1/死亡-1 的累计值，初始值来自外部传入（真实 token 余额）
+    totalCrossed: 0, // 累计成功翻过的山数（跨重开不清零），达到 15（1+2+3+4+5）触发闯关
+    levelCompleteTriggered: false,
     // 真假仙人掌序列生成器状态：
     // 假仙人掌连续出现次数按 1,2,3,4... 递增，每组假仙人掌后插入 1 个真仙人掌
     // 例：假(1个) 真 假(2个) 真 假(3个) 真 ...
@@ -107,6 +111,10 @@ export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
   });
 
   function handleAction() {
+    if (levelComplete) {
+      onLevelComplete?.();
+      return;
+    }
     if (gameOver) {
       restart();
       return;
@@ -144,6 +152,8 @@ export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
       spawnTimer: 0,
       scoreAcc: 0,
       tokenAcc: prevTokenAcc,
+      totalCrossed: 0, // 死亡重开即清零，必须连续翻满 15 座才算闯关，不能接着上次的进度继续攒
+      levelCompleteTriggered: false,
       cactusGroupLength: 1,
       cactusGroupProgress: 0,
     };
@@ -285,6 +295,17 @@ export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
         s.tokenAcc += crossedCount;
         setTokenLabel(s.tokenAcc);
         onTokenChange?.(s.tokenAcc, crossedCount); // 第二个参数是本次变化量，正数表示加分
+
+        s.totalCrossed += crossedCount;
+        if (!s.levelCompleteTriggered && s.totalCrossed >= 15) {
+          s.levelCompleteTriggered = true;
+          // 闯关成功额外 +10 token
+          s.tokenAcc += LEVEL_COMPLETE_BONUS;
+          setTokenLabel(s.tokenAcc);
+          onTokenChange?.(s.tokenAcc, LEVEL_COMPLETE_BONUS);
+          setLevelComplete(true);
+          setRunning(false); // 暂停游戏，等待用户点击进入下一关
+        }
       }
       s.frameCount++;
       if (s.frameCount % 300 === 0 && s.speed < 14) {
@@ -366,6 +387,12 @@ export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
         setScore(s.scoreAcc);
         return; // 渲染完最后一帧后再停止循环
       }
+
+      if (s.levelCompleteTriggered && running) {
+        // 闯关刚触发：渲染完这一帧后停止循环，等待用户点击进入下一关
+        return;
+      }
+
       rafId = requestAnimationFrame(loop);
     }
 
@@ -383,7 +410,7 @@ export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
     const CANVAS_W = dims.w;
     const CANVAS_H = dims.h;
 
-    if (!gameOver) {
+    if (!gameOver && !levelComplete) {
       const dpr = window.devicePixelRatio || 1;
       canvas.width = CANVAS_W * dpr;
       canvas.height = CANVAS_H * dpr;
@@ -417,7 +444,9 @@ export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
     }
 
     // 居中文字
-    const statusText = gameOver
+    const statusText = levelComplete
+      ? t("game.Level complete, click to enter next level")
+      : gameOver
       ? t("game.Game over, click to restart")
       : t("game.Click to start");
     ctx.font = "bold 20px monospace";
@@ -436,7 +465,7 @@ export default function DinoJump({ onScore, initialToken = 0, onTokenChange }) {
     ctx.fillText(statusText, centerX, centerY);
     ctx.textAlign = "start";
     ctx.textBaseline = "alphabetic";
-  }, [running, gameOver, score, dims, groundY]);
+  }, [running, gameOver, levelComplete, score, dims, groundY]);
 
   return (
     <div

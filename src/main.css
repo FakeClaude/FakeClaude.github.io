@@ -31,7 +31,7 @@
     --text-placeholder: #9c988f;
     --accent: #d97757;
     --accent-hover: #c96a4c;
-    --line: rgba(0, 0, 0, 0.08);
+    --line: rgba(0, 0, 0, 0.15);
     --green: #00ad74;
     --red: rgb(209, 0, 0);
 }
@@ -350,12 +350,15 @@ html, body {
     position: fixed;
     top: 24px;
     left: 24px;
-    background: var(--card-bg-hover);
+    background: var(--black-70);
     border-radius: 8px;
     padding: 6px 12px;
     font-size: 16px;
     color: var(--text-white);
     z-index: 1;
+}
+.game{
+    background: var(--home-bg);
 }
 .game-close {
     position: fixed;
@@ -366,6 +369,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    border: .5px solid var(--text-white-20);
     background: var(--card-bg-hover);
     border-radius: 8px;
     font-size: 24px;

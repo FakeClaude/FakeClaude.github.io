@@ -13,6 +13,7 @@
   },
   "game": {
     "Click to start": "点击开始",
-    "Game over, click to restart": "游戏结束，点击重新开始"
+    "Game over, click to restart": "游戏结束，点击重新开始",
+    "Level complete, click to enter next level": "关卡完成，点击进入下一关"
   }
 }

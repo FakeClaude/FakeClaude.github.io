@@ -177,8 +177,9 @@ function triangleNumber(k) {
   return (k * (k + 1)) / 2;
 }
 
-// 从大到小找左下角/右下角各自能满足的最大三角形边长，取两者里分数更高的那个
-function getStaircaseScore(board) {
+// 找左下角/右下角各自能满足的最大三角形边长，取分数更高的那个，
+// 同时返回是哪一侧（left/right），供闪光动效知道要点亮哪些格子坐标
+function getStaircaseResult(board) {
   const maxK = Math.min(ROWS, COLS);
   let bestLeft = 0;
   for (let k = maxK; k >= 1; k--) {
@@ -194,8 +195,24 @@ function getStaircaseScore(board) {
       break;
     }
   }
-  const bestK = Math.max(bestLeft, bestRight);
-  return triangleNumber(bestK); // bestK 为 0 时，triangleNumber(0) = 0，正好表示不得分
+  if (bestLeft === 0 && bestRight === 0) return { k: 0, side: null };
+  return bestLeft >= bestRight ? { k: bestLeft, side: "left" } : { k: bestRight, side: "right" };
+}
+
+// 根据边长 k 和方向，算出这个三角形具体占哪些 [row, col] 格子（用于闪光高亮）
+function getTriangleCells(k, side) {
+  const cells = [];
+  for (let i = 0; i < k; i++) {
+    const row = ROWS - 1 - i;
+    if (side === "left") {
+      const maxCol = k - 1 - i;
+      for (let c = 0; c <= maxCol; c++) cells.push([row, c]);
+    } else {
+      const minCol = COLS - k + i;
+      for (let c = minCol; c < COLS; c++) cells.push([row, c]);
+    }
+  }
+  return cells;
 }
 
 // ------------------------------
@@ -215,6 +232,8 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
   useEffect(() => {
     tokenRef.current = initialToken;
   }, [initialToken]);
+  // 得分那一刻，需要闪绿光的格子坐标集合（"row-col" 字符串），动画播完（600ms）后清空
+  const [flashCells, setFlashCells] = useState(() => new Set());
   // 移动端检测：粗指针（触屏）即认为是移动端，用来切换画布尺寸和触摸手势
   const [isMobile] = useState(() =>
     typeof window !== "undefined" && window.matchMedia
@@ -228,13 +247,18 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
     const next = spawnPiece(bagRef);
     if (!isValidPosition(merged, next)) {
       setGameOver(true);
-      const gained = getStaircaseScore(merged);
+      const result = getStaircaseResult(merged);
+      const gained = triangleNumber(result.k);
       if (gained > 0) {
         setScore((s) => s + gained);
         // 三角形分数直接加到 token 上，回传给上层（game.jsx）去更新真实 token 余额
         const newToken = tokenRef.current + gained;
         tokenRef.current = newToken;
         onTokenChange?.(newToken, gained);
+        // 点亮得分的三角形区域，闪一下绿光，600ms 后自动熄灭
+        const cells = getTriangleCells(result.k, result.side);
+        setFlashCells(new Set(cells.map(([r, c]) => `${r}-${c}`)));
+        setTimeout(() => setFlashCells(new Set()), 600);
       }
       setBoard(merged);
       return prevPiece; // 游戏结束，piece 保持不变即可
@@ -388,11 +412,27 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
           width: isMobile ? "100vw" : "fit-content",
         }}
       >
+        <style>{`
+          @keyframes tetrisScoreFlash {
+            0% { opacity: 0.5; }
+            100% { opacity: 0; }
+          }
+          .tetris-flash-overlay {
+            position: absolute;
+            inset: 1px;
+            background: var(--green);
+            animation: tetrisScoreFlash 1s ease-out forwards;
+            pointer-events: none;
+          }
+        `}</style>
         {displayBoard.flatMap((row, r) =>
           row.map((cell, c) => (
             <div
               key={`${r}-${c}`}
+              data-row={r}
+              data-col={c}
               style={{
+                position: "relative",
                 width: cellSize,
                 height: cellSize,
                 border: ".5px solid var(--line)",
@@ -410,6 +450,7 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
                   }}
                 />
               )}
+              {flashCells.has(`${r}-${c}`) && <div className="tetris-flash-overlay" />}
             </div>
           ))
         )}

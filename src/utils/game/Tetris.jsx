@@ -6,6 +6,7 @@
 // 两个角都满足的话取分数更高的那个；两个角都不满足，本局 0 分。
 
 import { useEffect, useRef, useState, useCallback } from "preact/hooks";
+import { useTranslation } from "react-i18next";
 
 // ------------------------------
 // 棋盘尺寸
@@ -218,11 +219,13 @@ function getTriangleCells(k, side) {
 // ------------------------------
 // 组件
 // ------------------------------
-export default function Tetris({ initialToken = 0, onTokenChange }) {
+export default function Tetris({ initialToken = 0, onTokenChange, onLevelComplete }) {
+  const { t } = useTranslation();
   const [board, setBoard] = useState(createEmptyBoard);
   const [piece, setPiece] = useState(spawnFirstPiece);
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
+  const [cleared, setCleared] = useState(false); // 单局得分满45分 = 通关（刷新重开积累的分数不算）
   const intervalRef = useRef(null);
   const boardRef = useRef(null);
   const bagRef = useRef([]); // 抽包状态：当前包里还没抽出的形状队列
@@ -240,6 +243,45 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
       ? window.matchMedia("(pointer: coarse)").matches
       : false
   );
+
+  // 调试专用：挂一个全局函数，控制台里跑 window.__winTetris() 就能直接伪造一局
+  // "左下角 k=9 三角形全空、其余全实心"的棋盘，走一遍和真实通关完全一样的计分/提示逻辑，
+  // 不用真的手动堆方块测试。组件卸载时自动清理，不会留下全局污染。
+  useEffect(() => {
+    window.__winTetris = () => {
+      const testBoard = createEmptyBoard();
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          testBoard[r][c] = 1;
+        }
+      }
+      const k = 9; // triangleNumber(9) = 45，正好是通关门槛
+      for (let i = 0; i < k; i++) {
+        const row = ROWS - 1 - i;
+        for (let c = 0; c <= k - 1 - i; c++) {
+          testBoard[row][c] = 0;
+        }
+      }
+      setBoard(testBoard);
+      setGameOver(true);
+      const result = getStaircaseResult(testBoard);
+      const gained = triangleNumber(result.k);
+      setScore((s) => s + gained);
+      const newToken = tokenRef.current + gained;
+      tokenRef.current = newToken;
+      onTokenChange?.(newToken, gained);
+      const cells = getTriangleCells(result.k, result.side);
+      setFlashCells(new Set(cells.map(([r, c]) => `${r}-${c}`)));
+      setTimeout(() => setFlashCells(new Set()), 600);
+      if (gained >= 45) {
+        setCleared(true);
+      }
+      console.log(`[__winTetris] 伪造通关成功，得分 ${gained}`);
+    };
+    return () => {
+      delete window.__winTetris;
+    };
+  }, [onTokenChange]);
 
   // 固定当前方块、生成下一个；若新方块一出生就冲突，说明堆到顶了 —— 结算一次阶梯判定
   const lockPieceAndSpawnNext = useCallback((prevBoard, prevPiece) => {
@@ -259,6 +301,11 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
         const cells = getTriangleCells(result.k, result.side);
         setFlashCells(new Set(cells.map(([r, c]) => `${r}-${c}`)));
         setTimeout(() => setFlashCells(new Set()), 600);
+        // 单次（这一局，从开局到堆顶）得分满 45 分 = 通关，刷新重开后累积的分数不算
+        // 这里只显示"下一关"提示，真正切换到下一个游戏要等用户点击/按键确认（见 handleKey/handleClick）
+        if (gained >= 45) {
+          setCleared(true);
+        }
       }
       setBoard(merged);
       return prevPiece; // 游戏结束，piece 保持不变即可
@@ -279,6 +326,16 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
       return prevBoard;
     });
   }, [lockPieceAndSpawnNext]);
+
+  const restart = useCallback(() => {
+    setBoard(createEmptyBoard());
+    setPiece(spawnFirstPiece());
+    setGameOver(false);
+    setCleared(false);
+    setScore(0);
+    setFlashCells(new Set());
+    bagRef.current = [];
+  }, []);
 
   const moveLeft = useCallback(() => {
     setBoard((prevBoard) => {
@@ -313,7 +370,18 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
   // 左右移动 / 旋转（方向键上或空格）/ 加速下落
   useEffect(() => {
     function handleKey(e) {
-      if (gameOver) return;
+      // 通关提示出现后，任意按键 = 确认进入下一关；不确认就刷新页面的话，
+      // 这个 cleared 只是组件内的本地状态，从没写过 idb，所以刷新后依然停留在当前关
+      if (cleared) {
+        e.preventDefault();
+        onLevelComplete?.();
+        return;
+      }
+      if (gameOver) {
+        e.preventDefault();
+        restart();
+        return;
+      }
       if (e.code === "ArrowLeft") {
         e.preventDefault();
         moveLeft();
@@ -330,7 +398,7 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [step, moveLeft, moveRight, rotate, gameOver]);
+  }, [step, moveLeft, moveRight, rotate, gameOver, cleared, onLevelComplete, restart]);
 
   useEffect(() => {
     if (gameOver) {
@@ -349,7 +417,14 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
     if (!el) return;
 
     function handleTouchStart(e) {
-      if (gameOver) return;
+      if (cleared) {
+        onLevelComplete?.();
+        return;
+      }
+      if (gameOver) {
+        restart();
+        return;
+      }
       const touch = e.touches[0];
       if (!touch) return;
       const rect = el.getBoundingClientRect();
@@ -373,7 +448,7 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
 
     el.addEventListener("touchstart", handleTouchStart, { passive: true });
     return () => el.removeEventListener("touchstart", handleTouchStart);
-  }, [isMobile, moveLeft, moveRight, rotate, step, gameOver]);
+  }, [isMobile, moveLeft, moveRight, rotate, step, gameOver, cleared, restart, onLevelComplete]);
 
   // ------------------------------
   // 渲染
@@ -391,6 +466,13 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
 
   return (
     <div
+      onClick={() => {
+        if (cleared) {
+          onLevelComplete?.();
+        } else if (gameOver) {
+          restart();
+        }
+      }}
       style={{
         fontFamily: "monospace",
         color: "var(--text-main)",
@@ -399,8 +481,47 @@ export default function Tetris({ initialToken = 0, onTokenChange }) {
         alignItems: isMobile ? "flex-end" : "center",
         width: isMobile ? "100vw" : undefined,
         height: isMobile ? "100vh" : undefined,
+        position: "relative",
       }}
     >
+      {cleared && (
+        <div
+          style={{
+            position: "fixed",
+            top: "25%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "var(--home-bg)",
+            color: "var(--text-white)",
+            fontWeight: "bold",
+            fontSize: "20px",
+            padding: "10px 16px",
+            zIndex: 10,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {t("game.Level complete, click to enter next level")}
+        </div>
+      )}
+      {gameOver && !cleared && (
+        <div
+          style={{
+            position: "fixed",
+            top: "25%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "var(--home-bg)",
+            color: "var(--text-white)",
+            fontWeight: "bold",
+            fontSize: "20px",
+            padding: "10px 16px",
+            zIndex: 10,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {t("game.Game over, click to restart")}
+        </div>
+      )}
       <div
         ref={boardRef}
         style={{

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "preact/hooks";
 import DinoJump from "./utils/game/DinoJump.jsx";
 import Tetris from "./utils/game/Tetris.jsx";
+import SnakeOrbit from "./utils/game/SnakeOrbit.jsx";
 import {h} from "preact";
 import { useTranslation } from "react-i18next";
 import { idb } from "./utils/IndexedDB";
@@ -110,10 +111,10 @@ export default function Game({ onClose }) {
     });
   }, []);
 
-  // 闯关成功时由 DinoJump 调用：把当前游戏记录切换成 Tetris，写回 idb.FakeClaudeDB.replies.game
-  function handleLevelComplete() {
-    idb.set("game", "Tetris");
-    setCurrentGame("Tetris");
+  // 闯关成功时由子游戏调用：把当前游戏记录切换成指定的下一个游戏，写回 idb.FakeClaudeDB.replies.game
+  function handleLevelComplete(nextGameKey) {
+    idb.set("game", nextGameKey);
+    setCurrentGame(nextGameKey);
   }
 
   // DinoJump 里翻山 +1 / 死亡 -1 时会调用这个，负责写回 idb、刷新页面数字、弹出动效
@@ -188,11 +189,18 @@ export default function Game({ onClose }) {
         <DinoJump
           initialToken={tokenValue}
           onTokenChange={handleTokenChange}
-          onLevelComplete={handleLevelComplete}
+          onLevelComplete={() => handleLevelComplete("Tetris")}
         />
       )}
       {tokenValue !== null && currentGame === "Tetris" && (
-        <Tetris initialToken={tokenValue} onTokenChange={handleTokenChange} />
+        <Tetris
+          initialToken={tokenValue}
+          onTokenChange={handleTokenChange}
+          onLevelComplete={() => handleLevelComplete("SnakeOrbit")}
+        />
+      )}
+      {tokenValue !== null && currentGame === "SnakeOrbit" && (
+        <SnakeOrbit initialToken={tokenValue} onTokenChange={handleTokenChange} />
       )}
     </div>
   );

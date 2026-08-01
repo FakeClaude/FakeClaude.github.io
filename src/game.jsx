@@ -70,7 +70,8 @@ export default function Game({ onClose }) {
   const [tokenValue, setTokenValue] = useState(null); // null = 还没从 idb 读到；读到之后是数字
   const [displayedToken, setDisplayedToken] = useState(null); // 页面上实际展示的数字，逐步 +1/-1 追向 tokenValue
   const [tokenToasts, setTokenToasts] = useState([]); // 得/减分动效队列，每项 { id, delta }
-  const [currentGame, setCurrentGame] = useState(null); // null = 还没从 idb 读到；"DinoJump" | "Tetris"
+  const [currentGame, setCurrentGame] = useState(null); // null = 还没从 idb 读到；"DinoJump" | "Tetris" | "SnakeOrbit"
+  const [snakeOrbitProgress, setSnakeOrbitProgress] = useState(null); // SnakeOrbit 上次过关瞬间的完整快照，null = 从第1关开始
 
   useEffect(() => {
     let cancelled = false;
@@ -102,19 +103,48 @@ export default function Game({ onClose }) {
 
   useEffect(() => {
     idb.get("game").then((saved) => {
-      if (saved) {
+      if (saved && typeof saved === "object") {
+        // 新格式：{ current: "DinoJump" | "Tetris" | "SnakeOrbit", SnakeOrbit: 快照对象 }
+        // SnakeOrbit 字段如果是完整快照对象（有 snake 字段）才能精确恢复；
+        // 如果是旧版本存的纯数字（只记关卡数），没法精确还原身体位置，回退到从第1关开始
+        setCurrentGame(saved.current);
+        const snakeProgress = saved.SnakeOrbit;
+        setSnakeOrbitProgress(
+          snakeProgress && typeof snakeProgress === "object" ? snakeProgress : null
+        );
+      } else if (typeof saved === "string") {
+        // 更旧的格式：直接存的字符串，读到后自动迁移成新的对象格式
+        const migrated = { current: saved, SnakeOrbit: null };
+        idb.set("game", migrated);
         setCurrentGame(saved);
+        setSnakeOrbitProgress(null);
       } else {
-        idb.set("game", "DinoJump");
+        const initial = { current: "DinoJump", SnakeOrbit: null };
+        idb.set("game", initial);
         setCurrentGame("DinoJump");
+        setSnakeOrbitProgress(null);
       }
     });
   }, []);
 
   // 闯关成功时由子游戏调用：把当前游戏记录切换成指定的下一个游戏，写回 idb.FakeClaudeDB.replies.game
   function handleLevelComplete(nextGameKey) {
-    idb.set("game", nextGameKey);
+    idb.get("game").then((saved) => {
+      const prev = saved && typeof saved === "object" ? saved : {};
+      idb.set("game", { ...prev, current: nextGameKey });
+    });
     setCurrentGame(nextGameKey);
+  }
+
+  // SnakeOrbit 每绕成功一圈（身体闪烁那一瞬间）就调用这个，把完整快照（身体坐标、
+  // 下一关目标、方向、待长出的量）写回 idb，同级于 current 字段；
+  // 死亡重开或刷新后由 SnakeOrbit 自己精确恢复到这一帧
+  function handleSnakeProgressChange(snapshot) {
+    setSnakeOrbitProgress(snapshot);
+    idb.get("game").then((saved) => {
+      const prev = saved && typeof saved === "object" ? saved : { current: "SnakeOrbit" };
+      idb.set("game", { ...prev, SnakeOrbit: snapshot });
+    });
   }
 
   // DinoJump 里翻山 +1 / 死亡 -1 时会调用这个，负责写回 idb、刷新页面数字、弹出动效
@@ -200,7 +230,12 @@ export default function Game({ onClose }) {
         />
       )}
       {tokenValue !== null && currentGame === "SnakeOrbit" && (
-        <SnakeOrbit initialToken={tokenValue} onTokenChange={handleTokenChange} />
+        <SnakeOrbit
+          initialToken={tokenValue}
+          onTokenChange={handleTokenChange}
+          initialProgress={snakeOrbitProgress}
+          onProgressChange={handleSnakeProgressChange}
+        />
       )}
     </div>
   );

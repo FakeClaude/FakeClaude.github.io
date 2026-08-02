@@ -53,7 +53,7 @@ function getRingCells(centerRow, centerCol, n) {
 // SPEED_STEP_MS：每过一关，间隔缩短多少毫秒（加快程度）
 // MIN_TICK_MS：间隔下限，防止关卡太多后快到没法反应
 // ------------------------------
-const INITIAL_TICK_MS = 400;
+const INITIAL_TICK_MS = 350;
 const SPEED_STEP_MS = 8;
 const MIN_TICK_MS = 40;
 const BOOST_INTERVAL_RATIO = 0.4; // 加速时的间隔 = 正常间隔 * 该比例

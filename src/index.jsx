@@ -3,34 +3,52 @@ import { useState, useEffect } from "preact/hooks";
 import Home from "./home.jsx";
 import Game from "./game.jsx";
 
-function getPageFromHash() {
-  return window.location.hash === "#/game" ? "game" : "home";
+// 解析形如 "#/game" 或 "#/game/DinoJump" 的 hash
+// 返回 { page: "home" | "game", gameKey: 具体游戏名 | null }
+function parseHash() {
+  const hash = window.location.hash;
+  const match = hash.match(/^#\/game(?:\/([^/]+))?$/);
+  if (match) {
+    return { page: "game", gameKey: match[1] || null };
+  }
+  return { page: "home", gameKey: null };
 }
 
 export default function App() {
-  const [page, setPage] = useState(getPageFromHash);
+  const [route, setRoute] = useState(parseHash);
 
   // 支持浏览器前进/后退按钮：hash 变化时同步页面状态
   useEffect(() => {
     function handleHashChange() {
-      setPage(getPageFromHash());
+      setRoute(parseHash());
     }
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
   function enterGame() {
+    // 不指定具体游戏名，进去之后由 Game 组件根据 idb 里的进度决定是哪个游戏，
+    // 再通过 onGameKeyChange 把具体游戏名补进地址栏
     window.location.hash = "#/game";
-    setPage("game");
+    setRoute({ page: "game", gameKey: null });
   }
 
   function closeGame() {
     window.location.hash = "";
-    setPage("home");
+    setRoute({ page: "home", gameKey: null });
   }
 
-  if (page === "game") {
-     return <Game onClose={closeGame} />;
+  // Game 组件内部当前显示的游戏发生变化时调用
+  function setGameHash(key) {
+    const newHash = `#/game/${key}`;
+    if (window.location.hash !== newHash) {
+      window.location.hash = newHash;
+    }
+    setRoute({ page: "game", gameKey: key });
+  }
+
+  if (route.page === "game") {
+    return <Game onClose={closeGame} urlGameKey={route.gameKey} onGameKeyChange={setGameHash} />;
   }
   return <Home onEnterGame={enterGame} />;
 }

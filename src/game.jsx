@@ -62,7 +62,10 @@ export function getNextGameToLoad(unlockedList) {
   return null; // 全部已解锁
 }
 
-export default function Game({ onClose }) {
+// 已知的游戏 key，用来校验 URL 里带来的游戏名是否合法
+const KNOWN_GAMES = ["DinoJump", "Tetris", "SnakeOrbit"];
+
+export default function Game({ onClose, urlGameKey, onGameKeyChange }) {
   const { t } = useTranslation();
   const [unlocked, setUnlocked] = useState(null); // null = 加载中
   const [nextGame, setNextGame] = useState(null);
@@ -103,29 +106,48 @@ export default function Game({ onClose }) {
 
   useEffect(() => {
     idb.get("game").then((saved) => {
+      let resolvedCurrent;
+      let resolvedSnakeProgress = null;
+      let needsWrite = false;
+
       if (saved && typeof saved === "object") {
         // 新格式：{ current: "DinoJump" | "Tetris" | "SnakeOrbit", SnakeOrbit: 快照对象 }
         // SnakeOrbit 字段如果是完整快照对象（有 snake 字段）才能精确恢复；
         // 如果是旧版本存的纯数字（只记关卡数），没法精确还原身体位置，回退到从第1关开始
-        setCurrentGame(saved.current);
+        resolvedCurrent = saved.current;
         const snakeProgress = saved.SnakeOrbit;
-        setSnakeOrbitProgress(
-          snakeProgress && typeof snakeProgress === "object" ? snakeProgress : null
-        );
+        resolvedSnakeProgress = snakeProgress && typeof snakeProgress === "object" ? snakeProgress : null;
       } else if (typeof saved === "string") {
         // 更旧的格式：直接存的字符串，读到后自动迁移成新的对象格式
-        const migrated = { current: saved, SnakeOrbit: null };
-        idb.set("game", migrated);
-        setCurrentGame(saved);
-        setSnakeOrbitProgress(null);
+        resolvedCurrent = saved;
+        needsWrite = true;
       } else {
-        const initial = { current: "DinoJump", SnakeOrbit: null };
-        idb.set("game", initial);
-        setCurrentGame("DinoJump");
-        setSnakeOrbitProgress(null);
+        resolvedCurrent = "DinoJump";
+        needsWrite = true;
       }
+
+      // 地址栏里指定了合法的游戏名（分享链接打开 / 手动改地址），优先采用，并同步写回 idb
+      if (urlGameKey && KNOWN_GAMES.includes(urlGameKey) && urlGameKey !== resolvedCurrent) {
+        resolvedCurrent = urlGameKey;
+        needsWrite = true;
+      }
+
+      if (needsWrite) {
+        idb.set("game", { current: resolvedCurrent, SnakeOrbit: resolvedSnakeProgress });
+      }
+
+      setCurrentGame(resolvedCurrent);
+      setSnakeOrbitProgress(resolvedSnakeProgress);
     });
   }, []);
+
+  // 当前显示的游戏一旦确定/发生变化（首次加载确定、或闯关切到下一个），
+  // 就把地址栏同步成 "#/game/具体游戏名"，这样地址可以直接分享打开
+  useEffect(() => {
+    if (currentGame) {
+      onGameKeyChange?.(currentGame);
+    }
+  }, [currentGame]);
 
   // 闯关成功时由子游戏调用：把当前游戏记录切换成指定的下一个游戏，写回 idb.FakeClaudeDB.replies.game
   function handleLevelComplete(nextGameKey) {

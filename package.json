@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "node scripts/prerender-langs.js && node scripts/generate-seo.mjs",
+    "postbuild": "node scripts/prerender-langs.js && node scripts/prerender-games.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

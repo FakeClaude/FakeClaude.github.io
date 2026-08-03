@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fakeclaude.pages.dev/sitemap.xml

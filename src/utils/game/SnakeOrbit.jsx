@@ -8,20 +8,14 @@
 // 开局蛇长 8，正好等于第1关所需格数，没有多余长度可以浪费，必须严丝合缝绕成一圈。
 // 每成功一关，蛇变长 8*(n+1) 格 —— 这个长度不多不少，刚好够拼下一关的圈。
 // 成功：+分；直接吃掉：-分（分值见 scoreForLevel：10、50、100、200、300、400...）。
-
 import { useEffect, useRef, useState, useCallback } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
-// ------------------------------
-// 棋盘尺寸（奇数，方便以某一格为正中心对称画圈）
-// ------------------------------
+// 棋盘尺寸
 const BOARD_SIZE = 21;
 const CENTER_MARGIN = BOARD_SIZE; // 仅用于占位说明，实际边界判断见 spawnTarget
 
-// ------------------------------
 // 环形/圈层相关的数学
-// ------------------------------
-// 第 n 关，从内到外总共需要占的格子数：1~n 圈的格子总和 = 4n(n+1)
 function requiredCellCount(n) {
   return 4 * n * (n + 1);
 }
@@ -47,23 +41,15 @@ function getRingCells(centerRow, centerCol, n) {
   return cells;
 }
 
-// ------------------------------
-// 移动速度：每过一关（每吃到/绕成功一次），下落间隔缩短一点，速度变快
-// INITIAL_TICK_MS：初始每步间隔（毫秒），数字越小蛇移动越快
-// SPEED_STEP_MS：每过一关，间隔缩短多少毫秒（加快程度）
-// MIN_TICK_MS：间隔下限，防止关卡太多后快到没法反应
-// ------------------------------
-const INITIAL_TICK_MS = 350;
-const SPEED_STEP_MS = 8;
-const MIN_TICK_MS = 40;
+const INITIAL_TICK_MS = 350;// 初始每步间隔（毫秒），数字越小蛇移动越快
+const SPEED_STEP_MS = 8;// 每过一关，间隔缩短多少毫秒（加快程度）
+const MIN_TICK_MS = 40;// 间隔下限，防止关卡太多后快到没法反应
 const BOOST_INTERVAL_RATIO = 0.4; // 加速时的间隔 = 正常间隔 * 该比例
 function getTickInterval(level) {
   return Math.max(MIN_TICK_MS, INITIAL_TICK_MS - (level - 1) * SPEED_STEP_MS);
 }
 
-// ------------------------------
 // 蛇的方向
-// ------------------------------
 const DIRS = {
   UP: [-1, 0],
   DOWN: [1, 0],
@@ -93,8 +79,6 @@ const CORNER_RADIUS = {
   "bottom-left": "0 0 0 50%",
 };
 // 转弯处的圆角：dirIn 是"进入这一格时的移动方向"，dirOut 是"离开这一格、往蛇头方向走的方向"。
-// 直行（两个方向一致）不需要圆角；拐弯时，圆角画在"没有身体连接的那两条边"的交角处，
-// 让两段直的身体之间用一个圆弧平滑过渡。
 function turnCornerStyle(dirIn, dirOut) {
   if (dirIn[0] === dirOut[0] && dirIn[1] === dirOut[1]) return null; // 直行
   const openSide1 = dirToSide([-dirIn[0], -dirIn[1]]); // 身体从这一侧连过来
@@ -113,7 +97,6 @@ function turnCornerStyle(dirIn, dirOut) {
 }
 
 // 根据朝向返回"这一格该往哪一侧鼓出圆角"，用于蛇头/蛇尾的胶囊造型
-// dir 指向的那一侧是"外凸/前进"方向，对应的两个角做成圆角
 function roundedEndStyle(dir) {
   const [dr, dc] = dir;
   if (dr === -1) return { borderRadius: "50% 50% 0 0" }; // 朝上：上方两角圆
@@ -169,8 +152,6 @@ function spawnTarget(level, snakeBody) {
 }
 
 // 根据保存的快照（若有）构造开局状态：
-// 没有快照 = 第1关默认开局；有快照 = 精确恢复到"上次过关（身体闪烁）那一瞬间"的
-// 身体坐标、目标位置、方向、待长出的量，不再用规则重新拼一个"看起来像"的姿态
 function buildStartState(progress) {
   if (!progress) {
     const initial = createInitialSnake();
@@ -185,9 +166,7 @@ function buildStartState(progress) {
   };
 }
 
-// ------------------------------
 // 组件
-// ------------------------------
 export default function SnakeOrbit({ initialToken = 0, onTokenChange, initialProgress = null, onProgressChange }) {
   const { t } = useTranslation();
   const [initState] = useState(() => buildStartState(initialProgress));

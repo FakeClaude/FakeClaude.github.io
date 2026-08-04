@@ -73,7 +73,12 @@ const DIRS = {
 function isOpposite(a, b) {
   return a[0] === -b[0] && a[1] === -b[1];
 }
-
+function wrapAwareSign(newVal, oldVal, boardSize) {
+  let diff = newVal - oldVal;
+  if (diff > boardSize / 2) diff -= boardSize;
+  if (diff < -boardSize / 2) diff += boardSize;
+  return Math.sign(diff);
+}
 function dirToSide(dir) {
   const [dr, dc] = dir;
   if (dr === -1) return "top";
@@ -478,8 +483,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange, initialPro
   const tailDir =
     tailIdx > 0
       ? [
-          Math.sign(tail[0] - beforeTail[0]) || 0,
-          Math.sign(tail[1] - beforeTail[1]) || 0,
+          wrapAwareSign(tail[0], beforeTail[0], BOARD_SIZE),
+          wrapAwareSign(tail[1], beforeTail[1], BOARD_SIZE),
         ]
       : headDir;
   const safeTailDir = tailDir[0] === 0 && tailDir[1] === 0 ? headDir : tailDir;
@@ -490,8 +495,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange, initialPro
     const behind = snake[i + 1];
     const cur = snake[i];
     const ahead = snake[i - 1];
-    const dirIn = [Math.sign(cur[0] - behind[0]) || 0, Math.sign(cur[1] - behind[1]) || 0];
-    const dirOut = [Math.sign(ahead[0] - cur[0]) || 0, Math.sign(ahead[1] - cur[1]) || 0];
+    const dirIn = [wrapAwareSign(cur[0], behind[0], BOARD_SIZE), wrapAwareSign(cur[1], behind[1], BOARD_SIZE)];
+    const dirOut = [wrapAwareSign(ahead[0], cur[0], BOARD_SIZE), wrapAwareSign(ahead[1], cur[1], BOARD_SIZE)];
     const style = turnCornerStyle(dirIn, dirOut);
     if (style) bodyCornerMap.set(`${cur[0]}-${cur[1]}`, style);
   }

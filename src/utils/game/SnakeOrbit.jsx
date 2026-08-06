@@ -1,593 +1,672 @@
-// src/utils/game/SnakeOrbit.jsx
-// 反转版贪吃蛇：
-// 传统玩法：吃到食物变长得分。这里恰恰相反——
-// 场上有一个彩色格子（--accent），头部直接撞上它 = "偷吃" = 扣分 + 蛇变短（长度不变，仅扣分）；
-// 真正的得分方式是"绕着它转圈"：蛇身要同时占满以它为中心、由内到外 n 圈的所有格子
-// （第1关=周围8格一圈；第2关=第1圈+第2圈共24格；第3关=再加第3圈共48格……
-//  第 n 圈本身有 8n 个格子，n 关总共需要 4n(n+1) 格）。
-// 开局蛇长 8，正好等于第1关所需格数，没有多余长度可以浪费，必须严丝合缝绕成一圈。
-// 每成功一关，蛇变长 8*(n+1) 格 —— 这个长度不多不少，刚好够拼下一关的圈。
-// 成功：+分；直接吃掉：-分（分值见 scoreForLevel：10、50、100、200、300、400...）。
 import { useEffect, useMemo, useRef, useState, useCallback } from "preact/hooks";
-import { useTranslation } from "react-i18next";
+const GRID_SIZE = 21;
+const CELL_SIZE = 30;
+const CANVAS_SIZE = GRID_SIZE * CELL_SIZE; // 630px
+const R = 4; // 弧线半径
+const SNAKE_WIDTH = 24;
+const SNAKE_SPEED = 120; // 像素/秒
+const SNAKE_BOOST_MULTIPLIER = 2; // 按住与当前朝向相同的方向键时的加速倍数
+const SEGMENT_SPACING = 8;
+// 仅用于描边渲染的采样间距。必须明显小于转弯圆弧弧长(约 R*π/2 ≈ 6.28px)，
+// 否则用 SEGMENT_SPACING(8px) 采样时，圆弧上"有没有采样点"会随头部移动的相位随机变化，
+// 导致转弯处的轮廓在"有弧线"和"直线抄近路"之间逐帧跳变——这才是转弯抖动闪烁的根源。
+const RENDER_SPACING = 2;
+// 每个格子(30px)对应的身体节点数：CELL_SIZE / SEGMENT_SPACING，用于把"需要占满N个格子"换算成实际身体节点数
+const CELLS_TO_SEGMENTS = CELL_SIZE / SEGMENT_SPACING;
+// 圆头/圆尾(lineCap:'round')会让视觉总长比中心线路径多出SNAKE_WIDTH(两端各凸出半个线宽)，需扣除该误差
+const INITIAL_SEGMENTS = Math.max(1, Math.round((8 * CELL_SIZE - SNAKE_WIDTH - CELL_SIZE) / SEGMENT_SPACING) + 1); // 开局视觉长度精确等于8格（在原公式基础上减去约1格的观测偏差）
+const FOOD_RADIUS = 7;
+// 主题色格子按关卡显示的动物：第1圈🐭 ... 第7圈🐳，超过7圈沿用🐳
+const TARGET_EMOJIS = ['🐭', '🐔', '🐑', '🐄', '🐫', '🐘', '🐳'];
 
-// 常量 & 纯函数：圈层数学 / 分数 / 速度
-const BOARD_SIZE = 21;
-const INITIAL_TICK_MS = 350; // 初始每步间隔（毫秒），数字越小蛇移动越快
-const SPEED_STEP_MS = 8; // 每过一关，间隔缩短多少毫秒（加快程度）
-const MIN_TICK_MS = 40; // 间隔下限，防止关卡太多后快到没法反应
-const BOOST_INTERVAL_RATIO = 0.4; // 加速时的间隔 = 正常间隔 * 该比例
+// 方向：0:右, 1:下, 2:左, 3:上
+const DIRS = [
+  { x: 1, y: 0 },
+  { x: 0, y: 1 },
+  { x: -1, y: 0 },
+  { x: 0, y: -1 }
+];
 
-// 第 n 关需要占满的格子总数：内到外共 n 圈，第 n 圈本身有 8n 格
+const getCellCenter = (col, row) => ({
+  x: (col + 0.5) * CELL_SIZE,
+  y: (row + 0.5) * CELL_SIZE
+});
+
+// 像素坐标 -> 最近网格坐标（用于把连续运动的身体节点映射回格子做包围判定）
+const pixelToGrid = (x, y) => ({
+  col: (Math.floor(x / CELL_SIZE) + GRID_SIZE) % GRID_SIZE,
+  row: (Math.floor(y / CELL_SIZE) + GRID_SIZE) % GRID_SIZE
+});
+
+// 第 n 关需要占满的格子总数：以目标格为中心，内到外共 n 圈（含）
 const requiredCellCount = (n) => 4 * n * (n + 1);
-// 完成第 n 关后蛇变长多少格：required(n+1) - required(n)，刚好够拼下一关的圈
+// 完成第 n 关后蛇身增长多少格（格子数，非身体节点数，使用时需乘 CELLS_TO_SEGMENTS 换算）
 const rewardLength = (n) => 8 * (n + 1);
-// 每关的加/减分值：第1关10分，第2关50分，第3关起每关多100分（100/200/300/400...）
+// 每关得分/扣分：10、50、100、200、300...
 const scoreForLevel = (n) => (n === 1 ? 10 : n === 2 ? 50 : 100 * (n - 2));
-// 每关的移动间隔（速度），随关卡加快，下限 MIN_TICK_MS
-const tickIntervalForLevel = (level) =>
-  Math.max(MIN_TICK_MS, INITIAL_TICK_MS - (level - 1) * SPEED_STEP_MS);
 
-// 第 n 关要求的具体格子坐标（以 target 为中心，切比雪夫距离 1~n 的所有格子，不含中心本身）
-function getRingCells(centerRow, centerCol, n) {
+// 第 n 关目标格中心周围，切比雪夫距离 1~n 的所有格子坐标（不含中心本身），支持穿墙取模
+function getRingCells(centerCol, centerRow, n) {
   const cells = [];
   for (let dr = -n; dr <= n; dr++) {
     for (let dc = -n; dc <= n; dc++) {
-      if (dr === 0 && dc === 0) continue; // 中心格是彩色目标本身，不算在内
-      cells.push([centerRow + dr, centerCol + dc]);
+      if (dr === 0 && dc === 0) continue;
+      const col = (centerCol + dc + GRID_SIZE) % GRID_SIZE;
+      const row = (centerRow + dr + GRID_SIZE) % GRID_SIZE;
+      cells.push(`${col}-${row}`);
     }
   }
   return cells;
 }
 
-// 方向相关
-const DIRS = { UP: [-1, 0], DOWN: [1, 0], LEFT: [0, -1], RIGHT: [0, 1] };
-const KEY_TO_DIR = {
-  ArrowUp: DIRS.UP,
-  ArrowDown: DIRS.DOWN,
-  ArrowLeft: DIRS.LEFT,
-  ArrowRight: DIRS.RIGHT,
-};
-const isOpposite = (a, b) => a[0] === -b[0] && a[1] === -b[1];
-const sameDir = (a, b) => a[0] === b[0] && a[1] === b[1];
-
-// 两点间的移动方向，感知穿墙环绕（差值超过棋盘一半时反向取模）
-function wrapAwareDir(newVal, oldVal, boardSize) {
-  let diff = newVal - oldVal;
-  if (diff > boardSize / 2) diff -= boardSize;
-  if (diff < -boardSize / 2) diff += boardSize;
-  return Math.sign(diff);
-}
-function wrapAwareStep(to, from, boardSize) {
-  return [wrapAwareDir(to[0], from[0], boardSize), wrapAwareDir(to[1], from[1], boardSize)];
+// 生成第 n 关目标格位置：确保包围圈(n格边距)不会超出画布边界
+function spawnTargetPosition(level) {
+  const margin = level;
+  const col = margin + Math.floor(Math.random() * (GRID_SIZE - margin * 2));
+  const row = margin + Math.floor(Math.random() * (GRID_SIZE - margin * 2));
+  return { col, row };
 }
 
-// 蛇身外观：圆角造型（直行不需要圆角，转弯/头/尾需要）
-const SIDE_OF_DIR = { "-1,0": "top", "1,0": "bottom", "0,-1": "left", "0,1": "right" };
-const dirToSide = ([dr, dc]) => SIDE_OF_DIR[`${dr},${dc}`];
-const CORNER_RADIUS = {
-  "top-left": "50% 0 0 0",
-  "top-right": "0 50% 0 0",
-  "bottom-right": "0 0 50% 0",
-  "bottom-left": "0 0 0 50%",
-};
-// 转弯处的圆角：dirIn 是"进入这一格时的移动方向"，dirOut 是"离开这一格、往蛇头方向走的方向"
-function turnCornerStyle(dirIn, dirOut) {
-  if (sameDir(dirIn, dirOut)) return null; // 直行，不需要圆角
-  const openSide1 = dirToSide([-dirIn[0], -dirIn[1]]); // 身体从这一侧连过来
-  const openSide2 = dirToSide(dirOut); // 身体往这一侧连出去
-  const closed = ["top", "right", "bottom", "left"].filter((s) => s !== openSide1 && s !== openSide2);
-  if (closed.length !== 2) return null; // 理论上不会发生（比如反向），保险起见跳过
-  const key = `${closed.includes("top") ? "top" : "bottom"}-${closed.includes("left") ? "left" : "right"}`;
-  return { borderRadius: CORNER_RADIUS[key] };
-}
-// 蛇头/蛇尾的胶囊造型：往前进方向的两个角变圆
-const ROUNDED_END_BY_DIR = {
-  "-1,0": { borderRadius: "50% 50% 0 0" }, // 朝上
-  "1,0": { borderRadius: "0 0 50% 50%" }, // 朝下
-  "0,-1": { borderRadius: "50% 0 0 50%" }, // 朝左
-  "0,1": { borderRadius: "0 50% 50% 0" }, // 朝右
-};
-const roundedEndStyle = ([dr, dc]) => ROUNDED_END_BY_DIR[`${dr},${dc}`];
-// 蛇头的两个眼睛位置：垂直于前进方向排布，偏向"前方"
-function eyeDotPositions([dr, dc]) {
-  if (dr !== 0) {
-    const top = dr === -1 ? "30%" : "70%";
-    return [{ left: "35%", top }, { left: "65%", top }];
-  }
-  const left = dc === -1 ? "30%" : "70%";
-  return [{ left, top: "35%" }, { left, top: "65%" }];
-}
-
-// 游戏局面构造
-function createInitialSnake() {
-  const startRow = Math.floor(BOARD_SIZE / 2);
-  const startCol = Math.floor(BOARD_SIZE / 2) - 4;
-  return Array.from({ length: 8 }, (_, i) => [startRow, startCol + 7 - i]); // [0] 是头
-}
-
-// 在棋盘上找一个能放下"第 n 关"整圈范围、且不和蛇身重叠的位置
-function spawnTarget(level, snakeBody) {
-  const snakeSet = new Set(snakeBody.map(([r, c]) => `${r}-${c}`));
-  const candidates = [];
-  for (let r = level; r < BOARD_SIZE - level; r++) {
-    for (let c = level; c < BOARD_SIZE - level; c++) {
-      if (!snakeSet.has(`${r}-${c}`)) candidates.push([r, c]);
-    }
-  }
-  if (candidates.length === 0) return null; // 棋盘已经装不下这一关了
-  const [row, col] = candidates[Math.floor(Math.random() * candidates.length)];
-  return { row, col };
-}
-
-// 根据保存的快照（若有）构造开局状态
-function buildStartState(progress) {
-  if (!progress) {
-    const snake = createInitialSnake();
-    return { snake, target: spawnTarget(1, snake), level: 1, dir: DIRS.RIGHT, pendingGrowth: 0 };
-  }
-  return {
-    snake: progress.snake,
-    target: progress.target,
-    level: progress.level,
-    dir: progress.direction || DIRS.RIGHT,
-    pendingGrowth: progress.pendingGrowth ?? 0,
-  };
-}
-
-// 调试用：把蛇身摆成"第 n-1 关已完成"的样子（棋盘正中心为目标）。
-function buildDebugLevelState(n) {
-  const center = { row: Math.floor(BOARD_SIZE / 2), col: Math.floor(BOARD_SIZE / 2) };
-  const prevLevel = n - 1;
-  const snake = prevLevel > 0 ? getRingCells(center.row, center.col, prevLevel) : createInitialSnake();
-  const pendingGrowth = prevLevel > 0 ? rewardLength(prevLevel) : 0;
-  // 蛇头选在方阵左上角，往上走一步刚好是空地，不会一进来就撞自己
-  return { snake, level: n, target: center, dir: DIRS.UP, pendingGrowth };
-}
-
-// 移动端检测：粗指针（触屏）即认为是移动端，用来切换棋盘尺寸单位（vw/vh）
-function useIsMobile() {
-  const [isMobile] = useState(
-    () => typeof window !== "undefined" && !!window.matchMedia?.("(pointer: coarse)").matches
-  );
-  return isMobile;
-}
-
-// 组件
-export default function SnakeOrbit({ initialToken = 0, onTokenChange, initialProgress = null, onProgressChange }) {
-  const { t } = useTranslation();
-  const isMobile = useIsMobile();
-
-  const [initState] = useState(() => buildStartState(initialProgress));
-  const [snake, setSnake] = useState(initState.snake);
-  const [level, setLevel] = useState(initState.level);
-  const [target, setTarget] = useState(initState.target);
+export default function SnakeOrbit() {
+  const canvasRef = useRef(null);
+  const panelRef = useRef(null);
   const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
   const [gameOver, setGameOver] = useState(false);
-  const [flashing, setFlashing] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const flashTimeoutRef = useRef(null);
-  const directionRef = useRef(initState.dir);
-  const pendingDirRef = useRef(null); // 一个 tick 内最多缓冲一次方向变更，防止连续按键在同一帧内绕过反向检测
-  const pendingGrowthRef = useRef(initState.pendingGrowth);
-  const startProgressRef = useRef(initialProgress); // "死亡重开后应该恢复到哪一帧"，每次过关会更新成最新快照
-  const boostRef = useRef(false); // 是否正在加速（按住与当前朝向相同的方向键）
-  const boostKeyRef = useRef(null); // 触发加速的那个按键 code，keyup 时用来匹配释放
-  const tickTimeoutRef = useRef(null);
-  const tokenRef = useRef(initialToken);
+  const gameState = useRef({
+    head: getCellCenter(10, 10),
+    dir: 0,
+    inputQueue: [],
+    mode: 'STRAIGHT',
+    targetGrid: { col: 11, row: 10 },
+    arc: null,
+    trail: [getCellCenter(10, 10)],
+    segmentCount: INITIAL_SEGMENTS,
+    segmentFloat: INITIAL_SEGMENTS,
+    pendingGrowth: 0,
+    level: 1,
+    target: { col: 15, row: 10 },
+    flashStart: null,
+    lastTime: performance.now()
+  });
 
-  useEffect(() => {
-    tokenRef.current = initialToken;
-  }, [initialToken]);
+  const spawnTarget = (level) => {
+    let pos;
+    do {
+      pos = spawnTargetPosition(level);
+    } while (pos.col === gameState.current.target.col && pos.row === gameState.current.target.row);
+    gameState.current.target = pos;
+  };
 
-  useEffect(() => () => clearTimeout(flashTimeoutRef.current), []);
-
-  const applyScoreDelta = useCallback(
-    (delta) => {
-      setScore((s) => s + delta);
-      tokenRef.current += delta;
-      onTokenChange?.(tokenRef.current, delta);
-    },
-    [onTokenChange]
-  );
-
-  const triggerFlash = useCallback(() => {
-    setFlashing(false);
-    requestAnimationFrame(() => setFlashing(true));
-    clearTimeout(flashTimeoutRef.current);
-    flashTimeoutRef.current = setTimeout(() => setFlashing(false), 600);
-  }, []);
-
-  // 把游戏状态整体切换到某一局面（重开 / 调试跳关共用）
-  const loadState = useCallback((start) => {
-    setSnake(start.snake);
-    setLevel(start.level);
-    setTarget(start.target);
-    directionRef.current = start.dir;
-    pendingDirRef.current = null;
-    boostRef.current = false;
-    boostKeyRef.current = null;
-    pendingGrowthRef.current = start.pendingGrowth;
-    clearTimeout(flashTimeoutRef.current);
-    setFlashing(false);
-    setGameOver(false);
-  }, []);
-
-  const restart = useCallback(() => {
-    loadState(buildStartState(startProgressRef.current));
-  }, [loadState]);
-
-  // 仅供调试：直接跳到第 n 关
-  const jumpToLevel = useCallback(
-    (n) => {
-      const debugState = buildDebugLevelState(n);
-      loadState(debugState);
-      startProgressRef.current = {
-        level: debugState.level,
-        snake: debugState.snake,
-        target: debugState.target,
-        direction: debugState.dir,
-        pendingGrowth: debugState.pendingGrowth,
-      };
-    },
-    [loadState]
-  );
-
-  useEffect(() => {
-    window.__snakeOrbitDebug = { jumpToLevel };
-    return () => {
-      delete window.__snakeOrbitDebug;
+  const resetGame = () => {
+    const startHead = getCellCenter(10, 10);
+    gameState.current = {
+      head: startHead,
+      dir: 0,
+      inputQueue: [],
+      mode: 'STRAIGHT',
+      targetGrid: { col: 11, row: 10 },
+      arc: null,
+      trail: [startHead],
+      segmentCount: INITIAL_SEGMENTS,
+      segmentFloat: INITIAL_SEGMENTS,
+      pendingGrowth: 0,
+      level: 1,
+      target: { col: 15, row: 10 },
+      flashStart: null,
+      lastTime: performance.now()
     };
-  }, [jumpToLevel]);
+    spawnTarget(1);
+    setScore(0);
+    setLevel(1);
+    setGameOver(false);
+    setIsPaused(false);
+  };
 
-  // 每个 tick 的核心推进逻辑
-  const tick = useCallback(() => {
-    // 每个 tick 只应用一次方向变更，防止一帧内多次按键连续改变方向导致反向撞自己
-    if (pendingDirRef.current) {
-      directionRef.current = pendingDirRef.current;
-      pendingDirRef.current = null;
+  useEffect(() => {
+    spawnTarget(1);
+
+    // canvas显示尺寸现在由外层响应式CSS决定（不同设备下不一样），
+    // 内部渲染分辨率需要跟着实际显示尺寸动态计算，而不是固定用630px乘一个倍数——
+    // 否则显示尺寸远小于固定分辨率时（比如手机上面板远小于桌面的630px），
+    // 缩放压缩比过大会让1px网格线在下采样时丢失/变淡，看起来像格子变少了。
+    // 这里用 ResizeObserver 监听面板实际渲染尺寸变化，重新设置canvas的像素缓冲区，
+    // 并用 scale 把绘图逻辑坐标系（始终是 0~CANVAS_SIZE）映射到新的缓冲区分辨率。
+    const canvasEl = canvasRef.current;
+    const syncCanvasResolution = () => {
+      if (!canvasEl) return;
+      const rect = canvasEl.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      const dpr = window.devicePixelRatio || 1;
+      canvasEl.width = Math.round(rect.width * dpr);
+      canvasEl.height = Math.round(rect.height * dpr);
+      const scaleFactor = canvasEl.width / CANVAS_SIZE;
+      const ctx = canvasEl.getContext('2d');
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(scaleFactor, scaleFactor);
+    };
+
+    syncCanvasResolution();
+    let resizeObserver;
+    if (canvasEl && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => syncCanvasResolution());
+      resizeObserver.observe(canvasEl);
     }
 
-    setSnake((prevSnake) => {
-      const [headR, headC] = prevSnake[0];
-      const [dr, dc] = directionRef.current;
-      // 穿墙：坐标取模环绕到棋盘另一侧
-      const newHead = [(headR + dr + BOARD_SIZE) % BOARD_SIZE, (headC + dc + BOARD_SIZE) % BOARD_SIZE];
+    // 键盘和触摸共用的方向输入处理
+    const queueDir = (newDir) => {
+      const state = gameState.current;
+      const queue = state.inputQueue;
 
-      // 撞自己（尾巴那一格如果这一步会被移走，不算撞）
-      const willMoveTail = pendingGrowthRef.current === 0;
-      const bodyToCheck = willMoveTail ? prevSnake.slice(0, -1) : prevSnake;
-      if (bodyToCheck.some(([r, c]) => r === newHead[0] && c === newHead[1])) {
-        setGameOver(true);
-        return prevSnake;
+      // 计算当前规划链条上的最后一个目标方向
+      let lastPlannedDir = state.dir;
+      if (queue.length > 0) {
+        lastPlannedDir = queue[queue.length - 1];
+      } else if (state.mode === 'ARC' && state.arc) {
+        lastPlannedDir = state.arc.targetDir;
       }
 
-      const advance = (extendBy = 0) => {
-        const newSnake = [newHead, ...prevSnake];
-        if (pendingGrowthRef.current > 0) pendingGrowthRef.current -= 1;
-        else newSnake.pop();
-        pendingGrowthRef.current += extendBy;
-        return newSnake;
-      };
+      // 过滤与规划方向相同或180度反向的指令，保持队列上限为 2
+      if (newDir !== lastPlannedDir && (newDir + 2) % 4 !== lastPlannedDir) {
+        if (queue.length < 2) {
+          queue.push(newDir);
+        }
+      }
+    };
 
-      const hitTarget = target && newHead[0] === target.row && newHead[1] === target.col;
+    // 记录当前正被按住的方向键，用于判断是否与蛇头朝向一致从而加速
+    const pressedDirs = new Set();
 
-      // 直接吃到彩色格子 = 偷吃，只扣分，蛇身长度不变（否则可能永远凑不齐这一关所需格数）
-      if (hitTarget) {
-        applyScoreDelta(-scoreForLevel(level));
-        const newSnake = advance();
-        const newTarget = spawnTarget(level, newSnake);
-        setTarget(newTarget);
-        if (!newTarget) setGameOver(true);
-        return newSnake;
+    const handleKeyDown = (e) => {
+      let newDir = null;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') newDir = 0;
+      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') newDir = 1;
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') newDir = 2;
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') newDir = 3;
+
+      if (e.key === ' ') {
+        e.preventDefault();
+        setIsPaused(prev => !prev);
+        return;
       }
 
-      // 正常移动
-      const newSnake = advance();
+      if (newDir !== null) {
+        e.preventDefault();
+        if (!e.repeat) {
+          pressedDirs.add(newDir);
+          queueDir(newDir);
+        }
+      }
+    };
 
-      // 检查是否绕成了这一关要求的圈
-      if (target) {
-        const required = getRingCells(target.row, target.col, level);
-        const bodySet = new Set(newSnake.map(([r, c]) => `${r}-${c}`));
-        const ringComplete =
-          newSnake.length === requiredCellCount(level) && required.every(([r, c]) => bodySet.has(`${r}-${c}`));
+    const handleKeyUp = (e) => {
+      let dirKey = null;
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') dirKey = 0;
+      if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dirKey = 1;
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dirKey = 2;
+      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dirKey = 3;
+      if (dirKey !== null) {
+        pressedDirs.delete(dirKey);
+      }
+    };
 
-        if (ringComplete) {
-          applyScoreDelta(scoreForLevel(level));
-          pendingGrowthRef.current += rewardLength(level);
-          triggerFlash();
+    // 移动端触摸控制：以整个游戏面板为参照，过中心点画一根45度线和一根与它垂直(135度)的线，
+    // 把屏幕分成上下左右四个三角形区域，点哪个区域就朝哪个方向走（不显示分割线，让用户自己摸索）。
+    // 判定方法等价于比较触摸点相对中心的 |dx| 与 |dy|：
+    // |dx| > |dy| 落在左右两个区域，否则落在上下两个区域，边界正好是两条45度对角线。
+    const handleTouchStart = (e) => {
+      const panelEl = panelRef.current;
+      if (!panelEl) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      if (!touch) return;
+      const rect = panelEl.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = touch.clientX - cx;
+      const dy = touch.clientY - cy;
 
-          const nextLevel = level + 1;
-          setLevel(nextLevel);
-          const newTarget = spawnTarget(nextLevel, newSnake);
-          setTarget(newTarget);
-          if (!newTarget) {
-            setGameOver(true);
+      if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return; // 太靠近中心点，忽略避免误触
+
+      let newDir;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        newDir = dx > 0 ? 0 : 2; // 右 : 左
+      } else {
+        newDir = dy > 0 ? 1 : 3; // 下 : 上
+      }
+      queueDir(newDir);
+    };
+
+    const panelEl = panelRef.current;
+    if (panelEl) {
+      panelEl.addEventListener('touchstart', handleTouchStart, { passive: false });
+    }
+
+    const handleBlur = () => {
+      pressedDirs.clear();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+    let animationFrameId;
+
+    const gameLoop = (time) => {
+      animationFrameId = requestAnimationFrame(gameLoop);
+      if (gameOver || isPaused) return;
+
+      const dt = Math.min((time - gameState.current.lastTime) / 1000, 0.1);
+      gameState.current.lastTime = time;
+
+      const state = gameState.current;
+      const currentSpeed = pressedDirs.has(state.dir) ? SNAKE_SPEED * SNAKE_BOOST_MULTIPLIER : SNAKE_SPEED;
+      let remainingDist = currentSpeed * dt;
+
+      // 待增长队列：按本帧实际移动距离折算成节点数，逐步消耗，让蛇尾随着前进慢慢变长（而非瞬间拉长）
+      if (state.pendingGrowth > 0) {
+        const growthAvailable = remainingDist / SEGMENT_SPACING;
+        const applied = Math.min(state.pendingGrowth, growthAvailable);
+        state.segmentFloat += applied;
+        state.pendingGrowth -= applied;
+        state.segmentCount = Math.floor(state.segmentFloat);
+      }
+
+      while (remainingDist > 0) {
+
+
+        if (state.mode === 'STRAIGHT') {
+          const dIn = DIRS[state.dir];
+          const center = getCellCenter(state.targetGrid.col, state.targetGrid.row);
+          const pStart = {
+            x: center.x - R * dIn.x,
+            y: center.y - R * dIn.y
+          };
+
+          let dx = pStart.x - state.head.x;
+          let dy = pStart.y - state.head.y;
+          if (Math.abs(dx) > CANVAS_SIZE / 2) dx -= Math.sign(dx) * CANVAS_SIZE;
+          if (Math.abs(dy) > CANVAS_SIZE / 2) dy -= Math.sign(dy) * CANVAS_SIZE;
+          const distToStart = Math.hypot(dx, dy);
+
+          if (remainingDist >= distToStart) {
+            state.head.x = pStart.x;
+            state.head.y = pStart.y;
+            remainingDist -= distToStart;
+
+            const targetDir = state.inputQueue.length > 0 ? state.inputQueue[0] : state.dir;
+            const isTurn = (targetDir !== state.dir) && ((targetDir + 2) % 4 !== state.dir);
+
+            if (isTurn) {
+              state.inputQueue.shift();
+              const dOut = DIRS[targetDir];
+              const cross = dIn.x * dOut.y - dIn.y * dOut.x;
+              const turnSign = cross > 0 ? 1 : -1;
+
+              const cx = center.x - R * dIn.x + R * dOut.x;
+              const cy = center.y - R * dIn.y + R * dOut.y;
+
+              const startAngle = Math.atan2(-dOut.y, -dOut.x);
+              let endAngle = startAngle + (turnSign * Math.PI / 2);
+
+              state.mode = 'ARC';
+              state.arc = {
+                cx, cy,
+                center,
+                currentAngle: startAngle,
+                endAngle,
+                turnSign,
+                targetDir
+              };
+            } else {
+              state.targetGrid.col = (state.targetGrid.col + dIn.x + GRID_SIZE) % GRID_SIZE;
+              state.targetGrid.row = (state.targetGrid.row + dIn.y + GRID_SIZE) % GRID_SIZE;
+            }
           } else {
-            // 记录闪烁这一瞬间的完整快照：死亡重开或刷新后精确恢复到这一帧，而不是重新拼一个"看起来像"的姿态
-            const snapshot = {
-              level: nextLevel,
-              snake: newSnake,
-              target: newTarget,
-              direction: directionRef.current,
-              pendingGrowth: pendingGrowthRef.current,
-            };
-            startProgressRef.current = snapshot;
-            onProgressChange?.(snapshot);
+            state.head.x += dIn.x * remainingDist;
+            state.head.y += dIn.y * remainingDist;
+            remainingDist = 0;
+          }
+        } else if (state.mode === 'ARC') {
+          const { cx, cy, currentAngle, endAngle, turnSign, targetDir } = state.arc;
+          const angularDist = remainingDist / R;
+          const angleStep = angularDist * turnSign;
+          let nextAngle = currentAngle + angleStep;
+
+          let arcFinished = false;
+          if (turnSign > 0 && nextAngle >= endAngle) arcFinished = true;
+          if (turnSign < 0 && nextAngle <= endAngle) arcFinished = true;
+
+          if (arcFinished) {
+            const usedAngle = Math.abs(endAngle - currentAngle);
+            remainingDist -= usedAngle * R;
+
+            state.head.x = cx + R * Math.cos(endAngle);
+            state.head.y = cy + R * Math.sin(endAngle);
+
+            state.dir = targetDir;
+            state.mode = 'STRAIGHT';
+
+            const dOut = DIRS[targetDir];
+            state.targetGrid.col = (state.targetGrid.col + dOut.x + GRID_SIZE) % GRID_SIZE;
+            state.targetGrid.row = (state.targetGrid.row + dOut.y + GRID_SIZE) % GRID_SIZE;
+          } else {
+            state.arc.currentAngle = nextAngle;
+            state.head.x = cx + R * Math.cos(nextAngle);
+            state.head.y = cy + R * Math.sin(nextAngle);
+            remainingDist = 0;
+          }
+        }
+
+        if (state.head.x < 0) state.head.x += CANVAS_SIZE;
+        if (state.head.x >= CANVAS_SIZE) state.head.x -= CANVAS_SIZE;
+        if (state.head.y < 0) state.head.y += CANVAS_SIZE;
+        if (state.head.y >= CANVAS_SIZE) state.head.y -= CANVAS_SIZE;
+
+        // 每完成一个运动子阶段（直线段终点/圆弧局部推进/圆弧终点）就记一次轨迹点。
+        // 若只在循环外记一次，单帧内一次性"吞掉"整段圆弧时（弧长很短、dt较大时容易发生），
+        // 轨迹就会用一条直线弦替代真实弧线，且这种情况随帧间dt波动时有时无，
+        // 导致重采样出的身体节点在"贴合弧线"与"抄近路"之间跳变，即转弯处的抖动闪烁。
+        state.trail.unshift({ x: state.head.x, y: state.head.y });
+      }
+
+      const bodyPositions = [];
+      let currentDistance = 0;
+      let targetDistance = SEGMENT_SPACING;
+      let trailIndex = 0;
+
+      while (
+        bodyPositions.length < state.segmentCount - 1 &&
+        trailIndex < state.trail.length - 1
+      ) {
+        const p1 = state.trail[trailIndex];
+        const p2 = state.trail[trailIndex + 1];
+        let dx = p2.x - p1.x;
+        let dy = p2.y - p1.y;
+
+        if (Math.abs(dx) > CANVAS_SIZE / 2) dx -= Math.sign(dx) * CANVAS_SIZE;
+        if (Math.abs(dy) > CANVAS_SIZE / 2) dy -= Math.sign(dy) * CANVAS_SIZE;
+        const dist = Math.hypot(dx, dy);
+
+        if (currentDistance + dist >= targetDistance) {
+          const ratio = (targetDistance - currentDistance) / dist;
+          let px = (p1.x + dx * ratio + CANVAS_SIZE) % CANVAS_SIZE;
+          let py = (p1.y + dy * ratio + CANVAS_SIZE) % CANVAS_SIZE;
+          bodyPositions.push({ x: px, y: py });
+          targetDistance += SEGMENT_SPACING;
+        } else {
+          currentDistance += dist;
+          trailIndex++;
+        }
+      }
+      // 注意：bodyPositions 用于自撞检测/格子包围判定，不能做补尾填充——
+      // 若把缺的节点重复填成轨迹末端同一个点，该点离头部往往很近（如开局时几乎为0距离），
+      // 会被自撞检测误判为"身体贴上了头部"，导致刚开局就判负。补尾只在纯视觉的
+      // renderPositions 里做（见下方）。
+
+      // 渲染专用的高密度采样点：与上面的逻辑完全一样，只是间距更细(RENDER_SPACING)，
+      // 保证转弯圆弧上稳定采到足够的点，画出来的轮廓不会因采样相位漂移而逐帧变形。
+      // 只影响描边视觉，不影响 bodyPositions（碰撞检测/格子占用判定仍用原来的间距）。
+      const renderPositions = [];
+      {
+        let rDistance = 0;
+        let rTarget = RENDER_SPACING;
+        let rIndex = 0;
+        const bodyLength = (state.segmentFloat - 1) * SEGMENT_SPACING;
+        while (
+          renderPositions.length < bodyLength / RENDER_SPACING &&
+          rIndex < state.trail.length - 1
+        ) {
+          const p1 = state.trail[rIndex];
+          const p2 = state.trail[rIndex + 1];
+          let dx = p2.x - p1.x;
+          let dy = p2.y - p1.y;
+
+          if (Math.abs(dx) > CANVAS_SIZE / 2) dx -= Math.sign(dx) * CANVAS_SIZE;
+          if (Math.abs(dy) > CANVAS_SIZE / 2) dy -= Math.sign(dy) * CANVAS_SIZE;
+          const dist = Math.hypot(dx, dy);
+
+          if (rDistance + dist >= rTarget) {
+            const ratio = (rTarget - rDistance) / dist;
+            let px = (p1.x + dx * ratio + CANVAS_SIZE) % CANVAS_SIZE;
+            let py = (p1.y + dy * ratio + CANVAS_SIZE) % CANVAS_SIZE;
+            renderPositions.push({ x: px, y: py });
+            rTarget += RENDER_SPACING;
+          } else {
+            rDistance += dist;
+            rIndex++;
+          }
+        }
+        // 轨迹不够长时，只需再补一个锚点把路径收尾即可（视觉上尾部"冻结"在那一点，
+        // 等真实轨迹追上来后再自然拉开）。之前误把这个锚点重复填充了很多次，
+        // 导致大量坐标完全相同的零长度线段挤在一起，round线连接(lineJoin:'round')
+        // 对这种重合点的处理不稳定，逐帧渲染出一个大小、位置都在跳动的团块——
+        // 这正是"变长后尾部有团块跳动"的根源。只补一个点就不会有这个问题。
+        const targetCount = Math.floor(bodyLength / RENDER_SPACING);
+        if (renderPositions.length < targetCount && state.trail.length > 0) {
+          const lastPoint = state.trail[state.trail.length - 1];
+          renderPositions.push({ x: lastPoint.x, y: lastPoint.y });
+        } else if (rIndex < state.trail.length - 1) {
+          // 尾部精确定位：上面按 RENDER_SPACING(2px) 整数倍采样，导致尾部端点
+          // 只能落在 2px 网格上；而 bodyLength 是连续变化的，端点会随之逐帧
+          // "卡"在最近的网格点上跳变，这就是变长时残留的抖动。这里沿轨迹继续
+          // 精确插值到恰好 bodyLength 处，用它替换掉最后一个近似点，
+          // 让尾部端点随长度连续平滑移动，不再受 2px 网格限制。
+          let rTarget2 = bodyLength;
+          while (rIndex < state.trail.length - 1) {
+            const p1 = state.trail[rIndex];
+            const p2 = state.trail[rIndex + 1];
+            let dx = p2.x - p1.x;
+            let dy = p2.y - p1.y;
+            if (Math.abs(dx) > CANVAS_SIZE / 2) dx -= Math.sign(dx) * CANVAS_SIZE;
+            if (Math.abs(dy) > CANVAS_SIZE / 2) dy -= Math.sign(dy) * CANVAS_SIZE;
+            const dist = Math.hypot(dx, dy);
+            if (rDistance + dist >= rTarget2) {
+              const ratio = (rTarget2 - rDistance) / dist;
+              let px = (p1.x + dx * ratio + CANVAS_SIZE) % CANVAS_SIZE;
+              let py = (p1.y + dy * ratio + CANVAS_SIZE) % CANVAS_SIZE;
+              if (renderPositions.length > 0) {
+                renderPositions[renderPositions.length - 1] = { x: px, y: py };
+              } else {
+                renderPositions.push({ x: px, y: py });
+              }
+              break;
+            } else {
+              rDistance += dist;
+              rIndex++;
+            }
           }
         }
       }
 
-      return newSnake;
-    });
-  }, [level, target, applyScoreDelta, triggerFlash, onProgressChange]);
+      const maxTrailLength = state.segmentCount * SEGMENT_SPACING * 3;
+      if (state.trail.length > maxTrailLength) {
+        state.trail.length = Math.floor(maxTrailLength);
+      }
 
-  // 公共转向逻辑：键盘和触屏共用，同样遵守"一个 tick 只缓冲一次转向 + 不能直接反向"
-  const tryTurn = useCallback((next) => {
-    if (pendingDirRef.current) return;
-    if (isOpposite(next, directionRef.current)) return;
-    pendingDirRef.current = next;
-  }, []);
+      for (let i = 8; i < bodyPositions.length; i++) {
+        let dx = state.head.x - bodyPositions[i].x;
+        let dy = state.head.y - bodyPositions[i].y;
+        if (Math.abs(dx) > CANVAS_SIZE / 2) dx -= Math.sign(dx) * CANVAS_SIZE;
+        if (Math.abs(dy) > CANVAS_SIZE / 2) dy -= Math.sign(dy) * CANVAS_SIZE;
+        if (Math.hypot(dx, dy) < SNAKE_WIDTH * 0.7) {
+          setGameOver(true);
+          return;
+        }
+      }
 
-  // 键盘：方向键转向；按住与当前方向相同的键 = 加速；游戏结束时任意键重开
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (gameOver) {
-        e.preventDefault();
-        restart();
-        return;
+      // 包围判定：把身体所有节点（含头）映射到网格，检查是否覆盖了当前关卡所需的所有格子
+      const headGrid = pixelToGrid(state.head.x, state.head.y);
+      const occupiedSet = new Set();
+      occupiedSet.add(`${headGrid.col}-${headGrid.row}`);
+      for (let i = 0; i < bodyPositions.length; i++) {
+        const g = pixelToGrid(bodyPositions[i].x, bodyPositions[i].y);
+        occupiedSet.add(`${g.col}-${g.row}`);
       }
-      const dir = KEY_TO_DIR[e.code];
-      if (!dir) return;
-      e.preventDefault();
-      if (sameDir(dir, directionRef.current)) {
-        boostRef.current = true;
-        boostKeyRef.current = e.code;
-      } else {
-        tryTurn(dir);
+      const requiredCells = getRingCells(state.target.col, state.target.row, state.level);
+      const fullyCovered = requiredCells.every(id => occupiedSet.has(id));
+
+      if (fullyCovered) {
+        // 成功包围：加分、变长、升级、目标重新生成、闪烁提示
+        const finishedLevel = state.level;
+        setScore(s => s + scoreForLevel(finishedLevel));
+        state.pendingGrowth += Math.ceil(rewardLength(finishedLevel) * CELLS_TO_SEGMENTS);
+        state.level += 1;
+        setLevel(state.level);
+        spawnTarget(state.level);
+        state.flashStart = time;
+      } else if (headGrid.col === state.target.col && headGrid.row === state.target.row) {
+        // 直接撞上目标格 = "偷吃"：扣分，目标重新生成（关卡不变），闪烁提示
+        setScore(s => s - scoreForLevel(state.level));
+        spawnTarget(state.level);
+        state.flashStart = time;
       }
-    }
-    function handleKeyUp(e) {
-      if (e.code === boostKeyRef.current) {
-        boostRef.current = false;
-        boostKeyRef.current = null;
+
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+      const rootStyle = getComputedStyle(document.documentElement);
+      const lineColor = rootStyle.getPropertyValue('--line').trim() || '#262626';
+      const bodyColor = rootStyle.getPropertyValue('--text-white-90').trim() || '#52c41a';
+      const eyeColor = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
+
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= GRID_SIZE; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * CELL_SIZE, 0);
+        ctx.lineTo(i * CELL_SIZE, CANVAS_SIZE);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, i * CELL_SIZE);
+        ctx.lineTo(CANVAS_SIZE, i * CELL_SIZE);
+        ctx.stroke();
       }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
+
+      // 主题色格子改成按关卡对应的动物emoji：第1圈🐭 ... 第7圈🐳，超过7圈沿用🐳
+      const targetEmoji = TARGET_EMOJIS[Math.min(state.level, TARGET_EMOJIS.length) - 1];
+      const targetCenter = getCellCenter(state.target.col, state.target.row);
+      ctx.font = `${CELL_SIZE}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(targetEmoji, targetCenter.x, targetCenter.y);
+
+      // 计算闪烁透明度：600ms内按 0→1→0→1→1 四段跳变，之后恢复常态不透明
+      let flashAlpha = 1;
+      if (state.flashStart !== null) {
+        const elapsed = time - state.flashStart;
+        if (elapsed >= 600) {
+          state.flashStart = null;
+        } else {
+          const segment = Math.min(3, Math.floor(elapsed / 150));
+          flashAlpha = [0, 1, 0, 1][segment];
+        }
+      }
+
+      if (bodyPositions.length > 0) {
+        ctx.lineWidth = SNAKE_WIDTH;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = bodyColor;
+        ctx.globalAlpha = flashAlpha;
+
+        ctx.beginPath();
+        let prevPos = state.head;
+        ctx.moveTo(prevPos.x, prevPos.y);
+
+        for (let i = 0; i < renderPositions.length; i++) {
+          const pos = renderPositions[i];
+          const dx = Math.abs(pos.x - prevPos.x);
+          const dy = Math.abs(pos.y - prevPos.y);
+
+          if (dx > CELL_SIZE * 2 || dy > CELL_SIZE * 2) {
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+          } else {
+            ctx.lineTo(pos.x, pos.y);
+          }
+          prevPos = pos;
+        }
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
+      const currentDirVec = DIRS[state.dir];
+      const eyeAngle = Math.atan2(currentDirVec.y, currentDirVec.x);
+      const eyeOffset = 0.5;
+      const eyeDist = SNAKE_WIDTH * 0.3;
+      ctx.fillStyle = eyeColor;
+      ctx.beginPath();
+      ctx.arc(
+        state.head.x + Math.cos(eyeAngle - eyeOffset) * eyeDist,
+        state.head.y + Math.sin(eyeAngle - eyeOffset) * eyeDist,
+        2, 0, Math.PI * 2
+      );
+      ctx.arc(
+        state.head.x + Math.cos(eyeAngle + eyeOffset) * eyeDist,
+        state.head.y + Math.sin(eyeAngle + eyeOffset) * eyeDist,
+        2, 0, Math.PI * 2
+      );
+      ctx.fill();
     };
-  }, [gameOver, restart, tryTurn]);
 
-  // 触屏：把整个容器按对角线（X形）分成上/下/左/右四个三角区，点哪个区就往哪个方向转
-  const handleTouchDirection = useCallback(
-    (clientX, clientY, rect) => {
-      const dx = (clientX - rect.left - rect.width / 2) / (rect.width / 2);
-      const dy = (clientY - rect.top - rect.height / 2) / (rect.height / 2);
-      const next =
-        Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? DIRS.RIGHT : DIRS.LEFT) : dy > 0 ? DIRS.DOWN : DIRS.UP;
-      tryTurn(next);
-    },
-    [tryTurn]
-  );
+    animationFrameId = requestAnimationFrame(gameLoop);
 
-  // 游戏循环：每过一关间隔缩短一点（更快），加速键按住时间隔再乘以 BOOST_INTERVAL_RATIO
-  useEffect(() => {
-    if (gameOver) {
-      clearTimeout(tickTimeoutRef.current);
-      return;
-    }
-    let cancelled = false;
-    function schedule() {
-      const base = tickIntervalForLevel(level);
-      const interval = boostRef.current ? Math.max(MIN_TICK_MS, Math.round(base * BOOST_INTERVAL_RATIO)) : base;
-      tickTimeoutRef.current = setTimeout(() => {
-        if (cancelled) return;
-        tick();
-        schedule();
-      }, interval);
-    }
-    schedule();
     return () => {
-      cancelled = true;
-      clearTimeout(tickTimeoutRef.current);
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
+      if (panelEl) {
+        panelEl.removeEventListener('touchstart', handleTouchStart);
+      }
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
     };
-  }, [tick, gameOver, level]);
-
-  // ------------------------------
-  // 渲染相关的派生数据
-  // ------------------------------
-  const snakeSet = useMemo(() => new Set(snake.map(([r, c]) => `${r}-${c}`)), [snake]);
-  const cellSize = isMobile ? `${100 / BOARD_SIZE}vw` : `${100 / BOARD_SIZE}vh`;
-
-  const headKey = `${snake[0][0]}-${snake[0][1]}`;
-  const tailIdx = snake.length - 1;
-  const tail = snake[tailIdx];
-  const tailKey = `${tail[0]}-${tail[1]}`;
-  const headDir = directionRef.current; // 蛇头朝向：直接用当前实际移动方向（不是排队中的转向）
-
-  // 蛇尾朝向：尾巴前一节指向尾巴本身的方向，即"如果尾巴继续往前爬会去哪"
-  const tailDir = useMemo(() => {
-    if (tailIdx === 0) return headDir;
-    const dir = wrapAwareStep(tail, snake[tailIdx - 1], BOARD_SIZE);
-    return dir[0] === 0 && dir[1] === 0 ? headDir : dir;
-  }, [snake, tailIdx, tail, headDir]);
-
-  // 身体每一节（不含头尾）的转弯圆角：dirIn 是上一步怎么走到这一格的，dirOut 是接下来往头部方向怎么走
-  const bodyCornerMap = useMemo(() => {
-    const map = new Map();
-    for (let i = 1; i < tailIdx; i++) {
-      const dirIn = wrapAwareStep(snake[i], snake[i + 1], BOARD_SIZE);
-      const dirOut = wrapAwareStep(snake[i - 1], snake[i], BOARD_SIZE);
-      const style = turnCornerStyle(dirIn, dirOut);
-      if (style) map.set(`${snake[i][0]}-${snake[i][1]}`, style);
-    }
-    return map;
-  }, [snake, tailIdx]);
-
-  const handleContainerClick = () => gameOver && restart();
-  const handleContainerTouchStart = (e) => {
-    if (gameOver) {
-      restart();
-      return;
-    }
-    const touch = e.touches[0];
-    if (!touch) return;
-    handleTouchDirection(touch.clientX, touch.clientY, e.currentTarget.getBoundingClientRect());
-  };
+  }, [gameOver, isPaused]);
 
   return (
-    <div
-      onClick={handleContainerClick}
-      onTouchStart={handleContainerTouchStart}
-      style={{
-        position: isMobile ? "fixed" : "relative",
-        left: isMobile ? 0 : undefined,
-        top: isMobile ? 0 : undefined,
-        fontFamily: "monospace",
-        color: "var(--text-main)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: isMobile ? "100vw" : undefined,
-        height: "100vh",
-      }}
-    >
+    <div style={{ width: '100vw', height: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--home-bg)', fontFamily: 'sans-serif', color: '#fff', boxSizing: 'border-box' }}>
       <style>{`
-        @keyframes snakeOrbitFlash {
-          0%   { opacity: 0; }
-          25%  { opacity: 1; }
-          50%  { opacity: 0; }
-          75%  { opacity: 1; }
-          100% { opacity: 1; }
+        .snake-orbit-panel {
+          position: relative;
+          height: 100dvh;
+          width: 100dvh;
+        }
+        @media (max-width: 768px) {
+          .snake-orbit-panel {
+            width: 100dvw;
+            height: 100dvw;
+          }
         }
       `}</style>
-      {gameOver && <GameOverBanner text={t("game.Game over, click to restart")} />}
-      <Board
-        boardSize={BOARD_SIZE}
-        cellSize={cellSize}
-        target={target}
-        snakeSet={snakeSet}
-        headKey={headKey}
-        tailKey={tailKey}
-        headDir={headDir}
-        tailDir={tailDir}
-        bodyCornerMap={bodyCornerMap}
-        flashing={flashing}
-      />
-    </div>
-  );
-}
-
-// 展示型子组件
-function GameOverBanner({ text }) {
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: "25%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        background: "var(--home-bg)",
-        color: "var(--text-white)",
-        fontWeight: "bold",
-        fontSize: "20px",
-        padding: "10px 16px",
-        zIndex: 10,
-        whiteSpace: "nowrap",
-      }}
-    >
-      {text}
-    </div>
-  );
-}
-function Board({ boardSize, cellSize, target, snakeSet, headKey, tailKey, headDir, tailDir, bodyCornerMap, flashing }) {
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${boardSize}, ${cellSize})`,
-        gridTemplateRows: `repeat(${boardSize}, ${cellSize})`,
-        gap: "0",
-        background: "var(--line)",
-      }}
-    >
-      {Array.from({ length: boardSize }).flatMap((_, r) =>
-        Array.from({ length: boardSize }).map((_, c) => {
-          const key = `${r}-${c}`;
-          const isTarget = target && target.row === r && target.col === c;
-          const isHead = key === headKey;
-          const isTail = !isHead && key === tailKey;
-          const isSnake = snakeSet.has(key);
-          return (
-            <Cell key={key} cellSize={cellSize} isTarget={isTarget}>
-              {isSnake && (
-                <SnakeSegment
-                  isHead={isHead}
-                  isTail={isTail}
-                  dir={isHead ? headDir : isTail ? tailDir : null}
-                  cornerStyle={bodyCornerMap.get(key)}
-                  flashing={flashing}
-                />
-              )}
-            </Cell>
-          );
-        })
-      )}
-    </div>
-  );
-}
-function Cell({ cellSize, isTarget, children }) {
-  return (
-    <div
-      style={{
-        width: cellSize,
-        height: cellSize,
-        border: ".5px solid var(--line)",
-        background: "var(--card-bg)",
-        boxSizing: "border-box",
-        position: "relative",
-      }}
-    >
-      {isTarget && (
-        <div style={{ width: "calc(100% - .5px)", height: "calc(100% - .5px)", margin: ".5px", background: "var(--accent)" }} />
-      )}
-      {children}
-    </div>
-  );
-}
-function SnakeSegment({ isHead, isTail, dir, cornerStyle, flashing }) {
-  const shapeStyle = isHead || isTail ? roundedEndStyle(dir) : cornerStyle || null;
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        margin: 0,
-        background: "var(--text-placeholder)",
-        animation: flashing ? "snakeOrbitFlash .6s steps(1) 1" : "none",
-        position: "relative",
-        ...(shapeStyle || {}),
-      }}
-    >
-      {isHead &&
-        eyeDotPositions(dir).map((pos, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              left: pos.left,
-              top: pos.top,
-              transform: "translate(-50%, -50%)",
-              width: "18%",
-              height: "18%",
-              borderRadius: "50%",
-              background: "var(--card-bg)",
-            }}
-          />
-        ))}
+      <div ref={panelRef} className="snake-orbit-panel">
+        <canvas
+          ref={canvasRef}
+          width={CANVAS_SIZE}
+          height={CANVAS_SIZE}
+          style={{ display: 'block', width: '100%', height: '100%', background: 'var(--home-bg)', touchAction: 'none' }}
+        />
+        {gameOver && (
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <h2 style={{ color: '#ff4d4f', margin: '0 0 10px 0' }}>游戏结束</h2>
+            <p style={{ margin: '0 0 20px 0' }}>最终得分: {score}</p>
+            <button onClick={resetGame} style={{ padding: '8px 20px', fontSize: '16px', cursor: 'pointer', background: '#52c41a', color: '#fff', border: 'none', borderRadius: '4px' }}>
+              重新开始
+            </button>
+          </div>
+        )}
+        {isPaused && !gameOver && (
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <h2 style={{ color: '#fff' }}>已暂停 (按空格键继续)</h2>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

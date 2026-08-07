@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "preact/hooks";
+import { useTranslation } from "react-i18next";
+import { idb } from "../IndexedDB";
 const GRID_SIZE = 21;
 const CELL_SIZE = 30;
 const CANVAS_SIZE = GRID_SIZE * CELL_SIZE; // 630px
@@ -67,13 +69,111 @@ function spawnTargetPosition(level) {
   return { col, row };
 }
 
-export default function SnakeOrbit() {
+// 关卡 n 允许生成目标的所有格子坐标（边距 = level，格子范围 [level, GRID_SIZE-level-1]）
+function collectValidTargetPositions(level) {
+  const margin = level;
+  const positions = [];
+  for (let col = margin; col < GRID_SIZE - margin; col++) {
+    for (let row = margin; row < GRID_SIZE - margin; row++) {
+      positions.push({ col, row });
+    }
+  }
+  return positions;
+}
+
+// 在合规格子里挑一个：优先选不和蛇身重叠、且不是当前目标位置的格子；
+// 如果所有合规格子都被蛇身占满，退而求其次，只保证不是当前目标位置；
+// 极端情况（合规格子只有一个且正好是当前目标）就不再排除，随便选一个。
+function pickTargetPosition(level, occupiedSet, prevKey) {
+  const all = collectValidTargetPositions(level);
+  if (all.length === 0) return spawnTargetPosition(level); // 理论上不会发生的兜底
+  const keyOf = (p) => `${p.col}-${p.row}`;
+  const free = all.filter((p) => !occupiedSet.has(keyOf(p)) && keyOf(p) !== prevKey);
+  if (free.length > 0) return free[Math.floor(Math.random() * free.length)];
+  const notPrev = all.filter((p) => keyOf(p) !== prevKey);
+  const pool = notPrev.length > 0 ? notPrev : all;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// 移动端检测：粗指针（触屏）即认为是移动端，用来切换外层容器定位方式（与 SnakeOrbit_old 保持一致）
+function useIsMobile() {
+  const [isMobile] = useState(
+    () => typeof window !== "undefined" && !!window.matchMedia?.("(pointer: coarse)").matches
+  );
+  return isMobile;
+}
+
+// 进度存档：读取/写入 FakeClaudeDB.replies.game 下的 SnakeOrbit 字段。
+// 存的是完整连续坐标状态（而非离散格子），这样重开/刷新后能精确复原到
+// 上一次"包围成功、身体闪烁"那一帧的画面与逻辑，而不是重新拼一个近似的姿态。
+async function loadSnakeOrbitProgress() {
+  try {
+    const saved = await idb.get('game');
+    return saved && saved.SnakeOrbit ? saved.SnakeOrbit : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function saveSnakeOrbitProgress(snapshot) {
+  try {
+    const saved = await idb.get('game');
+    await idb.set('game', { ...(saved || {}), SnakeOrbit: snapshot });
+  } catch (e) {
+    // 存档失败不影响正常游戏进行
+  }
+}
+
+// 把一份存档快照还原成 gameState.current 需要的形状
+function stateFromSnapshot(snapshot) {
+  return {
+    head: { x: snapshot.head.x, y: snapshot.head.y },
+    dir: snapshot.dir,
+    inputQueue: [],
+    mode: snapshot.mode,
+    targetGrid: { ...snapshot.targetGrid },
+    arc: snapshot.arc ? { ...snapshot.arc } : null,
+    trail: snapshot.trail.map(p => ({ x: p.x, y: p.y })),
+    segmentCount: snapshot.segmentCount,
+    segmentFloat: snapshot.segmentFloat,
+    pendingGrowth: snapshot.pendingGrowth,
+    level: snapshot.level,
+    target: { ...snapshot.target },
+    flashStart: null,
+    lastTime: performance.now()
+  };
+}
+export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
+  const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const canvasRef = useRef(null);
   const panelRef = useRef(null);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [gameOver, setGameOver] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isReady, setIsReady] = useState(false); // 存档读取完成前不启动游戏循环，避免闪一下默认局面
+  const tokenRef = useRef(initialToken);
+
+  useEffect(() => {
+    tokenRef.current = initialToken;
+  }, [initialToken]);
+
+  const applyScoreDelta = useCallback(
+    (delta) => {
+      setScore((s) => s + delta);
+      tokenRef.current += delta;
+      onTokenChange?.(tokenRef.current, delta);
+    },
+    [onTokenChange]
+  );
+  // 用 ref 保存最新的 applyScoreDelta：游戏循环 effect 通过 ref 调用它，
+  // 这样 onTokenChange 引用变化（如父组件因 token 数字动画频繁重渲染）不会导致
+  // 游戏循环 effect（含 canvas 动画帧、键盘监听等）被销毁重建，避免画布闪烁
+  const applyScoreDeltaRef = useRef(applyScoreDelta);
+  useEffect(() => {
+    applyScoreDeltaRef.current = applyScoreDelta;
+  }, [applyScoreDelta]);
 
   const gameState = useRef({
     head: getCellCenter(10, 10),
@@ -92,41 +192,71 @@ export default function SnakeOrbit() {
     lastTime: performance.now()
   });
 
-  const spawnTarget = (level) => {
-    let pos;
-    do {
-      pos = spawnTargetPosition(level);
-    } while (pos.col === gameState.current.target.col && pos.row === gameState.current.target.row);
+  const spawnTarget = (level, occupiedSet = null) => {
+    const prevKey = `${gameState.current.target.col}-${gameState.current.target.row}`;
+    const pos = occupiedSet
+      ? pickTargetPosition(level, occupiedSet, prevKey)
+      : spawnTargetPosition(level);
     gameState.current.target = pos;
+    // 记录这次生成的目标是否落在了蛇身格子上，绘制时据此决定 emoji 是否要画在蛇身之上
+    gameState.current.targetOverlapsSnake = occupiedSet ? occupiedSet.has(`${pos.col}-${pos.row}`) : false;
   };
 
-  const resetGame = () => {
-    const startHead = getCellCenter(10, 10);
-    gameState.current = {
-      head: startHead,
-      dir: 0,
-      inputQueue: [],
-      mode: 'STRAIGHT',
-      targetGrid: { col: 11, row: 10 },
-      arc: null,
-      trail: [startHead],
-      segmentCount: INITIAL_SEGMENTS,
-      segmentFloat: INITIAL_SEGMENTS,
-      pendingGrowth: 0,
-      level: 1,
-      target: { col: 15, row: 10 },
-      flashStart: null,
-      lastTime: performance.now()
-    };
-    spawnTarget(1);
-    setScore(0);
-    setLevel(1);
+  const resetGame = async () => {
+    const snapshot = await loadSnakeOrbitProgress();
+    if (snapshot) {
+      gameState.current = stateFromSnapshot(snapshot);
+      setLevel(snapshot.level);
+    } else {
+      const startHead = getCellCenter(10, 10);
+      gameState.current = {
+        head: startHead,
+        dir: 0,
+        inputQueue: [],
+        mode: 'STRAIGHT',
+        targetGrid: { col: 11, row: 10 },
+        arc: null,
+        trail: [startHead],
+        segmentCount: INITIAL_SEGMENTS,
+        segmentFloat: INITIAL_SEGMENTS,
+        pendingGrowth: 0,
+        level: 1,
+        target: { col: 15, row: 10 },
+        flashStart: null,
+        lastTime: performance.now()
+      };
+      spawnTarget(1);
+      setScore(0);
+      setLevel(1);
+    }
     setGameOver(false);
     setIsPaused(false);
   };
 
   useEffect(() => {
-    spawnTarget(1);
+    let cancelled = false;
+
+    (async () => {
+      const snapshot = await loadSnakeOrbitProgress();
+      if (cancelled) return;
+      if (snapshot) {
+        gameState.current = stateFromSnapshot(snapshot);
+        setLevel(snapshot.level);
+      } else {
+        spawnTarget(1);
+      }
+      setIsReady(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // 只在组件首次挂载时读取一次存档
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!isReady) return undefined;
 
     // canvas显示尺寸现在由外层响应式CSS决定（不同设备下不一样），
     // 内部渲染分辨率需要跟着实际显示尺寸动态计算，而不是固定用630px乘一个倍数——
@@ -140,8 +270,13 @@ export default function SnakeOrbit() {
       const rect = canvasEl.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
       const dpr = window.devicePixelRatio || 1;
-      canvasEl.width = Math.round(rect.width * dpr);
-      canvasEl.height = Math.round(rect.height * dpr);
+      const nextWidth = Math.round(rect.width * dpr);
+      const nextHeight = Math.round(rect.height * dpr);
+      // 给 canvas.width/height 赋值会清空画布内容，哪怕值和原来一样——
+      // 所以尺寸没变时直接跳过，避免游戏结束等状态变化触发 effect 重跑时把最后一帧清没了
+      if (canvasEl.width === nextWidth && canvasEl.height === nextHeight) return;
+      canvasEl.width = nextWidth;
+      canvasEl.height = nextHeight;
       const scaleFactor = canvasEl.width / CANVAS_SIZE;
       const ctx = canvasEl.getContext('2d');
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -180,6 +315,15 @@ export default function SnakeOrbit() {
     const pressedDirs = new Set();
 
     const handleKeyDown = (e) => {
+      // 游戏结束时任意键重开（重开机制与 Tetris 一致）；
+      // 只在按键第一次按下（非系统自动重复）时触发一次，避免死亡瞬间还按住方向键
+      // 导致 keydown 自动重复、resetGame（异步读存档）被并发调用多次、状态互相打架
+      if (gameOver) {
+        e.preventDefault();
+        if (!e.repeat) resetGame();
+        return;
+      }
+
       let newDir = null;
       if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') newDir = 0;
       if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') newDir = 1;
@@ -220,6 +364,11 @@ export default function SnakeOrbit() {
       const panelEl = panelRef.current;
       if (!panelEl) return;
       e.preventDefault();
+      // 游戏结束时任意触屏点击重开（重开机制与 Tetris 一致）
+      if (gameOver) {
+        resetGame();
+        return;
+      }
       const touch = e.touches[0];
       if (!touch) return;
       const rect = panelEl.getBoundingClientRect();
@@ -509,16 +658,32 @@ export default function SnakeOrbit() {
       if (fullyCovered) {
         // 成功包围：加分、变长、升级、目标重新生成、闪烁提示
         const finishedLevel = state.level;
-        setScore(s => s + scoreForLevel(finishedLevel));
+        applyScoreDeltaRef.current(scoreForLevel(finishedLevel));
         state.pendingGrowth += Math.ceil(rewardLength(finishedLevel) * CELLS_TO_SEGMENTS);
         state.level += 1;
         setLevel(state.level);
-        spawnTarget(state.level);
+        spawnTarget(state.level, occupiedSet);
         state.flashStart = time;
+
+        // 存档：记录这一帧（包围成功、身体闪烁那一瞬间）的完整连续坐标状态，
+        // 死亡或刷新重开后据此精确复原，而不是重新拼一个近似的姿态。
+        saveSnakeOrbitProgress({
+          level: state.level,
+          head: { x: state.head.x, y: state.head.y },
+          dir: state.dir,
+          mode: state.mode,
+          targetGrid: { ...state.targetGrid },
+          arc: state.arc ? { ...state.arc } : null,
+          trail: state.trail.map(p => ({ x: p.x, y: p.y })),
+          segmentCount: state.segmentCount,
+          segmentFloat: state.segmentFloat,
+          pendingGrowth: state.pendingGrowth,
+          target: { ...state.target }
+        });
       } else if (headGrid.col === state.target.col && headGrid.row === state.target.row) {
         // 直接撞上目标格 = "偷吃"：扣分，目标重新生成（关卡不变），闪烁提示
-        setScore(s => s - scoreForLevel(state.level));
-        spawnTarget(state.level);
+        applyScoreDeltaRef.current(-scoreForLevel(state.level));
+        spawnTarget(state.level, occupiedSet);
         state.flashStart = time;
       }
 
@@ -546,25 +711,20 @@ export default function SnakeOrbit() {
         ctx.stroke();
       }
 
-      // 主题色格子改成按关卡对应的动物emoji：第1圈🐭 ... 第7圈🐳，超过7圈沿用🐳
-      const targetEmoji = TARGET_EMOJIS[Math.min(state.level, TARGET_EMOJIS.length) - 1];
-      const targetCenter = getCellCenter(state.target.col, state.target.row);
-      ctx.font = `${CELL_SIZE}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(targetEmoji, targetCenter.x, targetCenter.y);
-
       // 计算闪烁透明度：600ms内按 0→1→0→1→1 四段跳变，之后恢复常态不透明
       let flashAlpha = 1;
-      if (state.flashStart !== null) {
-        const elapsed = time - state.flashStart;
-        if (elapsed >= 600) {
-          state.flashStart = null;
-        } else {
-          const segment = Math.min(3, Math.floor(elapsed / 150));
-          flashAlpha = [0, 1, 0, 1][segment];
-        }
-      }
+if (state.flashStart !== null) {
+  const elapsed = time - state.flashStart;
+  if (elapsed >= 600) {
+    state.flashStart = null;
+  } else {
+    const keyframes = [0.2, 1, 0.2, 1, 1]; // 多加一个收尾值，方便插值到最后一段
+    const progress = elapsed / 150; // 0~4 之间的小数
+    const segment = Math.min(3, Math.floor(progress));
+    const t = progress - segment; // 当前段内的小数进度 0~1
+    flashAlpha = keyframes[segment] + (keyframes[segment + 1] - keyframes[segment]) * t;
+  }
+}
 
       if (bodyPositions.length > 0) {
         ctx.lineWidth = SNAKE_WIDTH;
@@ -612,6 +772,16 @@ export default function SnakeOrbit() {
         2, 0, Math.PI * 2
       );
       ctx.fill();
+
+      // 主题色格子改成按关卡对应的动物emoji：第1圈🐭 ... 第7圈🐳，超过7圈沿用🐳
+      // 放在蛇身/头部之后绘制：即使目标和蛇身重叠（棋盘被占满时的兜底情况），
+      // emoji 也画在蛇身上层，不会被盖住看不见
+      const targetEmoji = TARGET_EMOJIS[Math.min(state.level, TARGET_EMOJIS.length) - 1];
+      const targetCenter = getCellCenter(state.target.col, state.target.row);
+      ctx.font = `${CELL_SIZE}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(targetEmoji, targetCenter.x, targetCenter.y);
     };
 
     animationFrameId = requestAnimationFrame(gameLoop);
@@ -628,10 +798,25 @@ export default function SnakeOrbit() {
         resizeObserver.disconnect();
       }
     };
-  }, [gameOver, isPaused]);
+  }, [gameOver, isPaused, isReady]);
 
   return (
-    <div style={{ width: '100vw', height: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--home-bg)', fontFamily: 'sans-serif', color: '#fff', boxSizing: 'border-box' }}>
+    <div
+      onClick={() => gameOver && resetGame()}
+      style={{
+        position: isMobile ? 'fixed' : 'relative',
+        left: isMobile ? 0 : undefined,
+        top: isMobile ? 0 : undefined,
+        fontFamily: 'monospace',
+        color: 'var(--text-main)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: isMobile ? '100vw' : undefined,
+        height: '100vh',
+        boxSizing: 'border-box'
+      }}
+    >
       <style>{`
         .snake-orbit-panel {
           position: relative;
@@ -653,12 +838,22 @@ export default function SnakeOrbit() {
           style={{ display: 'block', width: '100%', height: '100%', background: 'var(--home-bg)', touchAction: 'none' }}
         />
         {gameOver && (
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-            <h2 style={{ color: '#ff4d4f', margin: '0 0 10px 0' }}>游戏结束</h2>
-            <p style={{ margin: '0 0 20px 0' }}>最终得分: {score}</p>
-            <button onClick={resetGame} style={{ padding: '8px 20px', fontSize: '16px', cursor: 'pointer', background: '#52c41a', color: '#fff', border: 'none', borderRadius: '4px' }}>
-              重新开始
-            </button>
+          <div
+            style={{
+              position: 'fixed',
+              top: '25%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'var(--home-bg)',
+              color: 'var(--text-white)',
+              fontWeight: 'bold',
+              fontSize: '20px',
+              padding: '10px 16px',
+              zIndex: 10,
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {t("game.Game over, click to restart")}
           </div>
         )}
         {isPaused && !gameOver && (

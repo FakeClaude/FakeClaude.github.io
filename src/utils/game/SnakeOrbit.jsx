@@ -17,6 +17,8 @@ const RENDER_SPACING = 2;
 const CELLS_TO_SEGMENTS = CELL_SIZE / SEGMENT_SPACING;
 // 圆头/圆尾(lineCap:'round')会让视觉总长比中心线路径多出SNAKE_WIDTH(两端各凸出半个线宽)，需扣除该误差
 const INITIAL_SEGMENTS = Math.max(1, Math.round((8 * CELL_SIZE - SNAKE_WIDTH - CELL_SIZE) / SEGMENT_SPACING) + 1); // 开局视觉长度精确等于8格（在原公式基础上减去约1格的观测偏差）
+// 重开/读档后的无敌保护期时长（ms）：期间跳过自碰撞检测，同时蛇身按闪烁透明度提示"无敌中"
+const GRACE_DURATION = 1000;
 const FOOD_RADIUS = 7;
 // 主题色格子按关卡显示的动物：第1圈🐭 ... 第7圈🐳，超过7圈沿用🐳
 const TARGET_EMOJIS = ['🐭', '🐔', '🐑', '🐄', '🐫', '🐘', '🐳'];
@@ -140,7 +142,10 @@ function stateFromSnapshot(snapshot) {
     level: snapshot.level,
     target: { ...snapshot.target },
     flashStart: null,
-    lastTime: performance.now()
+    lastTime: performance.now(),
+    // 重开/读档后的短暂保护期：避免读到"刚好包围成功那一瞬"的存档时，
+    // 身体本就贴近自身，稍一移动就被自碰撞判负
+    graceUntil: performance.now() + GRACE_DURATION
   };
 }
 export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
@@ -151,7 +156,6 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [gameOver, setGameOver] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
   const [isReady, setIsReady] = useState(false); // 存档读取完成前不启动游戏循环，避免闪一下默认局面
   const tokenRef = useRef(initialToken);
 
@@ -216,21 +220,21 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         mode: 'STRAIGHT',
         targetGrid: { col: 11, row: 10 },
         arc: null,
-        trail: [startHead],
+        trail: [{ x: startHead.x, y: startHead.y }],
         segmentCount: INITIAL_SEGMENTS,
         segmentFloat: INITIAL_SEGMENTS,
         pendingGrowth: 0,
         level: 1,
         target: { col: 15, row: 10 },
         flashStart: null,
-        lastTime: performance.now()
+        lastTime: performance.now(),
+        graceUntil: performance.now() + GRACE_DURATION
       };
       spawnTarget(1);
       setScore(0);
       setLevel(1);
     }
     setGameOver(false);
-    setIsPaused(false);
   };
 
   useEffect(() => {
@@ -330,12 +334,6 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') newDir = 2;
       if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') newDir = 3;
 
-      if (e.key === ' ') {
-        e.preventDefault();
-        setIsPaused(prev => !prev);
-        return;
-      }
-
       if (newDir !== null) {
         e.preventDefault();
         if (!e.repeat) {
@@ -403,7 +401,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
 
     const gameLoop = (time) => {
       animationFrameId = requestAnimationFrame(gameLoop);
-      if (gameOver || isPaused) return;
+      if (gameOver) return;
 
       const dt = Math.min((time - gameState.current.lastTime) / 1000, 0.1);
       gameState.current.lastTime = time;
@@ -633,14 +631,16 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         state.trail.length = Math.floor(maxTrailLength);
       }
 
-      for (let i = 8; i < bodyPositions.length; i++) {
-        let dx = state.head.x - bodyPositions[i].x;
-        let dy = state.head.y - bodyPositions[i].y;
-        if (Math.abs(dx) > CANVAS_SIZE / 2) dx -= Math.sign(dx) * CANVAS_SIZE;
-        if (Math.abs(dy) > CANVAS_SIZE / 2) dy -= Math.sign(dy) * CANVAS_SIZE;
-        if (Math.hypot(dx, dy) < SNAKE_WIDTH * 0.7) {
-          setGameOver(true);
-          return;
+      if (!state.graceUntil || time > state.graceUntil) {
+        for (let i = 8; i < bodyPositions.length; i++) {
+          let dx = state.head.x - bodyPositions[i].x;
+          let dy = state.head.y - bodyPositions[i].y;
+          if (Math.abs(dx) > CANVAS_SIZE / 2) dx -= Math.sign(dx) * CANVAS_SIZE;
+          if (Math.abs(dy) > CANVAS_SIZE / 2) dy -= Math.sign(dy) * CANVAS_SIZE;
+          if (Math.hypot(dx, dy) < SNAKE_WIDTH * 0.7) {
+            setGameOver(true);
+            return;
+          }
         }
       }
 
@@ -711,20 +711,29 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         ctx.stroke();
       }
 
-      // 计算闪烁透明度：600ms内按 0→1→0→1→1 四段跳变，之后恢复常态不透明
+      // 计算闪烁透明度：优先处理"重开/读档后的无敌保护期"，期间用同一套渐变节奏
+      // 表现"无敌闪烁"提示；保护期结束后再走"吃到目标/包围成功"的常规闪烁逻辑
       let flashAlpha = 1;
-if (state.flashStart !== null) {
-  const elapsed = time - state.flashStart;
-  if (elapsed >= 600) {
-    state.flashStart = null;
-  } else {
-    const keyframes = [0.2, 1, 0.2, 1, 1]; // 多加一个收尾值，方便插值到最后一段
-    const progress = elapsed / 150; // 0~4 之间的小数
-    const segment = Math.min(3, Math.floor(progress));
-    const t = progress - segment; // 当前段内的小数进度 0~1
-    flashAlpha = keyframes[segment] + (keyframes[segment + 1] - keyframes[segment]) * t;
-  }
-}
+      if (state.graceUntil && time < state.graceUntil) {
+        const elapsed = GRACE_DURATION - (state.graceUntil - time);
+        const keyframes = [0.2, 1, 0.2, 1, 1];
+        const segLen = GRACE_DURATION / 4;
+        const progress = elapsed / segLen;
+        const segment = Math.min(3, Math.floor(progress));
+        const t = progress - segment;
+        flashAlpha = keyframes[segment] + (keyframes[segment + 1] - keyframes[segment]) * t;
+      } else if (state.flashStart !== null) {
+        const elapsed = time - state.flashStart;
+        if (elapsed >= 600) {
+          state.flashStart = null;
+        } else {
+          const keyframes = [0.2, 1, 0.2, 1, 1]; // 多加一个收尾值，方便插值到最后一段
+          const progress = elapsed / 150; // 0~4 之间的小数
+          const segment = Math.min(3, Math.floor(progress));
+          const t = progress - segment; // 当前段内的小数进度 0~1
+          flashAlpha = keyframes[segment] + (keyframes[segment + 1] - keyframes[segment]) * t;
+        }
+      }
 
       if (bodyPositions.length > 0) {
         ctx.lineWidth = SNAKE_WIDTH;
@@ -798,7 +807,7 @@ if (state.flashStart !== null) {
         resizeObserver.disconnect();
       }
     };
-  }, [gameOver, isPaused, isReady]);
+  }, [gameOver, isReady]);
 
   return (
     <div
@@ -854,11 +863,6 @@ if (state.flashStart !== null) {
             }}
           >
             {t("game.Game over, click to restart")}
-          </div>
-        )}
-        {isPaused && !gameOver && (
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <h2 style={{ color: '#fff' }}>已暂停 (按空格键继续)</h2>
           </div>
         )}
       </div>

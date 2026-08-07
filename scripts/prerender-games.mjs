@@ -55,7 +55,7 @@ const GAME_META = {
     hi: { title: "नया टेट्रिस - मुफ्त ऑनलाइन गेम खेलें", description: "यहाँ लाइनें साफ़ नहीं होतीं। पता लगाएं कि असल में अंक किससे मिलते हैं — असली नियम छिपा है।" },
   },
   SnakeOrbit: {
-    en: { title: "New Snake - Play the Free Online Game", description: "Same snake, different rules. Figure out how you actually win — before you crash." },
+    en: { title: "Snake Eats Whale - Play the Free Online Game", description: "Snake Eats Whale, different rules. Figure out how you actually win — before you crash." },
     zh: { title: "新贪吃蛇 - 免费在线游戏", description: "还是那条蛇，规则却变了。摸索出获胜的关键，撞上去之前想明白。" },
     fr: { title: "Nouveau Snake - Jouez Gratuitement en Ligne", description: "Même serpent, règles différentes. Découvrez comment gagner vraiment — avant de vous écraser." },
     de: { title: "Neues Snake - Kostenlos Online Spielen", description: "Gleiche Schlange, andere Regeln. Finde heraus, wie man wirklich gewinnt — bevor du abstürzt." },

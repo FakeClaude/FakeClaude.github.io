@@ -693,6 +693,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
       const rootStyle = getComputedStyle(document.documentElement);
+      const hintColor = rootStyle.getPropertyValue('--text-white-20').trim() || '#8c8c8c';
       const lineColor = rootStyle.getPropertyValue('--line').trim() || '#262626';
       const bodyColor = rootStyle.getPropertyValue('--text-white-90').trim() || '#52c41a';
       const eyeColor = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
@@ -710,6 +711,13 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         ctx.lineTo(CANVAS_SIZE, i * CELL_SIZE);
         ctx.stroke();
       }
+      // 提示框：以目标格为中心，外扩 state.level 圈的最外层边框
+      const boxSize = state.level * 2 + 1;
+      const boxX = (state.target.col - state.level) * CELL_SIZE;
+      const boxY = (state.target.row - state.level) * CELL_SIZE;
+      ctx.strokeStyle = hintColor;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(boxX, boxY, boxSize * CELL_SIZE, boxSize * CELL_SIZE);
 
       // 计算闪烁透明度：优先处理"重开/读档后的无敌保护期"，期间用同一套渐变节奏
       // 表现"无敌闪烁"提示；保护期结束后再走"吃到目标/包围成功"的常规闪烁逻辑

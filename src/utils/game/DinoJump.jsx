@@ -7,6 +7,25 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { useTranslation } from "react-i18next";
 
 
+function getWrappedLines(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  let line = '';
+  const lines = [];
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line ? line + ' ' + words[i] : words[i];
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      lines.push(line);
+      line = words[i];
+    } else {
+      line = testLine;
+    }
+  }
+  if (line) {
+    lines.push(line);
+  }
+  return lines;
+}
 // 后续换皮肤：直接改这几个 path 字符串（可以从别的 SVG 里复制 <path d="..."> 的内容）
 function readThemeColor(varName, fallback) {
   const val = getComputedStyle(document.documentElement)
@@ -449,20 +468,34 @@ export default function DinoJump({ onScore, initialToken = 0, onTokenChange, onL
       : gameOver
       ? t("game.Game over, click to restart")
       : t("game.Click to start");
+
     ctx.font = "bold 20px monospace";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const textMetrics = ctx.measureText(statusText);
+
+    const maxWidth = CANVAS_W - 80;
+    const lineHeight = 24;
+    const lines = getWrappedLines(ctx, statusText, maxWidth);
+
     const paddingX = 16;
     const paddingY = 10;
-    const boxW = textMetrics.width + paddingX * 2;
-    const boxH = 20 + paddingY * 2;
+    const maxLineWidth = Math.max(...lines.map(l => ctx.measureText(l).width));
+    const boxW = maxLineWidth + paddingX * 2;
+    const boxH = lines.length * lineHeight + paddingY * 2;
     const centerX = CANVAS_W / 2;
     const centerY = CANVAS_H / 4;
+
     ctx.fillStyle = readThemeColor("--home-bg", "rgba(255,255,255,0.85)");
     ctx.fillRect(centerX - boxW / 2, centerY - boxH / 2, boxW, boxH);
+
     ctx.fillStyle = readThemeColor("--text-white", "#535353");
-    ctx.fillText(statusText, centerX, centerY);
+
+    const totalHeight = lines.length * lineHeight;
+    let startY = centerY - totalHeight / 2 + lineHeight / 2;
+    lines.forEach((l, index) => {
+      ctx.fillText(l, centerX, startY + index * lineHeight);
+    });
+
     ctx.textAlign = "start";
     ctx.textBaseline = "alphabetic";
   }, [running, gameOver, levelComplete, score, dims, groundY]);

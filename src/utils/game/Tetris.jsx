@@ -493,11 +493,18 @@ export default function Tetris({ initialToken = 0, onTokenChange, onLevelComplet
             transform: "translate(-50%, -50%)",
             background: "var(--home-bg)",
             color: "var(--text-white)",
+            fontFamily: "monospace",
             fontWeight: "bold",
             fontSize: "20px",
+            lineHeight: "24px",
             padding: "10px 16px",
+            textAlign: "center",
+            width: "max-content",
+            maxWidth: "calc(100vw - 40px)",
+            boxSizing: "border-box",
+            overflowWrap: "break-word",
+            wordBreak: "normal",
             zIndex: 10,
-            whiteSpace: "nowrap",
           }}
         >
           {t("game.Level complete, click to enter next level")}
@@ -512,11 +519,18 @@ export default function Tetris({ initialToken = 0, onTokenChange, onLevelComplet
             transform: "translate(-50%, -50%)",
             background: "var(--home-bg)",
             color: "var(--text-white)",
+            fontFamily: "monospace",
             fontWeight: "bold",
             fontSize: "20px",
+            lineHeight: "24px",
             padding: "10px 16px",
+            textAlign: "center",
+            width: "max-content",
+            maxWidth: "calc(100vw - 40px)",
+            boxSizing: "border-box",
+            overflowWrap: "break-word",
+            wordBreak: "normal",
             zIndex: 10,
-            whiteSpace: "nowrap",
           }}
         >
           {t("game.Game over, click to restart")}

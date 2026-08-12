@@ -695,7 +695,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       const rootStyle = getComputedStyle(document.documentElement);
       const hintColor = rootStyle.getPropertyValue('--text-white-20').trim() || '#8c8c8c';
       const lineColor = rootStyle.getPropertyValue('--line').trim() || '#262626';
-      const bodyColor = rootStyle.getPropertyValue('--text-white-90').trim() || '#52c41a';
+      const bodyColor = rootStyle.getPropertyValue('--text-main').trim() || '#52c41a';
       const eyeColor = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
 
       ctx.strokeStyle = lineColor;

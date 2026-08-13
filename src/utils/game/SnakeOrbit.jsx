@@ -234,14 +234,15 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     applyScoreDeltaRef.current = applyScoreDelta;
   }, [applyScoreDelta]);
 
+  const startHeadInitial = { x: getCellCenter(10, 10).x - R, y: getCellCenter(10, 10).y };
   const gameState = useRef({
-    head: getCellCenter(10, 10),
+    head: startHeadInitial,
     dir: 0,
     inputQueue: [],
     mode: 'STRAIGHT',
-    targetGrid: { col: 11, row: 10 },
+    targetGrid: { col: 10, row: 10 },
     arc: null,
-    trail: buildInitialTrail(getCellCenter(10, 10), 0, INITIAL_SEGMENTS),
+    trail: buildInitialTrail(startHeadInitial, 0, INITIAL_SEGMENTS),
     segmentCount: INITIAL_SEGMENTS,
     segmentFloat: INITIAL_SEGMENTS,
     pendingGrowth: 0,
@@ -268,13 +269,13 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       gameState.current = stateFromSnapshot(snapshot);
       setLevel(snapshot.level);
     } else {
-      const startHead = getCellCenter(10, 10);
+      const startHead = { x: getCellCenter(10, 10).x - R, y: getCellCenter(10, 10).y };
       gameState.current = {
         head: startHead,
         dir: 0,
         inputQueue: [],
         mode: 'STRAIGHT',
-        targetGrid: { col: 11, row: 10 },
+        targetGrid: { col: 10, row: 10 },
         arc: null,
         trail: buildInitialTrail(startHead, 0, INITIAL_SEGMENTS),
         segmentCount: INITIAL_SEGMENTS,

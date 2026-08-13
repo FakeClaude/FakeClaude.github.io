@@ -7,7 +7,6 @@ const CANVAS_SIZE = GRID_SIZE * CELL_SIZE; // 630px
 const R = 4; // 弧线半径
 const SNAKE_WIDTH = 24;
 const SNAKE_SPEED = 120; // 像素/秒
-const SNAKE_BOOST_MULTIPLIER = 2; // 按住与当前朝向相同的方向键时的加速倍数
 const SEGMENT_SPACING = 8;
 // 仅用于描边渲染的采样间距。必须明显小于转弯圆弧弧长(约 R*π/2 ≈ 6.28px)，
 // 否则用 SEGMENT_SPACING(8px) 采样时，圆弧上"有没有采样点"会随头部移动的相位随机变化，
@@ -30,6 +29,21 @@ const DIRS = [
   { x: -1, y: 0 },
   { x: 0, y: -1 }
 ];
+
+// 生成开局用的初始 trail：从 head 位置沿 dir 反方向铺开足够多的点，
+// 让蛇一开始就是满长度静止显示，不再需要"自动走出来"的动画（因为蛇不再自动行走）
+function buildInitialTrail(head, dir, segmentFloat) {
+  const d = DIRS[dir];
+  const steps = Math.ceil(segmentFloat) + 2; // 多铺一点余量
+  const trail = [];
+  for (let i = 0; i <= steps; i++) {
+    trail.push({
+      x: (head.x - d.x * i * SEGMENT_SPACING + CANVAS_SIZE) % CANVAS_SIZE,
+      y: (head.y - d.y * i * SEGMENT_SPACING + CANVAS_SIZE) % CANVAS_SIZE
+    });
+  }
+  return trail;
+}
 
 const getCellCenter = (col, row) => ({
   x: (col + 0.5) * CELL_SIZE,
@@ -97,6 +111,46 @@ function pickTargetPosition(level, occupiedSet, prevKey) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
+// 用 1x1 离屏 canvas 把任意 CSS 颜色字符串（hex/rgb/named 等）解析成 [r,g,b]，
+// 这样不用自己写颜色格式解析器，交给浏览器处理
+let _colorProbeCtx = null;
+function resolveRGB(cssColor) {
+  if (!_colorProbeCtx) {
+    const c = document.createElement('canvas');
+    c.width = 1;
+    c.height = 1;
+    _colorProbeCtx = c.getContext('2d', { willReadFrequently: true });
+  }
+  _colorProbeCtx.fillStyle = '#000';
+  _colorProbeCtx.fillStyle = cssColor;
+  _colorProbeCtx.fillRect(0, 0, 1, 1);
+  const [r, g, b] = _colorProbeCtx.getImageData(0, 0, 1, 1).data;
+  return [r, g, b];
+}
+
+const mixToward = ([r, g, b], target, factor) => [
+  r + (target - r) * factor,
+  g + (target - g) * factor,
+  b + (target - b) * factor
+];
+const rgbCss = ([r, g, b]) => `rgb(${r}, ${g}, ${b})`;
+const luminance = ([r, g, b]) => 0.299 * r + 0.587 * g + 0.114 * b;
+
+// 把棋盘的两个基础色，在"提示范围"内对比度拉高：较亮的颜色再调亮，较暗的颜色再调暗，
+// factor 控制拉开幅度（0.5 = 各自往白/黑方向混合 50%）
+function boostContrast(colorA, colorB, factor = 0.5) {
+  const rgbA = resolveRGB(colorA);
+  const rgbB = resolveRGB(colorB);
+  const aIsLighter = luminance(rgbA) >= luminance(rgbB);
+  const lightRgb = aIsLighter ? rgbA : rgbB;
+  const darkRgb = aIsLighter ? rgbB : rgbA;
+  const boostedLight = mixToward(lightRgb, 255, factor);
+  const boostedDark = mixToward(darkRgb, 0, factor);
+  return aIsLighter
+    ? [rgbCss(boostedLight), rgbCss(boostedDark)]
+    : [rgbCss(boostedDark), rgbCss(boostedLight)];
+}
+
 // 移动端检测：粗指针（触屏）即认为是移动端，用来切换外层容器定位方式（与 SnakeOrbit_old 保持一致）
 function useIsMobile() {
   const [isMobile] = useState(
@@ -145,7 +199,8 @@ function stateFromSnapshot(snapshot) {
     lastTime: performance.now(),
     // 重开/读档后的短暂保护期：避免读到"刚好包围成功那一瞬"的存档时，
     // 身体本就贴近自身，稍一移动就被自碰撞判负
-    graceUntil: performance.now() + GRACE_DURATION
+    graceUntil: performance.now() + GRACE_DURATION,
+    stepBudget: 0 // 待走的格步数是瞬时输入状态，不持久化，读档后从静止开始
   };
 }
 export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
@@ -186,14 +241,15 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     mode: 'STRAIGHT',
     targetGrid: { col: 11, row: 10 },
     arc: null,
-    trail: [getCellCenter(10, 10)],
+    trail: buildInitialTrail(getCellCenter(10, 10), 0, INITIAL_SEGMENTS),
     segmentCount: INITIAL_SEGMENTS,
     segmentFloat: INITIAL_SEGMENTS,
     pendingGrowth: 0,
     level: 1,
     target: { col: 15, row: 10 },
     flashStart: null,
-    lastTime: performance.now()
+    lastTime: performance.now(),
+    stepBudget: 0 // 待走的"格步"数：0表示静止，仅在有输入(点击/按住)时才 > 0
   });
 
   const spawnTarget = (level, occupiedSet = null) => {
@@ -220,7 +276,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         mode: 'STRAIGHT',
         targetGrid: { col: 11, row: 10 },
         arc: null,
-        trail: [{ x: startHead.x, y: startHead.y }],
+        trail: buildInitialTrail(startHead, 0, INITIAL_SEGMENTS),
         segmentCount: INITIAL_SEGMENTS,
         segmentFloat: INITIAL_SEGMENTS,
         pendingGrowth: 0,
@@ -228,7 +284,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         target: { col: 15, row: 10 },
         flashStart: null,
         lastTime: performance.now(),
-        graceUntil: performance.now() + GRACE_DURATION
+        graceUntil: performance.now() + GRACE_DURATION,
+        stepBudget: 0
       };
       spawnTarget(1);
       setScore(0);
@@ -315,7 +372,10 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       }
     };
 
-    // 记录当前正被按住的方向键，用于判断是否与蛇头朝向一致从而加速
+    // 记录当前正被按住的方向键：蛇不再自动行走，只有这个集合非空（按住）
+    // 或 gameState.current.stepBudget > 0（点击攒下的待走步数）时才会移动。
+    // 同一时间只允许一个方向键"生效"：已经有键按住时，再按下别的方向键无效，
+    // 需先松开当前键才能切换。
     const pressedDirs = new Set();
 
     const handleKeyDown = (e) => {
@@ -336,9 +396,15 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
 
       if (newDir !== null) {
         e.preventDefault();
-        if (!e.repeat) {
+        // 已有其他方向键按住时，这次新按下的键忽略（同时按两个键，后一个无效）
+        if (!e.repeat && pressedDirs.size === 0) {
           pressedDirs.add(newDir);
           queueDir(newDir);
+          // 点一下(或按住起步)先攒1格的行走额度：
+          // - 如果只是点一下就松开，蛇正好走完这1格后停在下一个格子中心；
+          // - 如果是按住不放，下面 gameLoop 里 isHeld 为真会持续给它供给移动距离，
+          //   这1格额度只是保证起步那一下不会因为时序问题卡顿。
+          gameState.current.stepBudget += 1;
         }
       }
     };
@@ -349,8 +415,11 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dirKey = 1;
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dirKey = 2;
       if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dirKey = 3;
-      if (dirKey !== null) {
+      if (dirKey !== null && pressedDirs.has(dirKey)) {
         pressedDirs.delete(dirKey);
+        // 松开时如果正走到格子中间，补1格额度让它走完当前这一步再停，
+        // 避免停在格子中途造成画面卡顿/瞬移
+        gameState.current.stepBudget = Math.max(gameState.current.stepBudget, 1);
       }
     };
 
@@ -384,6 +453,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         newDir = dy > 0 ? 1 : 3; // 下 : 上
       }
       queueDir(newDir);
+      // 触屏目前只支持"点一下走一格"，攒1格行走额度
+      gameState.current.stepBudget += 1;
     };
 
     const panelEl = panelRef.current;
@@ -407,8 +478,13 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       gameState.current.lastTime = time;
 
       const state = gameState.current;
-      const currentSpeed = pressedDirs.has(state.dir) ? SNAKE_SPEED * SNAKE_BOOST_MULTIPLIER : SNAKE_SPEED;
-      let remainingDist = currentSpeed * dt;
+      // 按住方向键时，每帧都把 stepBudget 补到至少 1，让蛇持续走；
+      // 松开后不再补充，stepBudget 会随着走完当前这一格自然耗尽到 0，蛇随即停下。
+      if (pressedDirs.size > 0) {
+        state.stepBudget = Math.max(state.stepBudget, 1);
+      }
+      // stepBudget <= 0 时蛇完全静止（remainingDist = 0），不再自动行走
+      let remainingDist = state.stepBudget > 0 ? SNAKE_SPEED * dt : 0;
 
       // 待增长队列：按本帧实际移动距离折算成节点数，逐步消耗，让蛇尾随着前进慢慢变长（而非瞬间拉长）
       if (state.pendingGrowth > 0) {
@@ -468,6 +544,9 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
             } else {
               state.targetGrid.col = (state.targetGrid.col + dIn.x + GRID_SIZE) % GRID_SIZE;
               state.targetGrid.row = (state.targetGrid.row + dIn.y + GRID_SIZE) % GRID_SIZE;
+              // 走完了一整格，从待走额度里扣掉；额度耗尽就在这个格子中心停下（不再继续消耗本帧剩余距离）
+              state.stepBudget = Math.max(0, state.stepBudget - 1);
+              if (state.stepBudget <= 0) remainingDist = 0;
             }
           } else {
             state.head.x += dIn.x * remainingDist;
@@ -497,6 +576,9 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
             const dOut = DIRS[targetDir];
             state.targetGrid.col = (state.targetGrid.col + dOut.x + GRID_SIZE) % GRID_SIZE;
             state.targetGrid.row = (state.targetGrid.row + dOut.y + GRID_SIZE) % GRID_SIZE;
+            // 转弯圆弧走完，同样算走完了一格，扣减待走额度
+            state.stepBudget = Math.max(0, state.stepBudget - 1);
+            if (state.stepBudget <= 0) remainingDist = 0;
           } else {
             state.arc.currentAngle = nextAngle;
             state.head.x = cx + R * Math.cos(nextAngle);
@@ -693,31 +775,28 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
       const rootStyle = getComputedStyle(document.documentElement);
-      const hintColor = rootStyle.getPropertyValue('--text-white-20').trim() || '#8c8c8c';
-      const lineColor = rootStyle.getPropertyValue('--line').trim() || '#262626';
       const bodyColor = rootStyle.getPropertyValue('--text-main').trim() || '#52c41a';
       const eyeColor = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
+      const bgColorA = rootStyle.getPropertyValue('--line').trim() || '#262626';
+      const bgColorB = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
+      const [hiColorA, hiColorB] = boostContrast(bgColorA, bgColorB, 0.3);
 
-      ctx.strokeStyle = lineColor;
-      ctx.lineWidth = 1;
-      for (let i = 0; i <= GRID_SIZE; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * CELL_SIZE, 0);
-        ctx.lineTo(i * CELL_SIZE, CANVAS_SIZE);
-        ctx.stroke();
+      // 提示范围：以目标格为中心，内到外共 state.level 圈（含）的格子范围
+      const hintColMin = state.target.col - state.level;
+      const hintColMax = state.target.col + state.level;
+      const hintRowMin = state.target.row - state.level;
+      const hintRowMax = state.target.row + state.level;
 
-        ctx.beginPath();
-        ctx.moveTo(0, i * CELL_SIZE);
-        ctx.lineTo(CANVAS_SIZE, i * CELL_SIZE);
-        ctx.stroke();
+      for (let row = 0; row < GRID_SIZE; row++) {
+        for (let col = 0; col < GRID_SIZE; col++) {
+          const inHintBox = col >= hintColMin && col <= hintColMax && row >= hintRowMin && row <= hintRowMax;
+          const isEven = (row + col) % 2 === 0;
+          ctx.fillStyle = inHintBox
+            ? (isEven ? hiColorA : hiColorB)
+            : (isEven ? bgColorA : bgColorB);
+          ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
       }
-      // 提示框：以目标格为中心，外扩 state.level 圈的最外层边框
-      const boxSize = state.level * 2 + 1;
-      const boxX = (state.target.col - state.level) * CELL_SIZE;
-      const boxY = (state.target.row - state.level) * CELL_SIZE;
-      ctx.strokeStyle = hintColor;
-      ctx.lineWidth = 1;
-      ctx.strokeRect(boxX, boxY, boxSize * CELL_SIZE, boxSize * CELL_SIZE);
 
       // 计算闪烁透明度：优先处理"重开/读档后的无敌保护期"，期间用同一套渐变节奏
       // 表现"无敌闪烁"提示；保护期结束后再走"吃到目标/包围成功"的常规闪烁逻辑

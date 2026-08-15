@@ -7,6 +7,8 @@ const CANVAS_SIZE = GRID_SIZE * CELL_SIZE; // 630px
 const R = 4; // 弧线半径
 const SNAKE_WIDTH = 24;
 const SNAKE_SPEED = 120; // 像素/秒
+// 停靠时在"格子正中心"基础上，再往行进方向多探多少像素。0=正中心，正数=更往前，负数=往回收
+const HEAD_LAND_OFFSET = -8;
 const SEGMENT_SPACING = 8;
 // 仅用于描边渲染的采样间距。必须明显小于转弯圆弧弧长(约 R*π/2 ≈ 6.28px)，
 // 否则用 SEGMENT_SPACING(8px) 采样时，圆弧上"有没有采样点"会随头部移动的相位随机变化，
@@ -200,7 +202,9 @@ function stateFromSnapshot(snapshot) {
     // 重开/读档后的短暂保护期：避免读到"刚好包围成功那一瞬"的存档时，
     // 身体本就贴近自身，稍一移动就被自碰撞判负
     graceUntil: performance.now() + GRACE_DURATION,
-    stepBudget: 0 // 待走的格步数是瞬时输入状态，不持久化，读档后从静止开始
+    stepBudget: 0, // 待走的格步数是瞬时输入状态，不持久化，读档后从静止开始
+    coasting: false,
+    coastTarget: null
   };
 }
 export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
@@ -250,7 +254,9 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     target: { col: 15, row: 10 },
     flashStart: null,
     lastTime: performance.now(),
-    stepBudget: 0 // 待走的"格步"数：0表示静止，仅在有输入(点击/按住)时才 > 0
+    stepBudget: 0, // 待走的"格步"数：0表示静止，仅在有输入(点击/按住)时才 > 0
+    coasting: false, // 额度耗尽但还没真正到达落点时为true，期间头部继续动画滑到落点，而不是瞬间跳过去
+    coastTarget: null
   });
 
   const spawnTarget = (level, occupiedSet = null) => {
@@ -286,7 +292,9 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         flashStart: null,
         lastTime: performance.now(),
         graceUntil: performance.now() + GRACE_DURATION,
-        stepBudget: 0
+        stepBudget: 0,
+        coasting: false,
+        coastTarget: null
       };
       spawnTarget(1);
       setScore(0);
@@ -382,7 +390,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     // 避免仅凭"这一帧是否还按着"来判定，导致松手时机稍晚(哪怕零点几秒)就多走一步
     const pressStartTimes = new Map();
     // 按住超过这个时长才判定为"长按连续走"，否则无论何时松手都只走1格
-    const HOLD_THRESHOLD_MS = 350;
+    const HOLD_THRESHOLD_MS = 250;
 
     const handleKeyDown = (e) => {
       // 游戏结束时任意键重开（重开机制与 Tetris 一致）；
@@ -504,7 +512,9 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         }
       }
       // stepBudget <= 0 时蛇完全静止（remainingDist = 0），不再自动行走
-      let remainingDist = state.stepBudget > 0 ? SNAKE_SPEED * dt : 0;
+      // stepBudget>0 表示还有格步额度；coasting 表示额度刚耗尽但头部还没真正滑到落点，
+      // 这段"最后一小截"也要用同样的速度动画着走完，而不是瞬间跳过去
+      let remainingDist = (state.stepBudget > 0 || state.coasting) ? SNAKE_SPEED * dt : 0;
 
       // 待增长队列：按本帧实际移动距离折算成节点数，逐步消耗，让蛇尾随着前进慢慢变长（而非瞬间拉长）
       if (state.pendingGrowth > 0) {
@@ -519,70 +529,83 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
 
 
        if (state.mode === 'STRAIGHT') {
-         const R = 4; // 弧线半径
-const HEAD_LAND_OFFSET = -8; // 停靠时在"格子正中心"基础上，再往行进方向多探多少像素。0=正中心，正数=更往前，负数=往回收
-  const dIn = DIRS[state.dir];
-  const center = getCellCenter(state.targetGrid.col, state.targetGrid.row);
-  const pStart = {
-    x: center.x - R * dIn.x,
-    y: center.y - R * dIn.y
-  };
+         const dIn = DIRS[state.dir];
+         const center = getCellCenter(state.targetGrid.col, state.targetGrid.row);
+         // 正常情况下，目标点是"下一次判断转弯"的参照点(略微偏进新格子 R 像素)；
+         // 但如果额度已经耗尽、正在往落点滑(coasting)，目标点要换成真正的落点，
+         // 这样剩余的这一小段距离会用同一套"按帧推进+到点snap"的逻辑动画着走完，
+         // 而不是像之前那样直接瞬间把坐标设成落点(那就是"闪跳"的根源)。
+         const pStart = state.coasting && state.coastTarget
+           ? state.coastTarget
+           : { x: center.x - R * dIn.x, y: center.y - R * dIn.y };
 
-  let dx = pStart.x - state.head.x;
-  let dy = pStart.y - state.head.y;
-  if (Math.abs(dx) > CANVAS_SIZE / 2) dx -= Math.sign(dx) * CANVAS_SIZE;
-  if (Math.abs(dy) > CANVAS_SIZE / 2) dy -= Math.sign(dy) * CANVAS_SIZE;
-  // 带符号的"沿行进方向"距离：正=还没到停靠点；负或0=已经到达/越过。
-  // 之前用 Math.hypot 恒为正，一旦头部因为"停下时吸附到格子中心"而越过了
-  // 这个参照点，会被误判成"还没到"，白白扣一次预算却不挪窝——这就是点击没反应的根源。
-  const distToStart = dx * dIn.x + dy * dIn.y;
+         let dx = pStart.x - state.head.x;
+         let dy = pStart.y - state.head.y;
+         if (Math.abs(dx) > CANVAS_SIZE / 2) dx -= Math.sign(dx) * CANVAS_SIZE;
+         if (Math.abs(dy) > CANVAS_SIZE / 2) dy -= Math.sign(dy) * CANVAS_SIZE;
+         // 带符号的"沿行进方向"距离：正=还没到停靠点；负或0=已经到达/越过。
+         // 之前用 Math.hypot 恒为正，一旦头部因为"停下时吸附到格子中心"而越过了
+         // 这个参照点，会被误判成"还没到"，白白扣一次预算却不挪窝——这就是点击没反应的根源。
+         const distToStart = dx * dIn.x + dy * dIn.y;
 
-  if (distToStart <= 0 || remainingDist >= distToStart) {
-    remainingDist -= Math.max(0, distToStart);
-    state.head.x = pStart.x;
-    state.head.y = pStart.y;
+         if (distToStart <= 0 || remainingDist >= distToStart) {
+           remainingDist -= Math.max(0, distToStart);
+           state.head.x = pStart.x;
+           state.head.y = pStart.y;
 
-    const targetDir = state.inputQueue.length > 0 ? state.inputQueue[0] : state.dir;
-    const isTurn = (targetDir !== state.dir) && ((targetDir + 2) % 4 !== state.dir);
+           if (state.coasting) {
+             // 已经真正滑到落点，彻底停下
+             state.coasting = false;
+             state.coastTarget = null;
+             remainingDist = 0;
+           } else {
+             const targetDir = state.inputQueue.length > 0 ? state.inputQueue[0] : state.dir;
+             const isTurn = (targetDir !== state.dir) && ((targetDir + 2) % 4 !== state.dir);
 
-    if (isTurn) {
-      state.inputQueue.shift();
-      const dOut = DIRS[targetDir];
-      const cross = dIn.x * dOut.y - dIn.y * dOut.x;
-      const turnSign = cross > 0 ? 1 : -1;
+             if (isTurn) {
+               state.inputQueue.shift();
+               const dOut = DIRS[targetDir];
+               const cross = dIn.x * dOut.y - dIn.y * dOut.x;
+               const turnSign = cross > 0 ? 1 : -1;
 
-      const cx = center.x - R * dIn.x + R * dOut.x;
-      const cy = center.y - R * dIn.y + R * dOut.y;
+               const cx = center.x - R * dIn.x + R * dOut.x;
+               const cy = center.y - R * dIn.y + R * dOut.y;
 
-      const startAngle = Math.atan2(-dOut.y, -dOut.x);
-      let endAngle = startAngle + (turnSign * Math.PI / 2);
+               const startAngle = Math.atan2(-dOut.y, -dOut.x);
+               let endAngle = startAngle + (turnSign * Math.PI / 2);
 
-      state.mode = 'ARC';
-      state.arc = {
-        cx, cy,
-        center,
-        currentAngle: startAngle,
-        endAngle,
-        turnSign,
-        targetDir
-      };
-    } else {
-      state.targetGrid.col = (state.targetGrid.col + dIn.x + GRID_SIZE) % GRID_SIZE;
-      state.targetGrid.row = (state.targetGrid.row + dIn.y + GRID_SIZE) % GRID_SIZE;
-      state.stepBudget = Math.max(0, state.stepBudget - 1);
-      if (state.stepBudget <= 0) {
-  const newCenter = getCellCenter(state.targetGrid.col, state.targetGrid.row);
-  state.head.x = newCenter.x + dIn.x * HEAD_LAND_OFFSET;
-  state.head.y = newCenter.y + dIn.y * HEAD_LAND_OFFSET;
-  remainingDist = 0;
-}
-    }
-  } else {
-    state.head.x += dIn.x * remainingDist;
-    state.head.y += dIn.y * remainingDist;
-    remainingDist = 0;
-  }
-} else if (state.mode === 'ARC') {
+               state.mode = 'ARC';
+               state.arc = {
+                 cx, cy,
+                 center,
+                 currentAngle: startAngle,
+                 endAngle,
+                 turnSign,
+                 targetDir
+               };
+             } else {
+               state.targetGrid.col = (state.targetGrid.col + dIn.x + GRID_SIZE) % GRID_SIZE;
+               state.targetGrid.row = (state.targetGrid.row + dIn.y + GRID_SIZE) % GRID_SIZE;
+               state.stepBudget = Math.max(0, state.stepBudget - 1);
+               if (state.stepBudget <= 0) {
+                 // 额度耗尽：不再瞬间跳到落点，而是记下落点坐标，转入 coasting 状态，
+                 // 剩余的这一小段(约CELL_SIZE-R那么长)会在后续的 while 循环/后续帧里
+                 // 用同样的速度继续动画推进，直到真正到达落点才停下。
+                 const newCenter = getCellCenter(state.targetGrid.col, state.targetGrid.row);
+                 state.coasting = true;
+                 state.coastTarget = {
+                   x: newCenter.x + dIn.x * HEAD_LAND_OFFSET,
+                   y: newCenter.y + dIn.y * HEAD_LAND_OFFSET
+                 };
+               }
+             }
+           }
+         } else {
+           state.head.x += dIn.x * remainingDist;
+           state.head.y += dIn.y * remainingDist;
+           remainingDist = 0;
+         }
+       } else if (state.mode === 'ARC') {
   const { cx, cy, currentAngle, endAngle, turnSign, targetDir } = state.arc;
   const angularDist = remainingDist / R;
   const angleStep = angularDist * turnSign;
@@ -607,11 +630,15 @@ const HEAD_LAND_OFFSET = -8; // 停靠时在"格子正中心"基础上，再往�
     state.targetGrid.row = (state.targetGrid.row + dOut.y + GRID_SIZE) % GRID_SIZE;
     state.stepBudget = Math.max(0, state.stepBudget - 1);
     if (state.stepBudget <= 0) {
-  const newCenter = getCellCenter(state.targetGrid.col, state.targetGrid.row);
-  state.head.x = newCenter.x + dOut.x * HEAD_LAND_OFFSET;
-  state.head.y = newCenter.y + dOut.y * HEAD_LAND_OFFSET;
-  remainingDist = 0;
-}
+      // 转弯刚好是这次的最后一步：同样不再瞬间跳到落点，
+      // 而是转入 coasting，让 STRAIGHT 分支下一轮循环/后续帧继续动画滑过去
+      const newCenter = getCellCenter(state.targetGrid.col, state.targetGrid.row);
+      state.coasting = true;
+      state.coastTarget = {
+        x: newCenter.x + dOut.x * HEAD_LAND_OFFSET,
+        y: newCenter.y + dOut.y * HEAD_LAND_OFFSET
+      };
+    }
   } else {
     state.arc.currentAngle = nextAngle;
     state.head.x = cx + R * Math.cos(nextAngle);

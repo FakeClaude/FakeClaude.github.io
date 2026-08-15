@@ -359,6 +359,10 @@ html, body {
 }
 .game{
     background: var(--home-bg);
+    -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .game-close {
     position: fixed;

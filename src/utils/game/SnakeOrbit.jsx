@@ -515,15 +515,12 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       // stepBudget>0 表示还有格步额度；coasting 表示额度刚耗尽但头部还没真正滑到落点，
       // 这段"最后一小截"也要用同样的速度动画着走完，而不是瞬间跳过去
       let remainingDist = (state.stepBudget > 0 || state.coasting) ? SNAKE_SPEED * dt : 0;
-
-      // 待增长队列：按本帧实际移动距离折算成节点数，逐步消耗，让蛇尾随着前进慢慢变长（而非瞬间拉长）
-      if (state.pendingGrowth > 0) {
-        const growthAvailable = remainingDist / SEGMENT_SPACING;
-        const applied = Math.min(state.pendingGrowth, growthAvailable);
-        state.segmentFloat += applied;
-        state.pendingGrowth -= applied;
-        state.segmentCount = Math.floor(state.segmentFloat);
-      }
+      // 本帧头部"实际"移动的像素距离（区别于上面的预算 remainingDist）：
+      // 额度耗尽时可能会有一小段预算被直接丢弃而不产生真实位移（比如 coasting 提前到达
+      // 落点时剩余预算被清零，见下方 remainingDist = 0 处），如果仍按预算折算生长量，
+      // 生长速度会比头部实际前进速度快一点点，尾部端点就会瞬间多伸出一截、随后再被"追上"，
+      // 视觉上表现为尾巴轻微反向生长/抖动。改成按真实位移折算生长即可让尾部与头部前进严格同步。
+      let movedDist = 0;
 
       while (remainingDist > 0) {
 
@@ -550,6 +547,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
 
          if (distToStart <= 0 || remainingDist >= distToStart) {
            remainingDist -= Math.max(0, distToStart);
+           movedDist += Math.max(0, distToStart);
            state.head.x = pStart.x;
            state.head.y = pStart.y;
 
@@ -603,6 +601,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
          } else {
            state.head.x += dIn.x * remainingDist;
            state.head.y += dIn.y * remainingDist;
+           movedDist += remainingDist;
            remainingDist = 0;
          }
        } else if (state.mode === 'ARC') {
@@ -618,6 +617,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
   if (arcFinished) {
     const usedAngle = Math.abs(endAngle - currentAngle);
     remainingDist -= usedAngle * R;
+    movedDist += usedAngle * R;
 
     state.head.x = cx + R * Math.cos(endAngle);
     state.head.y = cy + R * Math.sin(endAngle);
@@ -643,6 +643,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     state.arc.currentAngle = nextAngle;
     state.head.x = cx + R * Math.cos(nextAngle);
     state.head.y = cy + R * Math.sin(nextAngle);
+    movedDist += remainingDist;
     remainingDist = 0;
   }
 }
@@ -690,6 +691,18 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         // 轨迹就会用一条直线弦替代真实弧线，且这种情况随帧间dt波动时有时无，
         // 导致重采样出的身体节点在"贴合弧线"与"抄近路"之间跳变，即转弯处的抖动闪烁。
         state.trail.unshift({ x: state.head.x, y: state.head.y });
+      }
+
+      // 待增长队列：按本帧头部"实际"移动的距离折算成节点数，逐步消耗，让蛇尾随着前进慢慢变长
+      // （而非瞬间拉长）。必须用循环结束后统计出的真实位移 movedDist，而不是循环开始前的
+      // 预算 remainingDist，否则额度耗尽被丢弃的那一小截预算也会被算成"生长"，
+      // 尾部就会比头部实际前进的距离多伸出一点点，产生轻微的反向生长和抖动。
+      if (state.pendingGrowth > 0 && movedDist > 0) {
+        const growthAvailable = movedDist / SEGMENT_SPACING;
+        const applied = Math.min(state.pendingGrowth, growthAvailable);
+        state.segmentFloat += applied;
+        state.pendingGrowth -= applied;
+        state.segmentCount = Math.floor(state.segmentFloat);
       }
 
       const bodyPositions = [];

@@ -207,15 +207,85 @@ function stateFromSnapshot(snapshot) {
     coastTarget: null
   };
 }
+// 虚拟方向键单个按键：外层是touch命中区域(尺寸随方向变化，见下方布局表)，
+// 内层是固定 20x30 的"键帽+箭头"整体，通过 CSS rotate 转成四个方向，
+// 不用分别画四份 SVG。按下时整体右下偏移1px(0.2s动画)+对比度提升，
+// 键帽自带右下角1px投影(用 drop-shadow 贴合形状轮廓，而不是矩形 box-shadow)。
+function DPadKey({ rotate, boxW, boxH, left, top, pressed, onPress, onRelease }) {
+  return (
+    <div
+      onPointerDown={(e) => {
+        e.preventDefault();
+        onPress();
+      }}
+      onPointerUp={(e) => {
+        e.preventDefault();
+        onRelease();
+      }}
+      onPointerCancel={onRelease}
+      onPointerLeave={onRelease}
+      onContextMenu={(e) => e.preventDefault()}
+      style={{
+        position: 'absolute',
+        left,
+        top,
+        width: boxW,
+        height: boxH,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        touchAction: 'none',
+        cursor: 'pointer',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        transition: 'transform 0.2s ease, filter 0.2s ease',
+        transform: pressed ? 'translate(1px, 1px)' : 'translate(0, 0)',
+        filter: pressed ? 'contrast(1.4)' : 'none'
+      }}
+    >
+      <div style={{ position: 'relative', width: 20, height: 30, transform: `rotate(${rotate}deg)` }}>
+        <svg
+          width="20" height="30" viewBox="0 0 20 30" fill="none"
+          style={{ display: 'block', filter: 'drop-shadow(1px 1px 0 var(--text-placeholder))' }}
+        >
+          <path fill="var(--text-white-20)" d="M0 19.2V2Q.2.2 2 0h16a2 2 0 0 1 2 2v17.2q0 .8-.6 1.4l-8 8a2 2 0 0 1-2.8 0l-8-8a2 2 0 0 1-.6-1.4" />
+        </svg>
+        <svg
+          width="7" height="5" viewBox="0 0 7 5" fill="none"
+          style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+        >
+          <path fill="var(--text-placeholder)" d="M3 .2.2 3.9q-.3.6.4.8h6q.6-.2.3-.8L3.8.2a1 1 0 0 0-.7 0" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// D-pad 十字布局：以96x96的容器为参照，上下键20x30，左右键(旋转90°后视觉上)30x20，
+// 相邻键间距均为8px。方向编号沿用游戏内定义：0右 1下 2左 3上
+const DPAD_LAYOUT = [
+  { dir: 3, rotate: 0, boxW: 20, boxH: 30, left: 38, top: 0 },   // 上
+  { dir: 0, rotate: 90, boxW: 30, boxH: 20, left: 66, top: 38 }, // 右
+  { dir: 1, rotate: 180, boxW: 20, boxH: 30, left: 38, top: 66 }, // 下
+  { dir: 2, rotate: 270, boxW: 30, boxH: 20, left: 0, top: 38 }  // 左
+];
+
 export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const canvasRef = useRef(null);
   const panelRef = useRef(null);
+  // 虚拟方向键(D-pad)按钮通过这个 ref 调用游戏循环 effect 里定义的 pressDir/releaseDir，
+  // 因为按钮是在 JSX 里渲染的，和游戏循环 effect 不在同一个作用域；effect 每次重跑时
+  // (依赖 [gameOver, isReady]) 都会把最新的 press/release 函数写进这个 ref。
+  const dpadRef = useRef({ press: () => {}, release: () => {} });
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [gameOver, setGameOver] = useState(false);
   const [isReady, setIsReady] = useState(false); // 存档读取完成前不启动游戏循环，避免闪一下默认局面
+  // 移动端虚拟方向键：记录当前被按下的按钮(视觉反馈用)——哪个方向的键正被手指按住，
+  // 就给它加"右下偏移1px + 对比度提升"的按压效果
+  const [pressedDpad, setPressedDpad] = useState(() => new Set());
   const tokenRef = useRef(initialToken);
 
   useEffect(() => {
@@ -269,6 +339,20 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     gameState.current.targetOverlapsSnake = occupiedSet ? occupiedSet.has(`${pos.col}-${pos.row}`) : false;
   };
 
+  // 根据"初始/重开时那条静止摆放好的蛇"算出它占用的格子集合，用于开局生成目标(老鼠)时
+  // 避开蛇身——开局蛇身是直接铺好的一条直线(buildInitialTrail)，不经过 gameLoop 里
+  // 逐帧计算 bodyPositions 那一套，所以这里直接把 trail 上的点映射到格子，取并集即可。
+  const occupiedSetFromInitialState = (state) => {
+    const set = new Set();
+    const headGrid = pixelToGrid(state.head.x, state.head.y);
+    set.add(`${headGrid.col}-${headGrid.row}`);
+    for (const p of state.trail) {
+      const g = pixelToGrid(p.x, p.y);
+      set.add(`${g.col}-${g.row}`);
+    }
+    return set;
+  };
+
   const resetGame = async () => {
     const snapshot = await loadSnakeOrbitProgress();
     if (snapshot) {
@@ -296,7 +380,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         coasting: false,
         coastTarget: null
       };
-      spawnTarget(1);
+      spawnTarget(1, occupiedSetFromInitialState(gameState.current));
       setScore(0);
       setLevel(1);
     }
@@ -313,7 +397,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         gameState.current = stateFromSnapshot(snapshot);
         setLevel(snapshot.level);
       } else {
-        spawnTarget(1);
+        spawnTarget(1, occupiedSetFromInitialState(gameState.current));
       }
       setIsReady(true);
     })();
@@ -392,6 +476,56 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     // 按住超过这个时长才判定为"长按连续走"，否则无论何时松手都只走1格
     const HOLD_THRESHOLD_MS = 250;
 
+    // 方向按下/松开的共用逻辑：键盘和右下角虚拟方向键都调用这两个函数，
+    // 保证"长按连续走 + 后按的方向优先，松开后自动切回还按着的方向"这套行为完全一致。
+    const pressDir = (newDir) => {
+      // 游戏结束时任意方向键/按键重开（重开机制与 Tetris 一致）
+      if (gameOver) {
+        resetGame();
+        return;
+      }
+      // 这个方向本来就已经按住了（比如系统重复触发），忽略
+      if (pressedDirs.includes(newDir)) return;
+      // 新按下的方向直接成为新的栈顶(最高优先级)，之前按住但还没松开的方向仍留在栈里，
+      // 只是暂时不生效，松开新方向后会自动切回它们。
+      pressedDirs.push(newDir);
+      pressStartTimes.set(newDir, performance.now());
+      queueDir(newDir);
+      // 点一下(或按住起步)先攒1格的行走额度：
+      // - 如果只是点一下就松开，蛇正好走完这1格后停在下一个格子中心；
+      // - 如果是按住不放，下面 gameLoop 里 isHeld 为真会持续给它供给移动距离，
+      //   这1格额度只是保证起步那一下不会因为时序问题卡顿。
+      gameState.current.stepBudget += 1;
+    };
+
+    const releaseDir = (dirKey) => {
+      const idx = pressedDirs.indexOf(dirKey);
+      if (idx === -1) return;
+      const wasActive = idx === pressedDirs.length - 1; // 松开的是不是当前正生效(栈顶)的方向
+      pressedDirs.splice(idx, 1);
+      pressStartTimes.delete(dirKey);
+      // 注意：这里不再凭空补 1 格额度。
+      // 之前的逻辑会在松手时把 stepBudget 强制补到至少 1，
+      // 本意是"如果正走到格子中间，让它走完这一步"，
+      // 但按下时已经攒了 1 格额度，只要还没走完这一步 stepBudget 本来就 >0，
+      // 根本不需要再补；一旦这一步已经走完（stepBudget 归 0 之后）才松手，
+      // 这行代码就会误把"已经走完"当成"还没走完"，凭空多给 1 格额度，
+      // 导致明明只按了一下却多走一步——这正是"多按一点点就走2步"的真正原因。
+
+      // 松开的正是当前生效的方向，且还有别的方向仍按住：切回那个方向继续走，
+      // 用 queueDir 把方向重新排进队列，蛇会在走到当前格子中心后转向那个方向
+      // （而不是瞬间掉头），行为和正常转弯一致。
+      if (wasActive && pressedDirs.length > 0) {
+        const resumeDir = pressedDirs[pressedDirs.length - 1];
+        queueDir(resumeDir);
+      }
+    };
+
+    // 把这两个函数暴露给组件下方渲染的虚拟方向键按钮（它们在这个 effect 作用域之外，
+    // 按钮的 onPointerDown/onPointerUp 通过这个 ref 调用同一套方向管理逻辑）
+    dpadRef.current.press = pressDir;
+    dpadRef.current.release = releaseDir;
+
     const handleKeyDown = (e) => {
       // 游戏结束时任意键重开（重开机制与 Tetris 一致）；
       // 只在按键第一次按下（非系统自动重复）时触发一次，避免死亡瞬间还按住方向键
@@ -410,20 +544,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
 
       if (newDir !== null) {
         e.preventDefault();
-        // 忽略系统自动重复触发的 keydown，以及"这个键本来就已经按住"的重复事件
-        // （比如浏览器在某些情况下对已按住的键补发 keydown）。
-        // 不再要求"没有其他键按住"才生效——新按下的方向键直接成为新的栈顶(最高优先级)，
-        // 之前按住但还没松开的键仍留在栈里，只是暂时不生效，松开新键后会自动切回它们。
-        if (!e.repeat && !pressedDirs.includes(newDir)) {
-          pressedDirs.push(newDir);
-          pressStartTimes.set(newDir, performance.now());
-          queueDir(newDir);
-          // 点一下(或按住起步)先攒1格的行走额度：
-          // - 如果只是点一下就松开，蛇正好走完这1格后停在下一个格子中心；
-          // - 如果是按住不放，下面 gameLoop 里 isHeld 为真会持续给它供给移动距离，
-          //   这1格额度只是保证起步那一下不会因为时序问题卡顿。
-          gameState.current.stepBudget += 1;
-        }
+        // 忽略系统自动重复触发的 keydown
+        if (!e.repeat) pressDir(newDir);
       }
     };
 
@@ -433,70 +555,11 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dirKey = 1;
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dirKey = 2;
       if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dirKey = 3;
-      if (dirKey !== null) {
-        const idx = pressedDirs.indexOf(dirKey);
-        if (idx !== -1) {
-          const wasActive = idx === pressedDirs.length - 1; // 松开的是不是当前正生效(栈顶)的键
-          pressedDirs.splice(idx, 1);
-          pressStartTimes.delete(dirKey);
-          // 注意：这里不再凭空补 1 格额度。
-          // 之前的逻辑会在松手时把 stepBudget 强制补到至少 1，
-          // 本意是"如果正走到格子中间，让它走完这一步"，
-          // 但按下时已经攒了 1 格额度，只要还没走完这一步 stepBudget 本来就 >0，
-          // 根本不需要再补；一旦这一步已经走完（stepBudget 归 0 之后）才松手，
-          // 这行代码就会误把"已经走完"当成"还没走完"，凭空多给 1 格额度，
-          // 导致明明只按了一下却多走一步——这正是"多按一点点就走2步"的真正原因。
-
-          // 松开的正是当前生效的键，且还有别的方向键仍按住：切回那个键继续走，
-          // 用 queueDir 把方向重新排进队列，蛇会在走到当前格子中心后转向那个方向
-          // （而不是瞬间掉头），行为和正常转弯一致。
-          if (wasActive && pressedDirs.length > 0) {
-            const resumeDir = pressedDirs[pressedDirs.length - 1];
-            queueDir(resumeDir);
-          }
-        }
-      }
+      if (dirKey !== null) releaseDir(dirKey);
     };
 
-    // 移动端触摸控制：以整个游戏面板为参照，过中心点画一根45度线和一根与它垂直(135度)的线，
-    // 把屏幕分成上下左右四个三角形区域，点哪个区域就朝哪个方向走（不显示分割线，让用户自己摸索）。
-    // 判定方法等价于比较触摸点相对中心的 |dx| 与 |dy|：
-    // |dx| > |dy| 落在左右两个区域，否则落在上下两个区域，边界正好是两条45度对角线。
-    const handleTouchStart = (e) => {
-      const panelEl = panelRef.current;
-      if (!panelEl) return;
-      e.preventDefault();
-      // 游戏结束时任意触屏点击重开（重开机制与 Tetris 一致）
-      if (gameOver) {
-        resetGame();
-        return;
-      }
-      const touch = e.touches[0];
-      if (!touch) return;
-      const rect = panelEl.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = touch.clientX - cx;
-      const dy = touch.clientY - cy;
-
-      if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return; // 太靠近中心点，忽略避免误触
-
-      let newDir;
-      if (Math.abs(dx) > Math.abs(dy)) {
-        newDir = dx > 0 ? 0 : 2; // 右 : 左
-      } else {
-        newDir = dy > 0 ? 1 : 3; // 下 : 上
-      }
-      queueDir(newDir);
-      // 触屏目前只支持"点一下走一格"，攒1格行走额度
-      gameState.current.stepBudget += 1;
-    };
-
-    const panelEl = panelRef.current;
-    if (panelEl) {
-      panelEl.addEventListener('touchstart', handleTouchStart, { passive: false });
-    }
-
+    // 移动端方向输入改为右下角虚拟方向键按钮（见组件下方 JSX），不再监听整个面板的
+    // touchstart 做四象限分区判断——四象限那套方案在按钮方案上线后不再需要。
     const handleBlur = () => {
       pressedDirs.length = 0;
       pressStartTimes.clear();
@@ -1008,9 +1071,6 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       window.removeEventListener('blur', handleBlur);
-      if (panelEl) {
-        panelEl.removeEventListener('touchstart', handleTouchStart);
-      }
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
@@ -1054,6 +1114,34 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
           height={CANVAS_SIZE}
           style={{ display: 'block', width: '100%', height: '100%', background: 'var(--home-bg)', touchAction: 'none' }}
         />
+        {isMobile && (
+          <div style={{ position: 'absolute', right: 16, bottom: 16, width: 96, height: 96, zIndex: 5 }}>
+            {DPAD_LAYOUT.map(({ dir, rotate, boxW, boxH, left, top }) => (
+              <DPadKey
+                key={dir}
+                rotate={rotate}
+                boxW={boxW}
+                boxH={boxH}
+                left={left}
+                top={top}
+                pressed={pressedDpad.has(dir)}
+                onPress={() => {
+                  dpadRef.current.press(dir);
+                  setPressedDpad((prev) => new Set(prev).add(dir));
+                }}
+                onRelease={() => {
+                  dpadRef.current.release(dir);
+                  setPressedDpad((prev) => {
+                    if (!prev.has(dir)) return prev;
+                    const next = new Set(prev);
+                    next.delete(dir);
+                    return next;
+                  });
+                }}
+              />
+            ))}
+          </div>
+        )}
         {gameOver && (
           <div
             style={{

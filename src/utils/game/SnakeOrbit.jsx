@@ -381,11 +381,11 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       }
     };
 
-    // 记录当前正被按住的方向键：蛇不再自动行走，只有这个集合非空（按住）
+    // 记录当前正被按住的方向键：蛇不再自动行走，只有这个数组非空（按住）
     // 或 gameState.current.stepBudget > 0（点击攒下的待走步数）时才会移动。
-    // 同一时间只允许一个方向键"生效"：已经有键按住时，再按下别的方向键无效，
-    // 需先松开当前键才能切换。
-    const pressedDirs = new Set();
+    // 允许同时按住多个方向键：用数组当栈使用，最后按下的键始终在栈顶、优先生效
+    // （即便更早按住的键还没松开）；松开当前生效的键后，退回到次新的、仍按住的键继续走。
+    const pressedDirs = [];
     // 记录每个方向键"按下的时刻"，用于判断到底是"点一下"还是"有意按住"，
     // 避免仅凭"这一帧是否还按着"来判定，导致松手时机稍晚(哪怕零点几秒)就多走一步
     const pressStartTimes = new Map();
@@ -410,9 +410,12 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
 
       if (newDir !== null) {
         e.preventDefault();
-        // 已有其他方向键按住时，这次新按下的键忽略（同时按两个键，后一个无效）
-        if (!e.repeat && pressedDirs.size === 0) {
-          pressedDirs.add(newDir);
+        // 忽略系统自动重复触发的 keydown，以及"这个键本来就已经按住"的重复事件
+        // （比如浏览器在某些情况下对已按住的键补发 keydown）。
+        // 不再要求"没有其他键按住"才生效——新按下的方向键直接成为新的栈顶(最高优先级)，
+        // 之前按住但还没松开的键仍留在栈里，只是暂时不生效，松开新键后会自动切回它们。
+        if (!e.repeat && !pressedDirs.includes(newDir)) {
+          pressedDirs.push(newDir);
           pressStartTimes.set(newDir, performance.now());
           queueDir(newDir);
           // 点一下(或按住起步)先攒1格的行走额度：
@@ -430,16 +433,28 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') dirKey = 1;
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') dirKey = 2;
       if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') dirKey = 3;
-      if (dirKey !== null && pressedDirs.has(dirKey)) {
-        pressedDirs.delete(dirKey);
-        pressStartTimes.delete(dirKey);
-        // 注意：这里不再凭空补 1 格额度。
-        // 之前的逻辑会在松手时把 stepBudget 强制补到至少 1，
-        // 本意是"如果正走到格子中间，让它走完这一步"，
-        // 但按下时已经攒了 1 格额度，只要还没走完这一步 stepBudget 本来就 >0，
-        // 根本不需要再补；一旦这一步已经走完（stepBudget 归 0 之后）才松手，
-        // 这行代码就会误把"已经走完"当成"还没走完"，凭空多给 1 格额度，
-        // 导致明明只按了一下却多走一步——这正是"多按一点点就走2步"的真正原因。
+      if (dirKey !== null) {
+        const idx = pressedDirs.indexOf(dirKey);
+        if (idx !== -1) {
+          const wasActive = idx === pressedDirs.length - 1; // 松开的是不是当前正生效(栈顶)的键
+          pressedDirs.splice(idx, 1);
+          pressStartTimes.delete(dirKey);
+          // 注意：这里不再凭空补 1 格额度。
+          // 之前的逻辑会在松手时把 stepBudget 强制补到至少 1，
+          // 本意是"如果正走到格子中间，让它走完这一步"，
+          // 但按下时已经攒了 1 格额度，只要还没走完这一步 stepBudget 本来就 >0，
+          // 根本不需要再补；一旦这一步已经走完（stepBudget 归 0 之后）才松手，
+          // 这行代码就会误把"已经走完"当成"还没走完"，凭空多给 1 格额度，
+          // 导致明明只按了一下却多走一步——这正是"多按一点点就走2步"的真正原因。
+
+          // 松开的正是当前生效的键，且还有别的方向键仍按住：切回那个键继续走，
+          // 用 queueDir 把方向重新排进队列，蛇会在走到当前格子中心后转向那个方向
+          // （而不是瞬间掉头），行为和正常转弯一致。
+          if (wasActive && pressedDirs.length > 0) {
+            const resumeDir = pressedDirs[pressedDirs.length - 1];
+            queueDir(resumeDir);
+          }
+        }
       }
     };
 
@@ -483,7 +498,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     }
 
     const handleBlur = () => {
-      pressedDirs.clear();
+      pressedDirs.length = 0;
       pressStartTimes.clear();
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -501,8 +516,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       const state = gameState.current;
       // 按住方向键时，每帧都把 stepBudget 补到至少 1，让蛇持续走；
       // 松开后不再补充，stepBudget 会随着走完当前这一格自然耗尽到 0，蛇随即停下。
-      if (pressedDirs.size > 0) {
-        const heldDir = pressedDirs.values().next().value;
+      if (pressedDirs.length > 0) {
+        const heldDir = pressedDirs[pressedDirs.length - 1]; // 栈顶：最后按下（或最后恢复生效）的方向键
         const pressedAt = pressStartTimes.get(heldDir) ?? time;
         // 只有真正按住超过阈值时长，才继续续供额度让蛇连续走；
         // 没到阈值之前，无论这一帧是否还按着键，都不会多给额度，

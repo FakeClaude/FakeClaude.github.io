@@ -88,79 +88,58 @@ function getBoxCells(col0, row0, size) {
   return cells;
 }
 
-// box 最外一圈格子（用于判定"蛇头可以停在最外圈"）
-function isOnBoxRing(col, row, col0, row0, size) {
-  return col === col0 || col === col0 + size - 1 || row === row0 || row === row0 + size - 1;
+// ===== 分圈构造法（构造式生成，非"生成+验证"）=====
+// box 边长 = 1+2n，天然是 n+1 层同心圈：第0圈(最外圈，不挖洞) ... 第n-1圈(挨着中心)，
+// 再加一个中心点(第n圈，恰好1格)。核心数学事实：一个正方形"环"去掉其中一格后，
+// 剩下部分必然变成一条链，链的两个端点正是这个洞左右相邻的两个格子——
+// 这是环的拓扑结构决定的，不需要另外验证。
+//
+// 算法从最外圈开始，逐圈往里"缝合"：
+//   1) 最外圈无洞，可以完整走一圈，自由选一个不落在角上的起点，走完停在起点前一格(exit)；
+//   2) 从 exit 找它径向朝内一格的邻居，作为下一圈的 entry；
+//   3) 下一圈的洞只能挖在 entry 的左邻居或右邻居两者之一（这样 entry 才恰好是链的端点）；
+//      两个候选各自决定链另一端(exit)落在哪，优先选不落在角上的那个（角格没有沿网格方向
+//      直接指向内圈的邻居，没法再往里缝合），两个都不落角时随机挑一个，增加视觉随机度；
+//   4) 重复直到最内一圈(边长3)，其 exit 必然正对中心格，最后把中心格也标记为洞。
+// 整个过程只走一遍每个格子，O(box 周长总和)，没有回溯、没有重试，天然保证可解。
+
+// 第 k 圈（k=0 为最外圈）在 box 内的四角坐标
+function ringCorners(col0, row0, size, k) {
+  const top = row0 + k;
+  const bottom = row0 + size - 1 - k;
+  const left = col0 + k;
+  const right = col0 + size - 1 - k;
+  return { top, bottom, left, right };
 }
 
-// 给定 box 内格子和 n 个要挖掉的 emoji 格子，用 Warnsdorff 启发式(最少可选项优先)
-// 尝试找一条哈密顿路径：覆盖所有非 emoji 格子恰好一次，且起点、终点都落在 box 最外圈。
-// 只是"验证可解"，不需要真正保存路径给蛇走。找不到时允许有限次回溯，超出步数预算就放弃。
-function findHamiltonianCoverage(col0, row0, size, blockedSet) {
-  const key = (c, r) => `${c}-${r}`;
-  const cells = getBoxCells(col0, row0, size).filter((p) => !blockedSet.has(key(p.col, p.row)));
-  const total = cells.length;
-  if (total === 0) return true;
-  const cellKeySet = new Set(cells.map((p) => key(p.col, p.row)));
-  const neighborsOf = (c, r) => {
-    const out = [];
-    const cand = [[c + 1, r], [c - 1, r], [c, r + 1], [c, r - 1]];
-    for (const [nc, nr] of cand) {
-      if (cellKeySet.has(key(nc, nr))) out.push({ col: nc, row: nr });
-    }
-    return out;
-  };
-  const ringStarts = cells.filter((p) => isOnBoxRing(p.col, p.row, col0, row0, size));
-  if (ringStarts.length === 0) return false;
-
-  const STEP_BUDGET = 20000;
-  let steps = 0;
-
-  const tryFrom = (startCell) => {
-    const visited = new Set([key(startCell.col, startCell.row)]);
-    const path = [startCell];
-
-    const backtrack = () => {
-      steps++;
-      if (steps > STEP_BUDGET) return false;
-      if (path.length === total) {
-        const last = path[path.length - 1];
-        return isOnBoxRing(last.col, last.row, col0, row0, size);
-      }
-      const current = path[path.length - 1];
-      let candidates = neighborsOf(current.col, current.row).filter(
-        (p) => !visited.has(key(p.col, p.row))
-      );
-      // Warnsdorff: 优先走"自身可选项最少"的邻居，减少走出死路的概率
-      candidates = candidates
-        .map((p) => ({
-          p,
-          degree: neighborsOf(p.col, p.row).filter((q) => !visited.has(key(q.col, q.row))).length
-        }))
-        .sort((a, b) => a.degree - b.degree)
-        .map((x) => x.p);
-
-      for (const next of candidates) {
-        visited.add(key(next.col, next.row));
-        path.push(next);
-        if (backtrack()) return true;
-        path.pop();
-        visited.delete(key(next.col, next.row));
-        if (steps > STEP_BUDGET) return false;
-      }
-      return false;
-    };
-
-    return backtrack();
-  };
-
-  // 随机打乱起点尝试顺序，多个起点里只要有一个能找到解就算可解
-  const shuffledStarts = [...ringStarts].sort(() => Math.random() - 0.5).slice(0, 8);
-  for (const start of shuffledStarts) {
-    if (tryFrom(start)) return true;
-    if (steps > STEP_BUDGET) break;
+// 第 k 圈按顺时针排好序的格子列表（size-2k===1 时只有中心一格）
+function ringCellsOrdered(col0, row0, size, k) {
+  const { top, bottom, left, right } = ringCorners(col0, row0, size, k);
+  if (top === bottom && left === right) return [{ col: left, row: top }]; // 中心点
+  const cells = [];
+  for (let c = left; c <= right; c++) cells.push({ col: c, row: top }); // 上边：左→右
+  for (let r = top + 1; r <= bottom; r++) cells.push({ col: right, row: r }); // 右边：上→下
+  if (bottom > top) {
+    for (let c = right - 1; c >= left; c--) cells.push({ col: c, row: bottom }); // 下边：右→左
   }
-  return false;
+  if (right > left) {
+    for (let r = bottom - 1; r >= top + 1; r--) cells.push({ col: left, row: r }); // 左边：下→上
+  }
+  return cells;
+}
+
+function isRingCorner(cell, col0, row0, size, k) {
+  const { top, bottom, left, right } = ringCorners(col0, row0, size, k);
+  return (cell.col === left || cell.col === right) && (cell.row === top || cell.row === bottom);
+}
+
+// 非角格 cell 沿"径向朝内"一步的邻居（角格没有合法的单步径向邻居，调用前必须保证非角）
+function radialInward(cell, col0, row0, size, k) {
+  const { top, bottom, left, right } = ringCorners(col0, row0, size, k);
+  if (cell.row === top) return { col: cell.col, row: cell.row + 1 };
+  if (cell.row === bottom) return { col: cell.col, row: cell.row - 1 };
+  if (cell.col === left) return { col: cell.col + 1, row: cell.row };
+  return { col: cell.col - 1, row: cell.row }; // cell.col === right
 }
 
 // 生成第 n 关的 box 左上角坐标：边长 boxSize(n)，不超出棋盘边界（不穿墙）
@@ -172,30 +151,72 @@ function spawnBoxPosition(level) {
   return { col: col0, row: row0, size };
 }
 
-// 在 box 内随机挑选 n 个格子作为 emoji 位置，并校验挖掉这些格子后 box 仍然可通关
-// （见 findHamiltonianCoverage）。多次尝试新的 box 位置 + emoji 组合，找不到解时
-// 兜底接受"最后一次尝试"的结果（尽力而为，不做无限重试）。
+// 从第 k 圈开始，尝试以 exitCell（上一圈缝合过来的入口所在格）为起点，一路构造到中心。
+// 每圈的洞只有"挖左邻居/挖右邻居"两种选择：多数情况下至少一种能让 exit 落在非角格上，
+// 但边长恰好为5的圈里，如果 entry 恰好落在某条边的正中间，两种选择会同时落在角上
+// （这是真实会发生的情况，出现概率约1/4，不是可以忽略的极端情况）。
+// 一旦某一圈两种选择都行不通，说明"上一圈选的那个 exit"这步选错了，需要回溯到上一圈换
+// 另一种选择重试。回溯的范围只在"每圈挖左边还是挖右边"这 n 个二元选择之间，
+// 和棋盘格子级别的搜索完全不是一个量级：最多 n 层、每层分支2，n 受限于棋盘大小（≤10），
+// 最坏 2^10=1024 种组合，每种只需 O(圈周长) 的代数计算，不会造成卡顿。
+function buildFromRing(k, exitCell, col, row, size, n) {
+  if (k > n - 1) return [{ col: col + n, row: row + n }]; // 到达中心，中心格恒为最后一个洞
+
+  const ring = ringCellsOrdered(col, row, size, k);
+  const m = ring.length;
+  const entryCell = radialInward(exitCell, col, row, size, k - 1);
+  const entryIdx = ring.findIndex((p) => p.col === entryCell.col && p.row === entryCell.row);
+
+  const candidates = [
+    { holeIdx: (entryIdx - 1 + m) % m, exitIdx: (entryIdx - 2 + m) % m },
+    { holeIdx: (entryIdx + 1) % m, exitIdx: (entryIdx + 2) % m }
+  ].sort(() => Math.random() - 0.5); // 顺序随机，增加"挖左边还是右边"的随机感
+
+  for (const c of candidates) {
+    const exitCandidate = ring[c.exitIdx];
+    if (isRingCorner(exitCandidate, col, row, size, k)) continue; // 角格没法再往内缝合，直接跳过
+    const rest = buildFromRing(k + 1, exitCandidate, col, row, size, n);
+    if (rest) return [ring[c.holeIdx], ...rest]; // 这一圈往后都能接通，直接采用
+  }
+  return null; // 两种挖法都不通：回溯给上一圈，让它换另一种挖法
+}
+
+// 分圈构造出 n 个 emoji 的位置（详见上方大段注释）。核心是代数计算+数组下标操作，
+// 唯一的搜索只发生在"每圈挖左边还是挖右边"这 n 个二元选择之间，复杂度恒定且极小，
+// 不是棋盘格子级别的搜索，不会造成卡顿。
+function buildRingEmojis(box, n) {
+  const { col, row, size } = box;
+
+  // 第0圈(最外圈)：无洞，可以完整走一圈，走到哪里停下都行——随机挑一个非角格作为 exit
+  // （等价于把"起点"定在这个格子的下一格，从那里绕一整圈回到这里）。多试几个不同的
+  // 非角格作为 exit，任何一个能让后续所有圈都缝合成功就采用。
+  const ring0 = ringCellsOrdered(col, row, size, 0);
+  const safeExit0 = ring0
+    .map((_, idx) => idx)
+    .filter((idx) => !isRingCorner(ring0[idx], col, row, size, 0))
+    .sort(() => Math.random() - 0.5);
+
+  for (const idx of safeExit0) {
+    const result = buildFromRing(1, ring0[idx], col, row, size, n);
+    if (result) return result;
+  }
+  // 理论上不会走到这里：第0圈的非角格选择足够多，且回溯覆盖了所有二元组合
+  return [{ col: col + n, row: row + n }];
+}
+
+// 生成第 n 关的 box + emoji 布局：box 随机放置（避免和上一关重复），emoji 用分圈构造法
+// 直接构造出保证可解的位置，不需要事后校验、不需要重试。
 function spawnBoxAndEmojis(level, prevBoxKey) {
   const n = level;
-  const MAX_ATTEMPTS = 15;
-  let best = null;
-
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const box = spawnBoxPosition(level);
+  const MAX_BOX_ATTEMPTS = 5; // 仅用于"别和上一关的 box 重复"，与可解性无关
+  let box = spawnBoxPosition(level);
+  for (let attempt = 1; attempt < MAX_BOX_ATTEMPTS; attempt++) {
     const boxKey = `${box.col}-${box.row}-${box.size}`;
-    if (boxKey === prevBoxKey && MAX_ATTEMPTS - attempt > 1) continue;
-
-    const cells = getBoxCells(box.col, box.row, box.size);
-    // emoji 不占用 box 最外圈的格子太多：留出足够的出入口，优先从内部格子里选
-    const shuffled = [...cells].sort(() => Math.random() - 0.5);
-    const emojiCells = shuffled.slice(0, n);
-    const blockedSet = new Set(emojiCells.map((p) => `${p.col}-${p.row}`));
-
-    const ok = findHamiltonianCoverage(box.col, box.row, box.size, blockedSet);
-    best = { box, emojis: emojiCells };
-    if (ok) return best;
+    if (boxKey !== prevBoxKey) break;
+    box = spawnBoxPosition(level);
   }
-  return best; // 兜底：尽力而为，返回最后一次尝试的布局
+  const emojis = buildRingEmojis(box, n);
+  return { box, emojis };
 }
 
 // 用 1x1 离屏 canvas 把任意 CSS 颜色字符串（hex/rgb/named 等）解析成 [r,g,b]，
@@ -350,7 +371,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     pendingGrowth: 0,
     level: 1,
     box: { col: 9, row: 9, size: 3 },
-    emojis: [{ col: 10, row: 9 }],
+    emojis: [{ col: 10, row: 10 }],
     flashStart: null,
     lastTime: performance.now(),
     stepBudget: 0, // 待走的"格步"数：0表示静止，仅在有输入(点击/按住)时才 > 0
@@ -388,7 +409,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         pendingGrowth: 0,
         level: 1,
         box: { col: 9, row: 9, size: 3 },
-        emojis: [{ col: 10, row: 9 }],
+        emojis: [{ col: 10, row: 10 }],
         flashStart: null,
         lastTime: performance.now(),
         graceUntil: performance.now() + GRACE_DURATION,

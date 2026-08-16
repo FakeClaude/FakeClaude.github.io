@@ -31,6 +31,9 @@ const GRACE_DURATION = 1000;
 const FOOD_RADIUS = 7;
 // 主题色格子按关卡显示的动物：第1圈🐭 ... 第7圈🐳，超过7圈沿用🐳
 const TARGET_EMOJIS = ['🐭', '🐔', '🐑', '🐄', '🐫', '🐘', '🐳'];
+// 最高关卡数：达到后不再继续增长（box大小/emoji数量/奖励/分值都封顶），
+// 之后每次过关只重新生成布局（换box位置+emoji排列），关卡数保持不变
+const MAX_LEVEL = 9;
 
 // 方向：0:右, 1:下, 2:左, 3:上
 const DIRS = [
@@ -159,8 +162,17 @@ function spawnBoxPosition(level) {
 // 另一种选择重试。回溯的范围只在"每圈挖左边还是挖右边"这 n 个二元选择之间，
 // 和棋盘格子级别的搜索完全不是一个量级：最多 n 层、每层分支2，n 受限于棋盘大小（≤10），
 // 最坏 2^10=1024 种组合，每种只需 O(圈周长) 的代数计算，不会造成卡顿。
-function buildFromRing(k, exitCell, col, row, size, n) {
-  if (k > n - 1) return [{ col: col + n, row: row + n }]; // 到达中心，中心格恒为最后一个洞
+// 把 cell 绕 box 中心做180°点反射(size为奇数，2*col+size-1恒为整数)
+function reflectCell(cell, col, row, size) {
+  return { col: col * 2 + size - 1 - cell.col, row: row * 2 + size - 1 - cell.row };
+}
+
+function buildFromRing(k, exitCell, col, row, size, n, prevHole) {
+  if (k > n - 1) {
+    const centerHole = { col: col + n, row: row + n };
+    if (prevHole && (centerHole.col === prevHole.col || centerHole.row === prevHole.row)) return null;
+    return [centerHole];
+  }
 
   const ring = ringCellsOrdered(col, row, size, k);
   const m = ring.length;
@@ -174,9 +186,11 @@ function buildFromRing(k, exitCell, col, row, size, n) {
 
   for (const c of candidates) {
     const exitCandidate = ring[c.exitIdx];
-    if (isRingCorner(exitCandidate, col, row, size, k)) continue; // 角格没法再往内缝合，直接跳过
-    const rest = buildFromRing(k + 1, exitCandidate, col, row, size, n);
-    if (rest) return [ring[c.holeIdx], ...rest]; // 这一圈往后都能接通，直接采用
+    if (isRingCorner(exitCandidate, col, row, size, k)) continue;
+    const holeCell = ring[c.holeIdx];
+    if (prevHole && (holeCell.col === prevHole.col || holeCell.row === prevHole.row)) continue;
+    const rest = buildFromRing(k + 1, exitCandidate, col, row, size, n, holeCell);
+    if (rest) return [holeCell, ...rest];
   }
   return null; // 两种挖法都不通：回溯给上一圈，让它换另一种挖法
 }
@@ -196,12 +210,26 @@ function buildRingEmojis(box, n) {
     .filter((idx) => !isRingCorner(ring0[idx], col, row, size, 0))
     .sort(() => Math.random() - 0.5);
 
+  // 每个 emoji（对应从外到内的每一圈）是否做轴反射，逐圈独立决定——
+  // 但不是逐个各自随机（那样会破坏链式缝合，导致不可解），而是按圈的奇偶交替：
+  // 相邻两圈的反射状态必然相反，只有"整体从哪个奇偶开始"是随机的，用来增加每局的视觉变化。
+  // emojis 数组里最后一个元素固定是中心点格子，中心点本身不参与反射（反射它也还是它自己）。
+  const maybeReflect = (emojis) => {
+    const startReflect = Math.random() < 0.5; // 随机决定第0圈(最外层洞所在圈)是否反射，后续圈依次交替
+    return emojis.map((cell, ringIdx) => {
+      const isCenter = ringIdx === emojis.length - 1;
+      if (isCenter) return cell;
+      const doReflect = ringIdx % 2 === 0 ? startReflect : !startReflect;
+      return doReflect ? reflectCell(cell, col, row, size) : cell;
+    });
+  };
+
   for (const idx of safeExit0) {
-    const result = buildFromRing(1, ring0[idx], col, row, size, n);
-    if (result) return result;
+    const result = buildFromRing(1, ring0[idx], col, row, size, n, null);
+    if (result) return maybeReflect(result);
   }
   // 理论上不会走到这里：第0圈的非角格选择足够多，且回溯覆盖了所有二元组合
-  return [{ col: col + n, row: row + n }];
+  return maybeReflect([{ col: col + n, row: row + n }]);
 }
 
 // 生成第 n 关的 box + emoji 布局：box 随机放置（避免和上一关重复），emoji 用分圈构造法
@@ -388,6 +416,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     gameState.current.box = box;
     gameState.current.emojis = emojis;
   };
+  window.__spawnTarget = spawnTarget; // 临时调试用，导出布局后请删除
+  window.__setLevel = setLevel; // 临时调试用，导出布局后请删除
 
   const resetGame = async () => {
     const snapshot = await loadSnakeOrbitProgress();
@@ -532,6 +562,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       gameState.current.lastTime = time;
 
       const state = gameState.current;
+      window.__snakeState = state;
+      //window.__snakeState 控制台获取emoji坐标
       // 按住方向键超过阈值时长后，每帧都把 stepBudget 补到至少 1，让蛇持续走；
       // 松开后不再补充，stepBudget 会随着走完当前这一格自然耗尽到 0，蛇随即停下。
       if (directionInputRef.current.getHeldDir(time) !== null) {
@@ -878,7 +910,9 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         const finishedLevel = state.level;
         applyScoreDeltaRef.current(scoreForLevel(finishedLevel));
         state.pendingGrowth += Math.ceil(rewardLength(finishedLevel) * CELLS_TO_SEGMENTS);
-        state.level += 1;
+        // 最多到第9关：达到上限后继续通关只重新生成布局（换box位置+emoji排列），
+        // 关卡数/难度（box大小、emoji数量、奖励、分值）都不再继续增长
+        state.level = Math.min(state.level + 1, MAX_LEVEL);
         setLevel(state.level);
         spawnTarget(state.level);
         state.flashStart = time;

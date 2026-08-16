@@ -66,59 +66,136 @@ const pixelToGrid = (x, y) => ({
   row: (Math.floor(y / CELL_SIZE) + GRID_SIZE) % GRID_SIZE
 });
 
-// 第 n 关需要占满的格子总数：以目标格为中心，内到外共 n 圈（含）
-const requiredCellCount = (n) => 4 * n * (n + 1);
-// 完成第 n 关后蛇身增长多少格（格子数，非身体节点数，使用时需乘 CELLS_TO_SEGMENTS 换算）
-const rewardLength = (n) => 8 * (n + 1);
+// 第 n 关高对比度格子（box）的边长：1 + 2n
+const boxSize = (n) => 1 + 2 * n;
+// 第 n 关 box 内需要占满的格子总数（不含 emoji 占用的格子）
+const requiredCellCount = (n) => boxSize(n) * boxSize(n) - n;
+// 完成第 n 关后蛇身增长多少格（格子数，非身体节点数，使用时需乘 CELLS_TO_SEGMENTS 换算）：
+// 在老公式 8*(n+1) 的基础上再减少若干格，减少量按关卡递增：1,1,2,2,3,3...（即 ceil(n/2)）
+// 对应：第1关 16-1=15，第2关 24-1=23，第3关 32-2=30，以此类推
+const rewardLength = (n) => 8 * (n + 1) - Math.ceil(n / 2);
 // 每关得分/扣分：10、50、100、200、300...
 const scoreForLevel = (n) => (n === 1 ? 10 : n === 2 ? 50 : 100 * (n - 2));
 
-// 第 n 关目标格中心周围，切比雪夫距离 1~n 的所有格子坐标（不含中心本身），支持穿墙取模
-function getRingCells(centerCol, centerRow, n) {
+// box 内所有格子坐标（左上角 col0,row0，边长 size），不跨越棋盘边界、不支持穿墙取模
+function getBoxCells(col0, row0, size) {
   const cells = [];
-  for (let dr = -n; dr <= n; dr++) {
-    for (let dc = -n; dc <= n; dc++) {
-      if (dr === 0 && dc === 0) continue;
-      const col = (centerCol + dc + GRID_SIZE) % GRID_SIZE;
-      const row = (centerRow + dr + GRID_SIZE) % GRID_SIZE;
-      cells.push(`${col}-${row}`);
+  for (let dr = 0; dr < size; dr++) {
+    for (let dc = 0; dc < size; dc++) {
+      cells.push({ col: col0 + dc, row: row0 + dr });
     }
   }
   return cells;
 }
 
-// 生成第 n 关目标格位置：确保包围圈(n格边距)不会超出画布边界
-function spawnTargetPosition(level) {
-  const margin = level;
-  const col = margin + Math.floor(Math.random() * (GRID_SIZE - margin * 2));
-  const row = margin + Math.floor(Math.random() * (GRID_SIZE - margin * 2));
-  return { col, row };
+// box 最外一圈格子（用于判定"蛇头可以停在最外圈"）
+function isOnBoxRing(col, row, col0, row0, size) {
+  return col === col0 || col === col0 + size - 1 || row === row0 || row === row0 + size - 1;
 }
 
-// 关卡 n 允许生成目标的所有格子坐标（边距 = level，格子范围 [level, GRID_SIZE-level-1]）
-function collectValidTargetPositions(level) {
-  const margin = level;
-  const positions = [];
-  for (let col = margin; col < GRID_SIZE - margin; col++) {
-    for (let row = margin; row < GRID_SIZE - margin; row++) {
-      positions.push({ col, row });
+// 给定 box 内格子和 n 个要挖掉的 emoji 格子，用 Warnsdorff 启发式(最少可选项优先)
+// 尝试找一条哈密顿路径：覆盖所有非 emoji 格子恰好一次，且起点、终点都落在 box 最外圈。
+// 只是"验证可解"，不需要真正保存路径给蛇走。找不到时允许有限次回溯，超出步数预算就放弃。
+function findHamiltonianCoverage(col0, row0, size, blockedSet) {
+  const key = (c, r) => `${c}-${r}`;
+  const cells = getBoxCells(col0, row0, size).filter((p) => !blockedSet.has(key(p.col, p.row)));
+  const total = cells.length;
+  if (total === 0) return true;
+  const cellKeySet = new Set(cells.map((p) => key(p.col, p.row)));
+  const neighborsOf = (c, r) => {
+    const out = [];
+    const cand = [[c + 1, r], [c - 1, r], [c, r + 1], [c, r - 1]];
+    for (const [nc, nr] of cand) {
+      if (cellKeySet.has(key(nc, nr))) out.push({ col: nc, row: nr });
     }
+    return out;
+  };
+  const ringStarts = cells.filter((p) => isOnBoxRing(p.col, p.row, col0, row0, size));
+  if (ringStarts.length === 0) return false;
+
+  const STEP_BUDGET = 20000;
+  let steps = 0;
+
+  const tryFrom = (startCell) => {
+    const visited = new Set([key(startCell.col, startCell.row)]);
+    const path = [startCell];
+
+    const backtrack = () => {
+      steps++;
+      if (steps > STEP_BUDGET) return false;
+      if (path.length === total) {
+        const last = path[path.length - 1];
+        return isOnBoxRing(last.col, last.row, col0, row0, size);
+      }
+      const current = path[path.length - 1];
+      let candidates = neighborsOf(current.col, current.row).filter(
+        (p) => !visited.has(key(p.col, p.row))
+      );
+      // Warnsdorff: 优先走"自身可选项最少"的邻居，减少走出死路的概率
+      candidates = candidates
+        .map((p) => ({
+          p,
+          degree: neighborsOf(p.col, p.row).filter((q) => !visited.has(key(q.col, q.row))).length
+        }))
+        .sort((a, b) => a.degree - b.degree)
+        .map((x) => x.p);
+
+      for (const next of candidates) {
+        visited.add(key(next.col, next.row));
+        path.push(next);
+        if (backtrack()) return true;
+        path.pop();
+        visited.delete(key(next.col, next.row));
+        if (steps > STEP_BUDGET) return false;
+      }
+      return false;
+    };
+
+    return backtrack();
+  };
+
+  // 随机打乱起点尝试顺序，多个起点里只要有一个能找到解就算可解
+  const shuffledStarts = [...ringStarts].sort(() => Math.random() - 0.5).slice(0, 8);
+  for (const start of shuffledStarts) {
+    if (tryFrom(start)) return true;
+    if (steps > STEP_BUDGET) break;
   }
-  return positions;
+  return false;
 }
 
-// 在合规格子里挑一个：优先选不和蛇身重叠、且不是当前目标位置的格子；
-// 如果所有合规格子都被蛇身占满，退而求其次，只保证不是当前目标位置；
-// 极端情况（合规格子只有一个且正好是当前目标）就不再排除，随便选一个。
-function pickTargetPosition(level, occupiedSet, prevKey) {
-  const all = collectValidTargetPositions(level);
-  if (all.length === 0) return spawnTargetPosition(level); // 理论上不会发生的兜底
-  const keyOf = (p) => `${p.col}-${p.row}`;
-  const free = all.filter((p) => !occupiedSet.has(keyOf(p)) && keyOf(p) !== prevKey);
-  if (free.length > 0) return free[Math.floor(Math.random() * free.length)];
-  const notPrev = all.filter((p) => keyOf(p) !== prevKey);
-  const pool = notPrev.length > 0 ? notPrev : all;
-  return pool[Math.floor(Math.random() * pool.length)];
+// 生成第 n 关的 box 左上角坐标：边长 boxSize(n)，不超出棋盘边界（不穿墙）
+function spawnBoxPosition(level) {
+  const size = boxSize(level);
+  const maxStart = GRID_SIZE - size;
+  const col0 = Math.floor(Math.random() * (maxStart + 1));
+  const row0 = Math.floor(Math.random() * (maxStart + 1));
+  return { col: col0, row: row0, size };
+}
+
+// 在 box 内随机挑选 n 个格子作为 emoji 位置，并校验挖掉这些格子后 box 仍然可通关
+// （见 findHamiltonianCoverage）。多次尝试新的 box 位置 + emoji 组合，找不到解时
+// 兜底接受"最后一次尝试"的结果（尽力而为，不做无限重试）。
+function spawnBoxAndEmojis(level, prevBoxKey) {
+  const n = level;
+  const MAX_ATTEMPTS = 15;
+  let best = null;
+
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    const box = spawnBoxPosition(level);
+    const boxKey = `${box.col}-${box.row}-${box.size}`;
+    if (boxKey === prevBoxKey && MAX_ATTEMPTS - attempt > 1) continue;
+
+    const cells = getBoxCells(box.col, box.row, box.size);
+    // emoji 不占用 box 最外圈的格子太多：留出足够的出入口，优先从内部格子里选
+    const shuffled = [...cells].sort(() => Math.random() - 0.5);
+    const emojiCells = shuffled.slice(0, n);
+    const blockedSet = new Set(emojiCells.map((p) => `${p.col}-${p.row}`));
+
+    const ok = findHamiltonianCoverage(box.col, box.row, box.size, blockedSet);
+    best = { box, emojis: emojiCells };
+    if (ok) return best;
+  }
+  return best; // 兜底：尽力而为，返回最后一次尝试的布局
 }
 
 // 用 1x1 离屏 canvas 把任意 CSS 颜色字符串（hex/rgb/named 等）解析成 [r,g,b]，
@@ -204,7 +281,8 @@ function stateFromSnapshot(snapshot) {
     segmentFloat: snapshot.segmentFloat,
     pendingGrowth: snapshot.pendingGrowth,
     level: snapshot.level,
-    target: { ...snapshot.target },
+    box: { ...snapshot.box },
+    emojis: (snapshot.emojis || []).map(p => ({ ...p })),
     flashStart: null,
     lastTime: performance.now(),
     // 重开/读档后的短暂保护期：避免读到"刚好包围成功那一瞬"的存档时，
@@ -271,36 +349,23 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     segmentFloat: INITIAL_SEGMENTS,
     pendingGrowth: 0,
     level: 1,
-    target: { col: 15, row: 10 },
+    box: { col: 9, row: 9, size: 3 },
+    emojis: [{ col: 10, row: 9 }],
     flashStart: null,
     lastTime: performance.now(),
     stepBudget: 0, // 待走的"格步"数：0表示静止，仅在有输入(点击/按住)时才 > 0
     coasting: false, // 额度耗尽但还没真正到达落点时为true，期间头部继续动画滑到落点，而不是瞬间跳过去
     coastTarget: null
   });
+  window.__gs = gameState; // 临时调试用，导出布局后请删除
 
-  const spawnTarget = (level, occupiedSet = null) => {
-    const prevKey = `${gameState.current.target.col}-${gameState.current.target.row}`;
-    const pos = occupiedSet
-      ? pickTargetPosition(level, occupiedSet, prevKey)
-      : spawnTargetPosition(level);
-    gameState.current.target = pos;
-    // 记录这次生成的目标是否落在了蛇身格子上，绘制时据此决定 emoji 是否要画在蛇身之上
-    gameState.current.targetOverlapsSnake = occupiedSet ? occupiedSet.has(`${pos.col}-${pos.row}`) : false;
-  };
-
-  // 根据"初始/重开时那条静止摆放好的蛇"算出它占用的格子集合，用于开局生成目标(老鼠)时
-  // 避开蛇身——开局蛇身是直接铺好的一条直线(buildInitialTrail)，不经过 gameLoop 里
-  // 逐帧计算 bodyPositions 那一套，所以这里直接把 trail 上的点映射到格子，取并集即可。
-  const occupiedSetFromInitialState = (state) => {
-    const set = new Set();
-    const headGrid = pixelToGrid(state.head.x, state.head.y);
-    set.add(`${headGrid.col}-${headGrid.row}`);
-    for (const p of state.trail) {
-      const g = pixelToGrid(p.x, p.y);
-      set.add(`${g.col}-${g.row}`);
-    }
-    return set;
+  // 为第 level 关生成新的 box + emoji 布局（n 个 emoji 共用同一块高对比度 box）
+  const spawnTarget = (level) => {
+    const prevBox = gameState.current.box;
+    const prevBoxKey = prevBox ? `${prevBox.col}-${prevBox.row}-${prevBox.size}` : null;
+    const { box, emojis } = spawnBoxAndEmojis(level, prevBoxKey);
+    gameState.current.box = box;
+    gameState.current.emojis = emojis;
   };
 
   const resetGame = async () => {
@@ -322,7 +387,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         segmentFloat: INITIAL_SEGMENTS,
         pendingGrowth: 0,
         level: 1,
-        target: { col: 15, row: 10 },
+        box: { col: 9, row: 9, size: 3 },
+        emojis: [{ col: 10, row: 9 }],
         flashStart: null,
         lastTime: performance.now(),
         graceUntil: performance.now() + GRACE_DURATION,
@@ -330,7 +396,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         coasting: false,
         coastTarget: null
       };
-      spawnTarget(1, occupiedSetFromInitialState(gameState.current));
+      spawnTarget(1);
       setScore(0);
       setLevel(1);
     }
@@ -364,7 +430,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         gameState.current = stateFromSnapshot(snapshot);
         setLevel(snapshot.level);
       } else {
-        spawnTarget(1, occupiedSetFromInitialState(gameState.current));
+        spawnTarget(1);
       }
       setIsReady(true);
     })();
@@ -779,17 +845,21 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         const g = pixelToGrid(bodyPositions[i].x, bodyPositions[i].y);
         occupiedSet.add(`${g.col}-${g.row}`);
       }
-      const requiredCells = getRingCells(state.target.col, state.target.row, state.level);
+      const emojiKeySet = new Set(state.emojis.map(p => `${p.col}-${p.row}`));
+      const requiredCells = getBoxCells(state.box.col, state.box.row, state.box.size)
+        .map(p => `${p.col}-${p.row}`)
+        .filter(id => !emojiKeySet.has(id));
       const fullyCovered = requiredCells.every(id => occupiedSet.has(id));
+      const ateEmoji = emojiKeySet.has(`${headGrid.col}-${headGrid.row}`);
 
       if (fullyCovered) {
-        // 成功包围：加分、变长、升级、目标重新生成、闪烁提示
+        // 成功填满 box（不含 emoji 格子）：加分、变长、升级、box+emoji 重新生成、闪烁提示
         const finishedLevel = state.level;
         applyScoreDeltaRef.current(scoreForLevel(finishedLevel));
         state.pendingGrowth += Math.ceil(rewardLength(finishedLevel) * CELLS_TO_SEGMENTS);
         state.level += 1;
         setLevel(state.level);
-        spawnTarget(state.level, occupiedSet);
+        spawnTarget(state.level);
         state.flashStart = time;
 
         // 存档：记录这一帧（包围成功、身体闪烁那一瞬间）的完整连续坐标状态，
@@ -805,12 +875,13 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
           segmentCount: state.segmentCount,
           segmentFloat: state.segmentFloat,
           pendingGrowth: state.pendingGrowth,
-          target: { ...state.target }
+          box: { ...state.box },
+          emojis: state.emojis.map(p => ({ ...p }))
         });
-      } else if (headGrid.col === state.target.col && headGrid.row === state.target.row) {
-        // 直接撞上目标格 = "偷吃"：扣分，目标重新生成（关卡不变），闪烁提示
+      } else if (ateEmoji) {
+        // 直接撞上某个 emoji 格子 = "偷吃"：扣分，box+emoji 重新生成（关卡不变），闪烁提示
         applyScoreDeltaRef.current(-scoreForLevel(state.level));
-        spawnTarget(state.level, occupiedSet);
+        spawnTarget(state.level);
         state.flashStart = time;
       }
 
@@ -826,11 +897,11 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       const bgColorB = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
       const [hiColorA, hiColorB] = boostContrast(bgColorA, bgColorB, 0.3);
 
-      // 提示范围：以目标格为中心，内到外共 state.level 圈（含）的格子范围
-      const hintColMin = state.target.col - state.level;
-      const hintColMax = state.target.col + state.level;
-      const hintRowMin = state.target.row - state.level;
-      const hintRowMax = state.target.row + state.level;
+      // 提示范围：本关的高对比度 box，本身就不跨越棋盘边界，直接用左上角+边长即可
+      const hintColMin = state.box.col;
+      const hintColMax = state.box.col + state.box.size - 1;
+      const hintRowMin = state.box.row;
+      const hintRowMax = state.box.row + state.box.size - 1;
 
       for (let row = 0; row < GRID_SIZE; row++) {
         for (let col = 0; col < GRID_SIZE; col++) {
@@ -914,15 +985,17 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       );
       ctx.fill();
 
-      // 主题色格子改成按关卡对应的动物emoji：第1圈🐭 ... 第7圈🐳，超过7圈沿用🐳
-      // 放在蛇身/头部之后绘制：即使目标和蛇身重叠（棋盘被占满时的兜底情况），
-      // emoji 也画在蛇身上层，不会被盖住看不见
+      // 主题色 box 内改成按关卡对应的动物 emoji：第1关🐭 ... 第7关🐳，超过7关沿用🐳，
+      // 第 n 关共有 n 个同样的 emoji 共用同一块 box。放在蛇身/头部之后绘制：
+      // 即使 emoji 格子和蛇身重叠（棋盘被占满时的兜底情况），emoji 也画在蛇身上层，不会被盖住看不见
       const targetEmoji = TARGET_EMOJIS[Math.min(state.level, TARGET_EMOJIS.length) - 1];
-      const targetCenter = getCellCenter(state.target.col, state.target.row);
       ctx.font = `${CELL_SIZE}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(targetEmoji, targetCenter.x, targetCenter.y);
+      for (const emojiPos of state.emojis) {
+        const emojiCenter = getCellCenter(emojiPos.col, emojiPos.row);
+        ctx.fillText(targetEmoji, emojiCenter.x, emojiCenter.y);
+      }
     };
 
     animationFrameId = requestAnimationFrame(gameLoop);

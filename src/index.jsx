@@ -21,6 +21,10 @@ export default function App() {
 
   // 静默拉game资源
   useEffect(() => {
+    const holderElement = document.getElementById("holder") || document.querySelector(".holder");
+    if (holderElement) {
+      holderElement.remove();
+    }
     function handleHashChange() {
       setRoute(parseHash());
     }

@@ -32,6 +32,10 @@ const HEAD_MASK_RADIUS = CELL_SIZE * 0.4;
 const TARGET_EMOJIS = ['🐭', '🐔', '🐑', '🐄', '🐫', '🐘', '🐳'];
 // 最高关卡数：达到后不再继续增长（box大小/emoji数量/奖励/分值都封顶），
 const MAX_LEVEL = 9;
+const GRACE_STEP = 500; // 每加一关，无敌保护时长增加多少ms
+// 第 n 关的无敌保护时长：基础1s，每关 +0.5s，关卡封顶后（第9关）时长也不再继续增长
+const graceDurationForLevel = (level) =>
+  GRACE_DURATION + GRACE_STEP * (Math.min(level, MAX_LEVEL) - 1);
 
 // 方向：0:右, 1:下, 2:左, 3:上
 const DIRS = [
@@ -304,8 +308,9 @@ function stateFromSnapshot(snapshot) {
     flashStart: null,
     lastTime: performance.now(),
     // 重开/读档后的短暂保护期：避免读到"刚好包围成功那一瞬"的存档时，
-    // 身体本就贴近自身，稍一移动就被自碰撞判负
-    graceUntil: performance.now() + GRACE_DURATION,
+    // 身体本就贴近自身，稍一移动就被自碰撞判负；关卡越高包围圈越大，保护时长也相应变长
+    graceDuration: graceDurationForLevel(snapshot.level),
+    graceUntil: performance.now() + graceDurationForLevel(snapshot.level),
     stepBudget: 0, // 待走的格步数是瞬时输入状态，不持久化，读档后从静止开始
     coasting: false,
     coastTarget: null
@@ -405,7 +410,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         headFatten: null,
         flashStart: null,
         lastTime: performance.now(),
-        graceUntil: performance.now() + GRACE_DURATION,
+        graceDuration: graceDurationForLevel(1),
+        graceUntil: performance.now() + graceDurationForLevel(1),
         stepBudget: 0,
         coasting: false,
         coastTarget: null
@@ -952,9 +958,10 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       // 表现"无敌闪烁"提示；保护期结束后再走"吃到目标/包围成功"的常规闪烁逻辑
       let flashAlpha = 1;
       if (state.graceUntil && time < state.graceUntil) {
-        const elapsed = GRACE_DURATION - (state.graceUntil - time);
+        const graceDuration = state.graceDuration || GRACE_DURATION;
+        const elapsed = graceDuration - (state.graceUntil - time);
         const keyframes = [0.2, 1, 0.2, 1, 1];
-        const segLen = GRACE_DURATION / 4;
+        const segLen = graceDuration / 4;
         const progress = elapsed / segLen;
         const segment = Math.min(3, Math.floor(progress));
         const t = progress - segment;

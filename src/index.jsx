@@ -1,7 +1,9 @@
 import { h } from "preact";
 import { useState, useEffect } from "preact/hooks";
+import { lazy, Suspense } from "preact/compat";
 import Home from "./home.jsx";
-import Game from "./game.jsx";
+
+const Game = lazy(() => import("./game.jsx"));
 
 // 解析形如 "#/game" 或 "#/game/DinoJump" 的 hash
 // 返回 { page: "home" | "game", gameKey: 具体游戏名 | null }
@@ -17,13 +19,26 @@ function parseHash() {
 export default function App() {
   const [route, setRoute] = useState(parseHash);
 
-  // 支持浏览器前进/后退按钮：hash 变化时同步页面状态
+  // 静默拉game资源
   useEffect(() => {
     function handleHashChange() {
       setRoute(parseHash());
     }
     window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
+
+    let idleId;
+    let timerId;
+    if ("requestIdleCallback" in window) {
+      idleId = requestIdleCallback(() => import("./game.jsx"), { timeout: 2000 });
+    } else {
+      timerId = setTimeout(() => import("./game.jsx"), 2000);
+    }
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+      if (idleId) cancelIdleCallback(idleId);
+      if (timerId) clearTimeout(timerId);
+    };
   }, []);
 
   function enterGame() {
@@ -48,7 +63,11 @@ export default function App() {
   }
 
   if (route.page === "game") {
-    return <Game onClose={closeGame} urlGameKey={route.gameKey} onGameKeyChange={setGameHash} />;
+    return (
+      <Suspense fallback={null}>
+        <Game onClose={closeGame} urlGameKey={route.gameKey} onGameKeyChange={setGameHash} />
+      </Suspense>
+    );
   }
   return <Home onEnterGame={enterGame} />;
 }

@@ -70,6 +70,19 @@ const pixelToGrid = (x, y) => ({
   row: (Math.floor(y / CELL_SIZE) + GRID_SIZE) % GRID_SIZE
 });
 
+// 把 head + trail（连续像素坐标）映射成网格占用格集合，供 spawnTarget 选 box 位置时参考，
+// 避免新 box 和当前蛇身重叠（开局时蛇身固定，也用它算一次）
+function occupiedSetFromState(head, trail) {
+  const set = new Set();
+  const headGrid = pixelToGrid(head.x, head.y);
+  set.add(`${headGrid.col}-${headGrid.row}`);
+  for (const p of trail) {
+    const g = pixelToGrid(p.x, p.y);
+    set.add(`${g.col}-${g.row}`);
+  }
+  return set;
+}
+
 // 第 n 关高对比度格子（box）的边长：1 + 2n
 const boxSize = (n) => 1 + 2 * n;
 // 第 n 关 box 内需要占满的格子总数（不含 emoji 占用的格子）
@@ -208,16 +221,29 @@ function buildRingEmojis(box, n) {
   return maybeReflect([{ col: col + n, row: row + n }]);
 }
 
-// 生成第 n 关的 box + emoji 布局：box 随机放置（避免和上一关重复）
-function spawnBoxAndEmojis(level, prevBoxKey) {
+// 生成第 n 关的 box + emoji 布局：box 随机放置多个候选，挑选和当前蛇身占用格
+function spawnBoxAndEmojis(level, prevBoxKey, occupiedSet) {
   const n = level;
-  const MAX_BOX_ATTEMPTS = 5; // 仅用于"别和上一关的 box 重复"，与可解性无关
-  let box = spawnBoxPosition(level);
-  for (let attempt = 1; attempt < MAX_BOX_ATTEMPTS; attempt++) {
-    const boxKey = `${box.col}-${box.row}-${box.size}`;
-    if (boxKey !== prevBoxKey) break;
-    box = spawnBoxPosition(level);
+  const MAX_BOX_ATTEMPTS = 24; // 用于挑"重叠最少"的候选，和可解性无关
+  let bestBox = null;
+  let bestOverlap = Infinity;
+  for (let attempt = 0; attempt < MAX_BOX_ATTEMPTS; attempt++) {
+    const candidate = spawnBoxPosition(level);
+    const boxKey = `${candidate.col}-${candidate.row}-${candidate.size}`;
+    if (boxKey === prevBoxKey) continue; // 尽量不和上一关完全重复
+    const overlap = occupiedSet
+      ? getBoxCells(candidate.col, candidate.row, candidate.size).reduce(
+          (acc, p) => acc + (occupiedSet.has(`${p.col}-${p.row}`) ? 1 : 0),
+          0
+        )
+      : 0;
+    if (overlap < bestOverlap) {
+      bestBox = candidate;
+      bestOverlap = overlap;
+      if (overlap === 0) break; // 已经完全不重叠，直接采用，不用再试了
+    }
   }
+  const box = bestBox || spawnBoxPosition(level); // 兜底：极端情况下退回一次纯随机
   const emojis = buildRingEmojis(box, n);
   return { box, emojis };
 }
@@ -376,10 +402,10 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
   window.__gs = gameState; // 临时调试用，导出布局后请删除
 
   // 为第 level 关生成新的 box + emoji 布局（n 个 emoji 共用同一块高对比度 box）
-  const spawnTarget = (level) => {
+  const spawnTarget = (level, occupiedSet) => {
     const prevBox = gameState.current.box;
     const prevBoxKey = prevBox ? `${prevBox.col}-${prevBox.row}-${prevBox.size}` : null;
-    const { box, emojis } = spawnBoxAndEmojis(level, prevBoxKey);
+    const { box, emojis } = spawnBoxAndEmojis(level, prevBoxKey, occupiedSet);
     gameState.current.box = box;
     gameState.current.emojis = emojis;
   };
@@ -416,7 +442,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         coasting: false,
         coastTarget: null
       };
-      spawnTarget(1);
+      spawnTarget(1, occupiedSetFromState(gameState.current.head, gameState.current.trail));
       setScore(0);
       setLevel(1);
     }
@@ -448,7 +474,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         gameState.current = stateFromSnapshot(snapshot);
         setLevel(snapshot.level);
       } else {
-        spawnTarget(1);
+        spawnTarget(1, occupiedSetFromState(gameState.current.head, gameState.current.trail));
       }
       setIsReady(true);
     })();
@@ -900,7 +926,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         // 关卡数/难度（box大小、emoji数量、奖励、分值）都不再继续增长
         state.level = Math.min(state.level + 1, MAX_LEVEL);
         setLevel(state.level);
-        spawnTarget(state.level);
+        spawnTarget(state.level, occupiedSet);
 
         // 存档：记录这一帧（包围成功、身体闪烁那一瞬间）的完整连续坐标状态，
         // 死亡或刷新重开后据此精确复原，而不是重新拼一个近似的姿态。
@@ -921,7 +947,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       } else if (ateEmoji) {
         // 直接撞上某个 emoji 格子 = "偷吃"：扣分，box+emoji 重新生成（关卡不变），闪烁提示
         applyScoreDeltaRef.current(-scoreForLevel(state.level));
-        spawnTarget(state.level);
+        spawnTarget(state.level, occupiedSet);
         state.flashStart = time;
       }
 

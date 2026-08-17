@@ -8,7 +8,7 @@
     --card-bg-hover: #363635;
     --text-white: #ffffff;
     --text-white-20: rgba(255, 255, 255, 0.2);
-    --text-white-90: rgba(255, 255, 255, 0.9);
+    --text-white-90: #e6e6e6;
     --text-main: #C3C2B7;
     --text-sub: #b0ada6;
     --text-placeholder: #8a8782;
@@ -25,7 +25,7 @@
     --card-bg-hover: #e8e5db;
     --text-white: #000000;
     --text-white-20: rgba(0, 0, 0, 0.2);
-    --text-white-90: rgba(0, 0, 0, 0.9);
+    --text-white-90: #1a1a1a;
     --text-main: #2d2c2a;
     --text-sub: #6b6862;
     --text-placeholder: #9c988f;

@@ -957,11 +957,11 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
       const rootStyle = getComputedStyle(document.documentElement);
-      const bodyColor = rootStyle.getPropertyValue('--text-main').trim() || '#52c41a';
+      const bodyColor = rootStyle.getPropertyValue('--text-white-90').trim() || '#52c41a';
       const eyeColor = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
-      const bgColorA = rootStyle.getPropertyValue('--line').trim() || '#262626';
+      const bgColorA = rootStyle.getPropertyValue('--black-70').trim() || '#262626';
       const bgColorB = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
-      const [hiColorA, hiColorB] = boostContrast(bgColorA, bgColorB, 0.3);
+      const [hiColorA, hiColorB] = boostContrast(bgColorA, bgColorB, 0.2);
 
       // 提示范围：本关的高对比度 box，本身就不跨越棋盘边界，直接用左上角+边长即可
       const hintColMin = state.box.col;

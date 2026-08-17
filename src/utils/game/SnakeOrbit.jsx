@@ -9,30 +9,28 @@ import {
   DPAD_LAYOUT,
   DPAD_DEAD_ZONE
 } from "../gameKeyboard";
+
 const GRID_SIZE = 21;
 const CELL_SIZE = 30;
 const CANVAS_SIZE = GRID_SIZE * CELL_SIZE; // 630px
 const R = 4; // 弧线半径
 const SNAKE_WIDTH = 24;
-const SNAKE_SPEED = 120; // 像素/秒
-// 停靠时在"格子正中心"基础上，再往行进方向多探多少像素。0=正中心，正数=更往前，负数=往回收
+const SNAKE_SPEED = 120; // 停靠时在"格子正中心"基础上，再往行进方向多探多少像素
 const HEAD_LAND_OFFSET = -8;
-const SEGMENT_SPACING = 8;
-// 仅用于描边渲染的采样间距。必须明显小于转弯圆弧弧长(约 R*π/2 ≈ 6.28px)，
-// 否则用 SEGMENT_SPACING(8px) 采样时，圆弧上"有没有采样点"会随头部移动的相位随机变化，
-// 导致转弯处的轮廓在"有弧线"和"直线抄近路"之间逐帧跳变——这才是转弯抖动闪烁的根源。
-const RENDER_SPACING = 2;
-// 每个格子(30px)对应的身体节点数：CELL_SIZE / SEGMENT_SPACING，用于把"需要占满N个格子"换算成实际身体节点数
-const CELLS_TO_SEGMENTS = CELL_SIZE / SEGMENT_SPACING;
-// 圆头/圆尾(lineCap:'round')会让视觉总长比中心线路径多出SNAKE_WIDTH(两端各凸出半个线宽)，需扣除该误差
+const SEGMENT_SPACING = 8;// 仅用于描边渲染的采样间距
+const RENDER_SPACING = 2;// 每个格子(30px)对应的身体节点数
+const CELLS_TO_SEGMENTS = CELL_SIZE / SEGMENT_SPACING;// 圆头/圆尾(lineCap:'round')
 const INITIAL_SEGMENTS = Math.max(1, Math.round((8 * CELL_SIZE - SNAKE_WIDTH - CELL_SIZE) / SEGMENT_SPACING) + 1); // 开局视觉长度精确等于8格（在原公式基础上减去约1格的观测偏差）
-// 重开/读档后的无敌保护期时长（ms）：期间跳过自碰撞检测，同时蛇身按闪烁透明度提示"无敌中"
 const GRACE_DURATION = 1000;
 const FOOD_RADIUS = 7;
+const EMOJI_TRAVEL_DURATION = 300;// 通关后，被包围的emoji飞向蛇头两眼中间的动画时长（先缓后速）
+const HEAD_FATTEN_TRAVEL_DURATION = 1200;// 蛇头变肥动画时长
+const HEAD_FATTEN_DISTANCE = 16 * CELL_SIZE; // 肥的状态最多沿蛇身传播6格后消失
+const HEAD_FAT_MAX_RADIUS = SNAKE_WIDTH * 0.85; // 肥的状态下鼓起圆形的半径（明显粗于正常蛇身半径12）
+const HEAD_MASK_RADIUS = CELL_SIZE * 0.4;
 // 主题色格子按关卡显示的动物：第1圈🐭 ... 第7圈🐳，超过7圈沿用🐳
 const TARGET_EMOJIS = ['🐭', '🐔', '🐑', '🐄', '🐫', '🐘', '🐳'];
 // 最高关卡数：达到后不再继续增长（box大小/emoji数量/奖励/分值都封顶），
-// 之后每次过关只重新生成布局（换box位置+emoji排列），关卡数保持不变
 const MAX_LEVEL = 9;
 
 // 方向：0:右, 1:下, 2:左, 3:上
@@ -43,7 +41,6 @@ const DIRS = [
   { x: 0, y: -1 }
 ];
 
-// 生成开局用的初始 trail：从 head 位置沿 dir 反方向铺开足够多的点，
 // 让蛇一开始就是满长度静止显示，不再需要"自动走出来"的动画（因为蛇不再自动行走）
 function buildInitialTrail(head, dir, segmentFloat) {
   const d = DIRS[dir];
@@ -73,9 +70,7 @@ const pixelToGrid = (x, y) => ({
 const boxSize = (n) => 1 + 2 * n;
 // 第 n 关 box 内需要占满的格子总数（不含 emoji 占用的格子）
 const requiredCellCount = (n) => boxSize(n) * boxSize(n) - n;
-// 完成第 n 关后蛇身增长多少格（格子数，非身体节点数，使用时需乘 CELLS_TO_SEGMENTS 换算）：
-// 在老公式 8*(n+1) 的基础上再减少若干格，减少量按关卡递增：1,1,2,2,3,3...（即 ceil(n/2)）
-// 对应：第1关 16-1=15，第2关 24-1=23，第3关 32-2=30，以此类推
+// 完成第 n 关后蛇身增长多少格
 const rewardLength = (n) => 8 * (n + 1) - Math.ceil(n / 2);
 // 每关得分/扣分：10、50、100、200、300...
 const scoreForLevel = (n) => (n === 1 ? 10 : n === 2 ? 50 : 100 * (n - 2));
@@ -91,20 +86,7 @@ function getBoxCells(col0, row0, size) {
   return cells;
 }
 
-// ===== 分圈构造法（构造式生成，非"生成+验证"）=====
-// box 边长 = 1+2n，天然是 n+1 层同心圈：第0圈(最外圈，不挖洞) ... 第n-1圈(挨着中心)，
-// 再加一个中心点(第n圈，恰好1格)。核心数学事实：一个正方形"环"去掉其中一格后，
-// 剩下部分必然变成一条链，链的两个端点正是这个洞左右相邻的两个格子——
-// 这是环的拓扑结构决定的，不需要另外验证。
-//
-// 算法从最外圈开始，逐圈往里"缝合"：
-//   1) 最外圈无洞，可以完整走一圈，自由选一个不落在角上的起点，走完停在起点前一格(exit)；
-//   2) 从 exit 找它径向朝内一格的邻居，作为下一圈的 entry；
-//   3) 下一圈的洞只能挖在 entry 的左邻居或右邻居两者之一（这样 entry 才恰好是链的端点）；
-//      两个候选各自决定链另一端(exit)落在哪，优先选不落在角上的那个（角格没有沿网格方向
-//      直接指向内圈的邻居，没法再往里缝合），两个都不落角时随机挑一个，增加视觉随机度；
-//   4) 重复直到最内一圈(边长3)，其 exit 必然正对中心格，最后把中心格也标记为洞。
-// 整个过程只走一遍每个格子，O(box 周长总和)，没有回溯、没有重试，天然保证可解。
+//分圈构造法
 
 // 第 k 圈（k=0 为最外圈）在 box 内的四角坐标
 function ringCorners(col0, row0, size, k) {
@@ -154,15 +136,7 @@ function spawnBoxPosition(level) {
   return { col: col0, row: row0, size };
 }
 
-// 从第 k 圈开始，尝试以 exitCell（上一圈缝合过来的入口所在格）为起点，一路构造到中心。
-// 每圈的洞只有"挖左邻居/挖右邻居"两种选择：多数情况下至少一种能让 exit 落在非角格上，
-// 但边长恰好为5的圈里，如果 entry 恰好落在某条边的正中间，两种选择会同时落在角上
-// （这是真实会发生的情况，出现概率约1/4，不是可以忽略的极端情况）。
-// 一旦某一圈两种选择都行不通，说明"上一圈选的那个 exit"这步选错了，需要回溯到上一圈换
-// 另一种选择重试。回溯的范围只在"每圈挖左边还是挖右边"这 n 个二元选择之间，
-// 和棋盘格子级别的搜索完全不是一个量级：最多 n 层、每层分支2，n 受限于棋盘大小（≤10），
-// 最坏 2^10=1024 种组合，每种只需 O(圈周长) 的代数计算，不会造成卡顿。
-// 把 cell 绕 box 中心做180°点反射(size为奇数，2*col+size-1恒为整数)
+// 从第 k 圈开始，尝试以 exitCell（上一圈缝合过来的入口所在格）为起点，一路构造到中心
 function reflectCell(cell, col, row, size) {
   return { col: col * 2 + size - 1 - cell.col, row: row * 2 + size - 1 - cell.row };
 }
@@ -195,9 +169,7 @@ function buildFromRing(k, exitCell, col, row, size, n, prevHole) {
   return null; // 两种挖法都不通：回溯给上一圈，让它换另一种挖法
 }
 
-// 分圈构造出 n 个 emoji 的位置（详见上方大段注释）。核心是代数计算+数组下标操作，
-// 唯一的搜索只发生在"每圈挖左边还是挖右边"这 n 个二元选择之间，复杂度恒定且极小，
-// 不是棋盘格子级别的搜索，不会造成卡顿。
+// 分圈构造出 n 个 emoji 的位置
 function buildRingEmojis(box, n) {
   const { col, row, size } = box;
 
@@ -232,8 +204,7 @@ function buildRingEmojis(box, n) {
   return maybeReflect([{ col: col + n, row: row + n }]);
 }
 
-// 生成第 n 关的 box + emoji 布局：box 随机放置（避免和上一关重复），emoji 用分圈构造法
-// 直接构造出保证可解的位置，不需要事后校验、不需要重试。
+// 生成第 n 关的 box + emoji 布局：box 随机放置（避免和上一关重复）
 function spawnBoxAndEmojis(level, prevBoxKey) {
   const n = level;
   const MAX_BOX_ATTEMPTS = 5; // 仅用于"别和上一关的 box 重复"，与可解性无关
@@ -247,8 +218,7 @@ function spawnBoxAndEmojis(level, prevBoxKey) {
   return { box, emojis };
 }
 
-// 用 1x1 离屏 canvas 把任意 CSS 颜色字符串（hex/rgb/named 等）解析成 [r,g,b]，
-// 这样不用自己写颜色格式解析器，交给浏览器处理
+// 用 1x1 离屏 canvas 把任意 CSS 颜色字符串（hex/rgb/named 等）
 let _colorProbeCtx = null;
 function resolveRGB(cssColor) {
   if (!_colorProbeCtx) {
@@ -272,8 +242,7 @@ const mixToward = ([r, g, b], target, factor) => [
 const rgbCss = ([r, g, b]) => `rgb(${r}, ${g}, ${b})`;
 const luminance = ([r, g, b]) => 0.299 * r + 0.587 * g + 0.114 * b;
 
-// 把棋盘的两个基础色，在"提示范围"内对比度拉高：较亮的颜色再调亮，较暗的颜色再调暗，
-// factor 控制拉开幅度（0.5 = 各自往白/黑方向混合 50%）
+// 把棋盘的两个基础色
 function boostContrast(colorA, colorB, factor = 0.5) {
   const rgbA = resolveRGB(colorA);
   const rgbB = resolveRGB(colorB);
@@ -295,9 +264,7 @@ function useIsMobile() {
   return isMobile;
 }
 
-// 进度存档：读取/写入 FakeClaudeDB.replies.game 下的 SnakeOrbit 字段。
-// 存的是完整连续坐标状态（而非离散格子），这样重开/刷新后能精确复原到
-// 上一次"包围成功、身体闪烁"那一帧的画面与逻辑，而不是重新拼一个近似的姿态。
+// 进度存档：读取/写入 FakeClaudeDB.replies.game 下的 SnakeOrbit 字段
 async function loadSnakeOrbitProgress() {
   try {
     const saved = await idb.get('game');
@@ -332,6 +299,8 @@ function stateFromSnapshot(snapshot) {
     level: snapshot.level,
     box: { ...snapshot.box },
     emojis: (snapshot.emojis || []).map(p => ({ ...p })),
+    emojiTravel: [],
+    headFatten: null,
     flashStart: null,
     lastTime: performance.now(),
     // 重开/读档后的短暂保护期：避免读到"刚好包围成功那一瞬"的存档时，
@@ -347,14 +316,10 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
   const isMobile = useIsMobile();
   const canvasRef = useRef(null);
   const panelRef = useRef(null);
-  // 虚拟方向键(D-pad)按钮通过这个 ref 调用游戏循环 effect 里定义的 pressDir/releaseDir，
-  // 因为按钮是在 JSX 里渲染的，和游戏循环 effect 不在同一个作用域；effect 每次重跑时
-  // (依赖 [gameOver, isReady]) 都会把最新的 press/release 函数写进这个 ref。
+  // 虚拟方向键(D-pad)
   const dpadRef = useRef({ press: () => {}, release: () => {} });
   // 记录当前每个触摸点(pointerId)对应的方向：支持多指同时按住不同方向键
   const dpadPointersRef = useRef(new Map());
-  // 游戏循环 effect 每次重跑时会把当前作用域里最新的 queueDir 写进这个 ref，
-  // 供组件顶层的 useDirectionInput（键盘/长按逻辑已抽到 gameKeyboard.js）调用
   const queueDirRef = useRef(() => {});
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
@@ -364,11 +329,9 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
   // 就给它加"右下偏移1px + 对比度提升"的按压效果
   const [pressedDpad, setPressedDpad] = useState(() => new Set());
   const tokenRef = useRef(initialToken);
-
   useEffect(() => {
     tokenRef.current = initialToken;
   }, [initialToken]);
-
   const applyScoreDelta = useCallback(
     (delta) => {
       setScore((s) => s + delta);
@@ -377,14 +340,11 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     },
     [onTokenChange]
   );
-  // 用 ref 保存最新的 applyScoreDelta：游戏循环 effect 通过 ref 调用它，
-  // 这样 onTokenChange 引用变化（如父组件因 token 数字动画频繁重渲染）不会导致
-  // 游戏循环 effect（含 canvas 动画帧、键盘监听等）被销毁重建，避免画布闪烁
+  // 用 ref 保存最新的 applyScoreDelta
   const applyScoreDeltaRef = useRef(applyScoreDelta);
   useEffect(() => {
     applyScoreDeltaRef.current = applyScoreDelta;
   }, [applyScoreDelta]);
-
   const startHeadInitial = { x: getCellCenter(10, 10).x - R, y: getCellCenter(10, 10).y };
   const gameState = useRef({
     head: startHeadInitial,
@@ -400,6 +360,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     level: 1,
     box: { col: 9, row: 9, size: 3 },
     emojis: [{ col: 10, row: 10 }],
+    emojiTravel: [],
+    headFatten: null,
     flashStart: null,
     lastTime: performance.now(),
     stepBudget: 0, // 待走的"格步"数：0表示静止，仅在有输入(点击/按住)时才 > 0
@@ -418,7 +380,6 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
   };
   window.__spawnTarget = spawnTarget; // 临时调试用，导出布局后请删除
   window.__setLevel = setLevel; // 临时调试用，导出布局后请删除
-
   const resetGame = async () => {
     const snapshot = await loadSnakeOrbitProgress();
     if (snapshot) {
@@ -440,6 +401,8 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         level: 1,
         box: { col: 9, row: 9, size: 3 },
         emojis: [{ col: 10, row: 10 }],
+        emojiTravel: [],
+        headFatten: null,
         flashStart: null,
         lastTime: performance.now(),
         graceUntil: performance.now() + GRACE_DURATION,
@@ -453,7 +416,6 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     }
     setGameOver(false);
   };
-
   // 上下左右 + 长按连续走的通用输入逻辑（键盘 & 虚拟方向键共用），已抽到 gameKeyboard.js
   const directionInput = useDirectionInput(
     {
@@ -470,7 +432,6 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
   );
   const directionInputRef = useRef(directionInput);
   directionInputRef.current = directionInput;
-
   useEffect(() => {
     let cancelled = false;
 
@@ -492,7 +453,6 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
     // 只在组件首次挂载时读取一次存档
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   useEffect(() => {
     if (!isReady) return undefined;
 
@@ -872,6 +832,15 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         }
       }
 
+      // 沿蛇身查找"距蛇头 dist 像素"处的点（用于蛇头变肥动画：让鼓起的圆形沿身体传导）。
+      // 复用上面按 RENDER_SPACING 采样出的 renderPositions（索引0即离头部第一个采样点）。
+      const getBodyPointAtDistance = (dist) => {
+        if (dist <= 0) return state.head;
+        if (renderPositions.length === 0) return state.head;
+        const idx = Math.min(renderPositions.length - 1, Math.max(0, Math.round(dist / RENDER_SPACING) - 1));
+        return renderPositions[idx] || state.head;
+      };
+
       const maxTrailLength = state.segmentCount * SEGMENT_SPACING * 3;
       if (state.trail.length > maxTrailLength) {
         state.trail.length = Math.floor(maxTrailLength);
@@ -906,8 +875,19 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       const ateEmoji = emojiKeySet.has(`${headGrid.col}-${headGrid.row}`);
 
       if (fullyCovered) {
-        // 成功填满 box（不含 emoji 格子）：加分、变长、升级、box+emoji 重新生成、闪烁提示
+        // 成功填满 box（不含 emoji 格子）：加分、变长、升级、box+emoji 重新生成。
+        // 通关不再用蛇身透明度闪烁提示，改为让被包围的emoji（当前这一关的emoji，
+        // 而非重新生成后的下一关emoji）飞向蛇头两眼中间并逐渐缩小到50%大小消失，
+        // 到达蛇头时再触发蛇头变肥并向蛇尾传导的动画。
         const finishedLevel = state.level;
+        const finishedEmojiChar = TARGET_EMOJIS[Math.min(finishedLevel, TARGET_EMOJIS.length) - 1];
+        for (const p of state.emojis) {
+          state.emojiTravel.push({
+            char: finishedEmojiChar,
+            startPos: getCellCenter(p.col, p.row),
+            startTime: time
+          });
+        }
         applyScoreDeltaRef.current(scoreForLevel(finishedLevel));
         state.pendingGrowth += Math.ceil(rewardLength(finishedLevel) * CELLS_TO_SEGMENTS);
         // 最多到第9关：达到上限后继续通关只重新生成布局（换box位置+emoji排列），
@@ -915,7 +895,6 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         state.level = Math.min(state.level + 1, MAX_LEVEL);
         setLevel(state.level);
         spawnTarget(state.level);
-        state.flashStart = time;
 
         // 存档：记录这一帧（包围成功、身体闪烁那一瞬间）的完整连续坐标状态，
         // 死亡或刷新重开后据此精确复原，而不是重新拼一个近似的姿态。
@@ -1022,6 +1001,27 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         ctx.globalAlpha = 1;
       }
 
+      // 蛇头变肥动画：
+      if (state.headFatten) {
+        const elapsed = time - state.headFatten.startTime;
+        const travelT = Math.min(1, elapsed / HEAD_FATTEN_TRAVEL_DURATION);
+        const eased = travelT * travelT; // 先缓后速
+        const waveDist = eased * HEAD_FATTEN_DISTANCE;
+
+        const radius = HEAD_FAT_MAX_RADIUS * (1 - waveDist / HEAD_FATTEN_DISTANCE);
+
+        if (radius > 0.5) {
+          const pt = getBodyPointAtDistance(waveDist);
+          ctx.fillStyle = bodyColor;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (travelT >= 1) {
+          state.headFatten = null;
+        }
+      }
+
       const currentDirVec = DIRS[state.dir];
       const eyeAngle = Math.atan2(currentDirVec.y, currentDirVec.x);
       const eyeOffset = 0.5;
@@ -1039,6 +1039,47 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         2, 0, Math.PI * 2
       );
       ctx.fill();
+
+      // 通关后被包围的emoji飞向蛇头两眼中间：始终画在蛇身之上，但用裁剪挖掉蛇头
+      // 所在的一格区域，让emoji经过/到达蛇头时被蛇头挡住（不影响下面正常emoji的绘制）。
+      if (state.emojiTravel.length > 0) {
+        const eyeMidX = state.head.x
+          + (Math.cos(eyeAngle - eyeOffset) + Math.cos(eyeAngle + eyeOffset)) * eyeDist * 0.5;
+        const eyeMidY = state.head.y
+          + (Math.sin(eyeAngle - eyeOffset) + Math.sin(eyeAngle + eyeOffset)) * eyeDist * 0.5;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        ctx.moveTo(state.head.x + HEAD_MASK_RADIUS, state.head.y);
+        ctx.arc(state.head.x, state.head.y, HEAD_MASK_RADIUS, 0, Math.PI * 2, true);
+        ctx.clip('evenodd');
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `${CELL_SIZE}px sans-serif`;
+
+        for (let ti = state.emojiTravel.length - 1; ti >= 0; ti--) {
+          const anim = state.emojiTravel[ti];
+          const t = Math.min(1, (time - anim.startTime) / EMOJI_TRAVEL_DURATION);
+          const eased = t * t; // 先缓后速
+          const ex = anim.startPos.x + (eyeMidX - anim.startPos.x) * eased;
+          const ey = anim.startPos.y + (eyeMidY - anim.startPos.y) * eased;
+          const scale = 1 - 0.5 * eased; // 移动过程中用缩放逐渐变小，到达时变为50%
+          ctx.save();
+          ctx.translate(ex, ey);
+          ctx.scale(scale, scale);
+          ctx.fillText(anim.char, 0, 0);
+          ctx.restore();
+
+          if (t >= 1) {
+            state.emojiTravel.splice(ti, 1);
+            if (!state.headFatten) {
+              state.headFatten = { startTime: time };
+            }
+          }
+        }
+        ctx.restore();
+      }
 
       // 主题色 box 内改成按关卡对应的动物 emoji：第1关🐭 ... 第7关🐳，超过7关沿用🐳，
       // 第 n 关共有 n 个同样的 emoji 共用同一块 box。放在蛇身/头部之后绘制：

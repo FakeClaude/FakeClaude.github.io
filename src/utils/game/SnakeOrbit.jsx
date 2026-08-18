@@ -14,7 +14,13 @@ const GRID_SIZE = 21;
 const CELL_SIZE = 30;
 const CANVAS_SIZE = GRID_SIZE * CELL_SIZE; // 630px
 const R = 4; // 弧线半径
-const SNAKE_WIDTH = 24;
+const SNAKE_WIDTH = 18; // 原24，整体瘦身6px
+const SNAKE_OUTLINE_WIDTH = 6; // 白边比灰色身体每侧多出的宽度（直径层面的外扩量）
+const SNAKE_OUTLINE_COLOR = getComputedStyle(document.documentElement)
+  .getPropertyValue('--text-white').trim();
+const HEAD_SHAPE_RADIUS = SNAKE_WIDTH * 0.7; // 头部半径，比身体正常半径(SNAKE_WIDTH/2)更粗一圈
+const HEAD_SHAPE_BACK_OFFSET = 5; // 头部隆起峰值中心相对 state.head 沿身体后方的偏移量(px)
+const HEAD_TAPER_DISTANCE = 14; // 头部隆起影响的半宽范围，越大头身过渡越平缓
 const SNAKE_SPEED = 120; // 停靠时在"格子正中心"基础上，再往行进方向多探多少像素
 const HEAD_LAND_OFFSET = -8;
 const SEGMENT_SPACING = 8;// 仅用于描边渲染的采样间距
@@ -27,7 +33,7 @@ const EMOJI_TRAVEL_DURATION = 300;// 通关后，被包围的emoji飞向蛇头�
 const HEAD_FATTEN_TRAVEL_DURATION = 1200;// 蛇头变肥动画时长
 const HEAD_FATTEN_DISTANCE = 16 * CELL_SIZE; // 肥的状态最多沿蛇身传播6格后消失
 const HEAD_FAT_MAX_RADIUS = SNAKE_WIDTH * 0.85; // 肥的状态下鼓起圆形的半径（明显粗于正常蛇身半径12）
-const HEAD_MASK_RADIUS = CELL_SIZE * 0.4;
+const HEAD_MASK_RADIUS = CELL_SIZE * 0.4;//蛇头遮住emoij的遮罩
 // 主题色格子按关卡显示的动物：第1圈🐭 ... 第7圈🐳，超过7圈沿用🐳
 const TARGET_EMOJIS = ['🐭', '🐔', '🐑', '🐄', '🐫', '🐘', '🐳'];
 // 最高关卡数：达到后不再继续增长（box大小/emoji数量/奖励/分值都封顶），
@@ -63,6 +69,35 @@ const getCellCenter = (col, row) => ({
   x: (col + 0.5) * CELL_SIZE,
   y: (row + 0.5) * CELL_SIZE
 });
+
+// 身体某个采样点（index=-1 代表 state.head 本身，index>=0 对应 renderPositions[index]）
+// 当前应有的半径。这里叠加两种局部隆起，取二者中更大的一个：
+// 1) 头部隆起：固定存在，峰值中心在离 state.head 沿身体方向 HEAD_SHAPE_BACK_OFFSET 处，
+//    半径向 HEAD_SHAPE_RADIUS 靠拢，超出 HEAD_TAPER_DISTANCE 范围恢复正常半径。这让头部
+//    和身体是同一条路径连续过渡出来的粗细变化，不是另外叠加的一个圆。
+// 2) headFatten 隆起：fattenBump 不为 null 时表示变胖动画正在沿身体传播，
+//    { centerDist, bumpRadius } 描述隆起中心离蛇头的路径距离、以及影响的半宽范围。
+function getBodyRadiusAtIndex(index, fattenBump) {
+  const normalRadius = SNAKE_WIDTH / 2;
+  const pointDist = (index + 1) * RENDER_SPACING; // index=-1 时 pointDist=0，即 state.head 处
+  let radius = normalRadius;
+
+  const headDelta = Math.abs(pointDist - HEAD_SHAPE_BACK_OFFSET);
+  if (headDelta < HEAD_TAPER_DISTANCE) {
+    const headInfluence = 1 - headDelta / HEAD_TAPER_DISTANCE; // 中心=1，边缘=0
+    radius = Math.max(radius, normalRadius + (HEAD_SHAPE_RADIUS - normalRadius) * headInfluence);
+  }
+
+  if (fattenBump && fattenBump.bumpRadius > 0.5) {
+    const delta = Math.abs(pointDist - fattenBump.centerDist);
+    if (delta < fattenBump.bumpRadius) {
+      const influence = 1 - delta / fattenBump.bumpRadius;
+      radius = Math.max(radius, normalRadius + (fattenBump.bumpRadius - normalRadius) * influence);
+    }
+  }
+
+  return radius;
+}
 
 // 像素坐标 -> 最近网格坐标（用于把连续运动的身体节点映射回格子做包围判定）
 const pixelToGrid = (x, y) => ({
@@ -957,10 +992,10 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
       const rootStyle = getComputedStyle(document.documentElement);
-      const bodyColor = rootStyle.getPropertyValue('--text-white-90').trim() || '#52c41a';
-      const eyeColor = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
+      const bodyColor = rootStyle.getPropertyValue('--text-placeholder').trim() || '#52c41a';
       const bgColorA = rootStyle.getPropertyValue('--black-70').trim() || '#262626';
       const bgColorB = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
+      const nostrilColor = rootStyle.getPropertyValue('--text-main').trim() || '#888888';
       const [hiColorA, hiColorB] = boostContrast(bgColorA, bgColorB, 0.2);
 
       // 提示范围：本关的高对比度 box，本身就不跨越棋盘边界，直接用左上角+边长即可
@@ -1005,73 +1040,152 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         }
       }
 
-      if (bodyPositions.length > 0) {
-        ctx.lineWidth = SNAKE_WIDTH;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.strokeStyle = bodyColor;
-        ctx.globalAlpha = flashAlpha;
-
-        ctx.beginPath();
-        let prevPos = state.head;
-        ctx.moveTo(prevPos.x, prevPos.y);
-
-        for (let i = 0; i < renderPositions.length; i++) {
-          const pos = renderPositions[i];
-          const dx = Math.abs(pos.x - prevPos.x);
-          const dy = Math.abs(pos.y - prevPos.y);
-
-          if (dx > CELL_SIZE * 2 || dy > CELL_SIZE * 2) {
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
-          } else {
-            ctx.lineTo(pos.x, pos.y);
-          }
-          prevPos = pos;
-        }
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
-
-      // 蛇头变肥动画：
+      // 蛇头变肥动画：先算出本帧的隆起中心距离/影响半径，供下面画身体时让对应
+      // 采样点的半径局部变粗，不再像原来那样另外叠加一个圆。
+      let fattenBump = null;
       if (state.headFatten) {
         const elapsed = time - state.headFatten.startTime;
         const travelT = Math.min(1, elapsed / HEAD_FATTEN_TRAVEL_DURATION);
         const eased = travelT * travelT; // 先缓后速
         const waveDist = eased * HEAD_FATTEN_DISTANCE;
+        const bumpRadius = HEAD_FAT_MAX_RADIUS * (1 - waveDist / HEAD_FATTEN_DISTANCE);
 
-        const radius = HEAD_FAT_MAX_RADIUS * (1 - waveDist / HEAD_FATTEN_DISTANCE);
-
-        if (radius > 0.5) {
-          const pt = getBodyPointAtDistance(waveDist);
-          ctx.fillStyle = bodyColor;
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, radius, 0, Math.PI * 2);
-          ctx.fill();
+        if (bumpRadius > 0.5) {
+          fattenBump = { centerDist: waveDist, bumpRadius };
         }
         if (travelT >= 1) {
           state.headFatten = null;
         }
       }
 
+      if (bodyPositions.length > 0) {
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.globalAlpha = flashAlpha;
+
+        // 分段绘制：相邻两个采样点之间单独 stroke 一小段，线宽取这两点半径的均值。
+        // fattenBump 不为 null 时，靠近隆起中心的采样点半径会被局部放大，
+        // 视觉上表现为身体本身连续鼓起一段，而不是额外叠加一个圆。
+        //
+        // 白边做法：白边层线宽 = 灰色层线宽 + 固定外扩量 SNAKE_OUTLINE_WIDTH，用同一份
+        // 半径数据，鼓起时白边跟着同步变粗。先把所有段的白色都画完，再统一画灰色层盖
+        // 上去（而不是逐段"画白再画灰"交替），避免灰色段覆盖住相邻段的白边。
+        const drawBodyPass = (strokeColor, extraWidth) => {
+          ctx.strokeStyle = strokeColor;
+          let prevPos = state.head;
+          let prevRadius = getBodyRadiusAtIndex(-1, fattenBump);
+
+          for (let i = 0; i < renderPositions.length; i++) {
+            const pos = renderPositions[i];
+            const dx = Math.abs(pos.x - prevPos.x);
+            const dy = Math.abs(pos.y - prevPos.y);
+            const radius = getBodyRadiusAtIndex(i, fattenBump);
+
+            // 穿墙跳跃：这一段不连续，不能当正常相邻点插值连线，直接跳到新起点
+            if (dx > CELL_SIZE * 2 || dy > CELL_SIZE * 2) {
+              prevPos = pos;
+              prevRadius = radius;
+              continue;
+            }
+
+            ctx.lineWidth = (prevRadius + radius) + extraWidth; // 半径均值 * 2 = 直径，外加白边扩展量
+            ctx.beginPath();
+            ctx.moveTo(prevPos.x, prevPos.y);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+
+            prevPos = pos;
+            prevRadius = radius;
+          }
+        };
+
+        drawBodyPass(SNAKE_OUTLINE_COLOR, SNAKE_OUTLINE_WIDTH); // 白边层（整体先画完）
+        drawBodyPass(bodyColor, 0);                             // 灰色层（再整体盖上去）
+
+        ctx.globalAlpha = 1;
+      }
+
       const currentDirVec = DIRS[state.dir];
       const eyeAngle = Math.atan2(currentDirVec.y, currentDirVec.x);
-      const eyeOffset = 0.5;
-      const eyeDist = SNAKE_WIDTH * 0.3;
-      ctx.fillStyle = eyeColor;
-      ctx.beginPath();
-      ctx.arc(
+      const eyeOffset = 1; // 两眼张开角度（越大两眼越分开）
+      const eyeDist = SNAKE_WIDTH * -0.4; // 眼睛离头部中心的距离
+
+      // 眼睛三层：灰色外圈环(椭圆) -> 白色巩膜(椭圆，比外圈略小) -> 黑色瞳孔(圆)。
+      // 椭圆整体相对于"眼睛朝向头部前方"的角度，向外侧(远离鼻梁方向)再多转 5 度，
+      // 对应参考图里"沿鼻孔向外侧轻微旋转"的效果。先大致给一版比例，后续可精调。
+      const EYE_OUTER_RX = 6;
+      const EYE_OUTER_RY = 5;
+      const EYE_SCLERA_RX = 5.25;
+      const EYE_SCLERA_RY = 4.25;
+      const EYE_PUPIL_RADIUS = 2;
+      const EYE_PUPIL_OFFSET = 1.4; // 瞳孔在巩膜内的偏移距离
+      const EYE_PUPIL_LOOK_ANGLE = 20 * Math.PI / 180; // 瞳孔注视方向相对前进方向的偏转角度，两眼共用同一角度(不镜像)，正值偏右
+      const EYE_TILT_OUTWARD = 15 * Math.PI / 180; // 向外侧额外旋转 15 度
+
+      const drawEye = (ex, ey, tiltSign) => {
+        const rotation = eyeAngle + tiltSign * EYE_TILT_OUTWARD;
+
+        ctx.save();
+        ctx.translate(ex, ey);
+        ctx.rotate(rotation);
+
+        // 外圈灰色环
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, EYE_OUTER_RX, EYE_OUTER_RY, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 白色巩膜
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, EYE_SCLERA_RX, EYE_SCLERA_RY, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+
+        // 黑色瞳孔：单独在世界坐标系算位置，两眼共用同一个注视方向(eyeAngle + EYE_PUPIL_LOOK_ANGLE)，
+        // 不随椭圆旋转、也不因左右眼镜像，让两只眼睛看起来同时望向同一侧，更生动。
+        const pupilLookAngle = eyeAngle + EYE_PUPIL_LOOK_ANGLE;
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(
+          ex + Math.cos(pupilLookAngle) * EYE_PUPIL_OFFSET,
+          ey + Math.sin(pupilLookAngle) * EYE_PUPIL_OFFSET,
+          EYE_PUPIL_RADIUS, 0, Math.PI * 2
+        );
+        ctx.fill();
+      };
+
+      drawEye(
         state.head.x + Math.cos(eyeAngle - eyeOffset) * eyeDist,
         state.head.y + Math.sin(eyeAngle - eyeOffset) * eyeDist,
-        2, 0, Math.PI * 2
+        -1
       );
-      ctx.arc(
+      drawEye(
         state.head.x + Math.cos(eyeAngle + eyeOffset) * eyeDist,
         state.head.y + Math.sin(eyeAngle + eyeOffset) * eyeDist,
-        2, 0, Math.PI * 2
+        1
       );
-      ctx.fill();
+
+      // 鼻孔：头部前方靠嘴的位置两个小灰点，左右对称分布在前进方向两侧。
+      // NOSTRIL_FORWARD_DIST 控制往前伸出多远，NOSTRIL_SPREAD 控制左右分开多宽，
+      // NOSTRIL_RADIUS 控制点的大小，都可以单独调整。
+      const NOSTRIL_FORWARD_DIST = SNAKE_WIDTH * 0.45;
+      const NOSTRIL_SPREAD = 0.3; // 左右两个鼻孔相对前进方向的角度偏移
+      const NOSTRIL_RX = 1.5;
+      const NOSTRIL_RY = 1.1; // 比RX略小，做出轻微椭圆效果
+
+      ctx.fillStyle = nostrilColor;
+      [-1, 1].forEach((side) => {
+        const angle = eyeAngle + side * NOSTRIL_SPREAD;
+        ctx.beginPath();
+        ctx.ellipse(
+          state.head.x + Math.cos(angle) * NOSTRIL_FORWARD_DIST,
+          state.head.y + Math.sin(angle) * NOSTRIL_FORWARD_DIST,
+          NOSTRIL_RX, NOSTRIL_RY, angle, 0, Math.PI * 2
+        );
+        ctx.fill();
+      });
 
       // 通关后被包围的emoji飞向蛇头两眼中间：始终画在蛇身之上，但用裁剪挖掉蛇头
       // 所在的一格区域，让emoji经过/到达蛇头时被蛇头挡住（不影响下面正常emoji的绘制）。

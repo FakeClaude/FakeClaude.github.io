@@ -20,7 +20,7 @@ const SNAKE_OUTLINE_COLOR = getComputedStyle(document.documentElement)
   .getPropertyValue('--text-white').trim();
 const HEAD_SHAPE_RADIUS = SNAKE_WIDTH * 0.7; // 头部半径，比身体正常半径(SNAKE_WIDTH/2)更粗一圈
 const HEAD_SHAPE_BACK_OFFSET = 5; // 头部隆起峰值中心相对 state.head 沿身体后方的偏移量(px)
-const HEAD_TAPER_DISTANCE = 14; // 头部隆起影响的半宽范围，越大头身过渡越平缓
+const HEAD_TAPER_DISTANCE = 10; // 头部隆起影响的半宽范围，越大头身过渡越平缓
 const SNAKE_SPEED = 120; // 停靠时在"格子正中心"基础上，再往行进方向多探多少像素
 const HEAD_LAND_OFFSET = -8;
 const SEGMENT_SPACING = 8;// 仅用于描边渲染的采样间距
@@ -992,10 +992,10 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
       const rootStyle = getComputedStyle(document.documentElement);
-      const bodyColor = rootStyle.getPropertyValue('--text-placeholder').trim() || '#52c41a';
+      const bodyColor = rootStyle.getPropertyValue('--green').trim() || '#52c41a';
       const bgColorA = rootStyle.getPropertyValue('--black-70').trim() || '#262626';
       const bgColorB = rootStyle.getPropertyValue('--home-bg').trim() || '#141414';
-      const nostrilColor = rootStyle.getPropertyValue('--text-main').trim() || '#888888';
+      const nostrilColor = rootStyle.getPropertyValue('--card-bg-hover').trim() || '#888888';
       const [hiColorA, hiColorB] = boostContrast(bgColorA, bgColorB, 0.2);
 
       // 提示范围：本关的高对比度 box，本身就不跨越棋盘边界，直接用左上角+边长即可
@@ -1182,7 +1182,7 @@ export default function SnakeOrbit({ initialToken = 0, onTokenChange }) {
         ctx.ellipse(
           state.head.x + Math.cos(angle) * NOSTRIL_FORWARD_DIST,
           state.head.y + Math.sin(angle) * NOSTRIL_FORWARD_DIST,
-          NOSTRIL_RX, NOSTRIL_RY, angle, 0, Math.PI * 2
+          NOSTRIL_RX, NOSTRIL_RY, -angle, 0, Math.PI * 2
         );
         ctx.fill();
       });
